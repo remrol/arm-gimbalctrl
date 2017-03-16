@@ -120,6 +120,8 @@ ISR(TIMER0_COMP_vect)
 		g_motorPosition += g_actualDirection;
 }
 
+//-------------------------------------------------------------------------------------
+
 // Timer2 interrupt, approx 200 times/second
 ISR(TIMER2_COMP_vect)
 {
@@ -362,7 +364,6 @@ int main(void)
 		_delay_ms( 1000 );
 		ucr0 = OCR0;
 
-//		processPulse( g_pulseDuration );
 		printf( "%d %d %d %d\n", g_pulseDuration * PULSE_SCALE, g_speed, g_actualSpeed, ucr0 );
 		
 		HMC5883L_read();		

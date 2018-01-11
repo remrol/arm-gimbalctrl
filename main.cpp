@@ -242,7 +242,7 @@ void motorSpeed( int8_t speed )
 #define TIME_MAX ( 2000 / PULSE_SCALE )
 #define DEADBAND ( 300 / PULSE_SCALE )
 // 1..128
-#define POWER_MAX 128
+#define POWER_MAX 60
 
 void processPulse( uint16_t pulseMs )
 {
@@ -378,7 +378,6 @@ void HMC5883L_init(void)
 	#define HMC5883L_WRITE 0x3C // write address
 	#define HMC5883L_READ 0x3D // read address
 	
-	int16_t magx = 0, magy = 0, magz = 0;
 	//	char buf[16];
 	
 	i2c_start(HMC5883L_WRITE);

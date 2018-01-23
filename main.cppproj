@@ -52,8 +52,11 @@
       <ToolNumber>00A200032463</ToolNumber>
       <ToolName>AVR Dragon</ToolName>
     </com_atmel_avrdbg_tool_avrdragon>
-    <avrtoolinterface>JTAG</avrtoolinterface>
+    <avrtoolinterface>
+    </avrtoolinterface>
     <avrtoolinterfaceclock>200000</avrtoolinterfaceclock>
+    <ResetRule>0</ResetRule>
+    <EraseKey />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
@@ -169,6 +172,12 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="calculations.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="calculations.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="i2c_master.cpp">
       <SubType>compile</SubType>
     </Compile>

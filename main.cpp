@@ -16,7 +16,7 @@ volatile uint16_t g_lastPulseTime = 0;
 
 volatile uint32_t risingEdgeTimeStamp = 0;		// Rising edge time stamp, 0 means non-valid.
 
-#define PULSE_SCALE 2
+#define PULSE_DURATION_SCALE 2
 // Public value: last measured pulse duration in microseconds, 0 if not available.
 volatile uint16_t g_pulseDuration = 0;	// Last measured pulse duration.
 
@@ -71,7 +71,10 @@ ISR(TIMER1_OVF_vect)
 
 	//  If no response for 2 seconds then set pulse duration to invalid.
 	if( g_timeSec - g_lastPulseTime >= 2 )
+	{
 		g_pulseDuration = 0;
+		processPulse( g_pulseDuration );
+	}
 }	
 
 ISR(TIMER1_CAPT_vect)
@@ -100,7 +103,7 @@ ISR(TIMER1_CAPT_vect)
 		risingEdgeTimeStamp = 0;
 	
 		// Validate measured pulse duration. Accept only 500 - 2500 us range.	
-		if( pulseDuration >= 700 / PULSE_SCALE && pulseDuration <= 2300 / PULSE_SCALE )
+		if( pulseDuration >= 700 / PULSE_DURATION_SCALE && pulseDuration <= 2300 / PULSE_DURATION_SCALE )
 		{
 			g_pulseDuration = pulseDuration;	// Store pulse duration.
 			g_lastPulseTime = g_timeSec;		// Store pulse time stamp.
@@ -237,10 +240,10 @@ void motorSpeed( int8_t speed )
 	g_actualSpeed = speed;
 }
 
-#define TIME_MIN ( 1000 / PULSE_SCALE )
-#define TIME_MID ( 1500 / PULSE_SCALE )
-#define TIME_MAX ( 2000 / PULSE_SCALE )
-#define DEADBAND ( 300 / PULSE_SCALE )
+#define TIME_MIN ( 1000 / PULSE_DURATION_SCALE )
+#define TIME_MID ( 1500 / PULSE_DURATION_SCALE )
+#define TIME_MAX ( 2000 / PULSE_DURATION_SCALE )
+#define DEADBAND ( 300 / PULSE_DURATION_SCALE )
 // 1..128
 #define POWER_MAX 60
 
@@ -365,7 +368,7 @@ int main(void)
 		_delay_ms( 1000 );
 		ucr0 = OCR0;
 
-		printf( "%d %d %d %d\n", g_pulseDuration * PULSE_SCALE, g_speed, g_actualSpeed, ucr0 );
+		printf( "%d %d %d %d\n", g_pulseDuration * PULSE_DURATION_SCALE, g_speed, g_actualSpeed, ucr0 );
 		
 		HMC5883L_read();		
     }

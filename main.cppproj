@@ -187,6 +187,9 @@
     <Compile Include="main.cpp">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="servo.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="simple_uart.cpp">
       <SubType>compile</SubType>
     </Compile>

@@ -9,6 +9,7 @@
 
 #include "simple_uart.h"
 #include "i2c_master.h"
+#include "servo.h"
 
 // Pulse duration measure, Working (private) variables --------------------------
 // Timestamp of last measured pulse
@@ -16,7 +17,7 @@ volatile uint16_t g_lastPulseTime = 0;
 
 volatile uint32_t risingEdgeTimeStamp = 0;		// Rising edge time stamp, 0 means non-valid.
 
-#define PULSE_DURATION_SCALE 2
+
 // Public value: last measured pulse duration in microseconds, 0 if not available.
 volatile uint16_t g_pulseDuration = 0;	// Last measured pulse duration.
 
@@ -240,10 +241,9 @@ void motorSpeed( int8_t speed )
 	g_actualSpeed = speed;
 }
 
-#define TIME_MIN ( 1000 / PULSE_DURATION_SCALE )
-#define TIME_MID ( 1500 / PULSE_DURATION_SCALE )
-#define TIME_MAX ( 2000 / PULSE_DURATION_SCALE )
-#define DEADBAND ( 300 / PULSE_DURATION_SCALE )
+
+
+#define DEADBAND_MS ( 300 / PULSE_DURATION_SCALE )
 // 1..128
 #define POWER_MAX 60
 
@@ -265,26 +265,26 @@ void processPulse( uint16_t pulseMs )
 	}
 	else
 	{
-		if( pulseMs > TIME_MAX )
-			pulseMs = TIME_MAX;
-		if( pulseMs < TIME_MIN )
-			pulseMs = TIME_MIN;
+		if( pulseMs > PULSE_MAX_MS )
+			pulseMs = PULSE_MAX_MS;
+		if( pulseMs < PULSE_MIN_MS )
+			pulseMs = PULSE_MIN_MS;
 			
-		if( pulseMs >= ( TIME_MID + DEADBAND / 2 ) )
+		if( pulseMs >= ( PULSE_CENTER_MS + DEADBAND_MS / 2 ) )
 		{
 			// Positive rotation.
-			diff = ( pulseMs - ( TIME_MID + DEADBAND / 2 ) ) * POWER_MAX;
-			diff /= ( TIME_MAX - ( TIME_MID + DEADBAND / 2 ) );
+			diff = ( pulseMs - ( PULSE_CENTER_MS + DEADBAND_MS / 2 ) ) * POWER_MAX;
+			diff /= ( PULSE_MAX_MS - ( PULSE_CENTER_MS + DEADBAND_MS / 2 ) );
 			if( diff > 127 )
 				diff = 127;
 				
 			g_speed = diff;
 		}
-		else if( pulseMs <= ( TIME_MID - DEADBAND / 2 ) )
+		else if( pulseMs <= ( PULSE_CENTER_MS - DEADBAND_MS / 2 ) )
 		{
 			// Negative rotation.
-			diff = ( ( TIME_MID - DEADBAND / 2 ) - pulseMs ) * POWER_MAX;
-			diff /= ( TIME_MID - DEADBAND / 2 ) - TIME_MIN;
+			diff = ( ( PULSE_CENTER_MS - DEADBAND_MS / 2 ) - pulseMs ) * POWER_MAX;
+			diff /= ( PULSE_CENTER_MS - DEADBAND_MS / 2 ) - PULSE_MIN_MS;
 			if( diff > 127 )
 				diff = 127;
 				

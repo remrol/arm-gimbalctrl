@@ -10,6 +10,7 @@
 #include "simple_uart.h"
 #include "i2c_master.h"
 #include "servo.h"
+#include "calculations.h"
 
 // Pulse duration measure, Working (private) variables --------------------------
 // Timestamp of last measured pulse
@@ -247,6 +248,9 @@ void motorSpeed( int8_t speed )
 // 1..128
 #define POWER_MAX 60
 
+#define EXPO_PERCENT 10
+
+
 void processPulse( uint16_t pulseMs )
 {
 	static uint16_t lastPulseMs = 0;
@@ -273,8 +277,12 @@ void processPulse( uint16_t pulseMs )
 		if( pulseMs >= ( PULSE_CENTER_MS + DEADBAND_MS / 2 ) )
 		{
 			// Positive rotation.
-			diff = ( pulseMs - ( PULSE_CENTER_MS + DEADBAND_MS / 2 ) ) * POWER_MAX;
-			diff /= ( PULSE_MAX_MS - ( PULSE_CENTER_MS + DEADBAND_MS / 2 ) );
+//			diff = ( pulseMs - ( PULSE_CENTER_MS + DEADBAND_MS / 2 ) ) * POWER_MAX;
+//			diff /= ( PULSE_MAX_MS - ( PULSE_CENTER_MS + DEADBAND_MS / 2 ) );
+			
+			diff = exponent(pulseMs - ( PULSE_CENTER_MS + DEADBAND_MS / 2 ), PULSE_MAX_MS - ( PULSE_CENTER_MS + DEADBAND_MS / 2 ), EXPO_PERCENT );
+			diff = diff * POWER_MAX / ( PULSE_MAX_MS - ( PULSE_CENTER_MS + DEADBAND_MS / 2 ) );
+
 			if( diff > 127 )
 				diff = 127;
 				
@@ -283,8 +291,12 @@ void processPulse( uint16_t pulseMs )
 		else if( pulseMs <= ( PULSE_CENTER_MS - DEADBAND_MS / 2 ) )
 		{
 			// Negative rotation.
-			diff = ( ( PULSE_CENTER_MS - DEADBAND_MS / 2 ) - pulseMs ) * POWER_MAX;
-			diff /= ( PULSE_CENTER_MS - DEADBAND_MS / 2 ) - PULSE_MIN_MS;
+//			diff = ( ( PULSE_CENTER_MS - DEADBAND_MS / 2 ) - pulseMs ) * POWER_MAX;
+//			diff /= ( PULSE_CENTER_MS - DEADBAND_MS / 2 ) - PULSE_MIN_MS;
+
+			diff = exponent( ( PULSE_CENTER_MS - DEADBAND_MS / 2 ) - pulseMs, ( PULSE_CENTER_MS - DEADBAND_MS / 2 ) - PULSE_MIN_MS, EXPO_PERCENT );
+			diff = diff * POWER_MAX / (( PULSE_CENTER_MS - DEADBAND_MS / 2 ) - PULSE_MIN_MS);
+			
 			if( diff > 127 )
 				diff = 127;
 				

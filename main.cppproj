@@ -172,7 +172,7 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="calculations.c">
+    <Compile Include="calculations.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="calculations.h">

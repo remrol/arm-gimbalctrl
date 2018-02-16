@@ -178,6 +178,12 @@
     <Compile Include="calculations.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="config.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="config.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="i2c_master.cpp">
       <SubType>compile</SubType>
     </Compile>

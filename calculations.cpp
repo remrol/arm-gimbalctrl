@@ -1,7 +1,8 @@
 #include "calculations.h"
 #include "servo.h"
 
-uint16_t expo(uint16_t pulse_time_ms, uint8_t percent /* 0-100 */)
+/*
+uint16_t expo(uint16_t pulse_time_ms, uint8_t percent )
 {
 	#define X_RANGE 512L
 	#define P_RANGE 100L
@@ -17,6 +18,7 @@ uint16_t expo(uint16_t pulse_time_ms, uint8_t percent /* 0-100 */)
 
 	return (uint16_t)x;
 }
+*/
 
 int16_t exponent(int16_t value, int16_t maxValue, uint8_t percent)
 {

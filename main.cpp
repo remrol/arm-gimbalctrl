@@ -11,6 +11,7 @@
 #include "i2c_master.h"
 #include "servo.h"
 #include "calculations.h"
+#include "config.h"
 
 // Pulse duration measure, Working (private) variables --------------------------
 // Timestamp of last measured pulse
@@ -172,9 +173,9 @@ void handleSpeed()
 
 void motorSpeed( int8_t speed )
 {
-	#define FREF 3000
+	#define FREF 800
 	// cpu clock / 64
-	#define CLOCK0_SELECT ( _BV( CS02 ) | _BV( CS00 ) )
+	#define CLOCK0_SELECT ( _BV( CS02 ) | _BV( CS01 ) | _BV( CS00 ))
 	
 	uint8_t  portbState;
 	
@@ -242,15 +243,6 @@ void motorSpeed( int8_t speed )
 	g_actualSpeed = speed;
 }
 
-
-
-#define DEADBAND_MS ( 300 / PULSE_DURATION_SCALE )
-// 1..128
-#define POWER_MAX 60
-
-#define EXPO_PERCENT 10
-
-
 void processPulse( uint16_t pulseMs )
 {
 	static uint16_t lastPulseMs = 0;
@@ -269,33 +261,33 @@ void processPulse( uint16_t pulseMs )
 	}
 	else
 	{
-		if( pulseMs > PULSE_MAX_MS )
-			pulseMs = PULSE_MAX_MS;
-		if( pulseMs < PULSE_MIN_MS )
-			pulseMs = PULSE_MIN_MS;
+		if( pulseMs > g_config.pulse_max )
+			pulseMs = g_config.pulse_max;
+		if( pulseMs < g_config.pulse_min)
+			pulseMs = g_config.pulse_min;
 			
-		if( pulseMs >= ( PULSE_CENTER_MS + DEADBAND_MS / 2 ) )
+		if( pulseMs >=  g_config.pulse_center_hi )
 		{
 			// Positive rotation.
-//			diff = ( pulseMs - ( PULSE_CENTER_MS + DEADBAND_MS / 2 ) ) * POWER_MAX;
-//			diff /= ( PULSE_MAX_MS - ( PULSE_CENTER_MS + DEADBAND_MS / 2 ) );
+//			diff = ( pulseMs - g_config.pulse_center_hi * g_config.power;
+//			diff /= ( g_config.pulse_max - g_config.pulse_center_hi );
 			
-			diff = exponent(pulseMs - ( PULSE_CENTER_MS + DEADBAND_MS / 2 ), PULSE_MAX_MS - ( PULSE_CENTER_MS + DEADBAND_MS / 2 ), EXPO_PERCENT );
-			diff = diff * POWER_MAX / ( PULSE_MAX_MS - ( PULSE_CENTER_MS + DEADBAND_MS / 2 ) );
+			diff = exponent(pulseMs - g_config.pulse_center_hi, g_config.pulse_max - g_config.pulse_center_hi, g_config.expo_percent );
+			diff = diff * g_config.power / ( g_config.pulse_max - g_config.pulse_center_hi );
 
 			if( diff > 127 )
 				diff = 127;
 				
 			g_speed = diff;
 		}
-		else if( pulseMs <= ( PULSE_CENTER_MS - DEADBAND_MS / 2 ) )
+		else if( pulseMs <= g_config.pulse_center_lo )
 		{
 			// Negative rotation.
-//			diff = ( ( PULSE_CENTER_MS - DEADBAND_MS / 2 ) - pulseMs ) * POWER_MAX;
-//			diff /= ( PULSE_CENTER_MS - DEADBAND_MS / 2 ) - PULSE_MIN_MS;
+//			diff = ( g_config.pulse_center_lo - pulseMs ) * g_config.power;
+//			diff /= g_config.pulse_center_lo - g_config.pulse_min;
 
-			diff = exponent( ( PULSE_CENTER_MS - DEADBAND_MS / 2 ) - pulseMs, ( PULSE_CENTER_MS - DEADBAND_MS / 2 ) - PULSE_MIN_MS, EXPO_PERCENT );
-			diff = diff * POWER_MAX / (( PULSE_CENTER_MS - DEADBAND_MS / 2 ) - PULSE_MIN_MS);
+			diff = exponent( g_config.pulse_center_lo - pulseMs, g_config.pulse_center_lo - g_config.pulse_min, g_config.expo_percent );
+			diff = diff * g_config.power / ( g_config.pulse_center_lo - g_config.pulse_min );
 			
 			if( diff > 127 )
 				diff = 127;
@@ -314,6 +306,8 @@ int16_t ucr0;
 
 int main(void)
 {
+	configLoad();
+	
 	// OUTPUT --------------------------------------------------------------------
 	// WAVE out OC0 = PB4 (STEP)
 	//                PB2 (DIR)
@@ -328,7 +322,7 @@ int main(void)
 	DDRA = 0xff;	// PA out
 
 	TCCR0 = _BV( WGM01 ) |								// CTC
-			/*_BV( CS02 ) | _BV( CS01 ) | _BV( CS00 ) | // clock / 64 */
+			/*_BV( CS02 ) | _BV( CS01 ) | _BV( CS00 ) | // clock prescaler */
 			_BV( COM00 );								// Set OC0 on compare match when up-counting. Clear OC0 on compare match when down counting
 	
 	// Input -----------------------------------------------------------------
@@ -377,7 +371,7 @@ int main(void)
 	
     while(1)
     {
-		_delay_ms( 1000 );
+		_delay_ms( 500 );
 		ucr0 = OCR0;
 
 		printf( "%d %d %d %d\n", g_pulseDuration * PULSE_DURATION_SCALE, g_speed, g_actualSpeed, ucr0 );

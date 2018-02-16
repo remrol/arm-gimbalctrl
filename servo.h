@@ -1,12 +1,7 @@
 #ifndef SERVO_H
 #define SERVO_H
 
-
 #define PULSE_DURATION_SCALE 2
-#define PULSE_MIN_MS ( 1000 / PULSE_DURATION_SCALE )
-#define PULSE_MAX_MS ( 2000 / PULSE_DURATION_SCALE )
-
-#define PULSE_CENTER_MS ( ( PULSE_MIN_MS + PULSE_MAX_MS ) / 2 )
 
 
 #endif // SERVO_H

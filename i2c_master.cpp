@@ -1,7 +1,4 @@
-#ifndef  F_CPU
-#define F_CPU 8000000UL
-#endif
-
+#include "fcpu.h"
 #include <avr/io.h>
 #include <util/twi.h>
 

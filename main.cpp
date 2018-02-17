@@ -1,6 +1,4 @@
-#define F_CPU 8000000
-
-
+#include "fcpu.h"
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
@@ -39,7 +37,6 @@ volatile uint16_t g_timeSec = 0;
 
 void HMC5883L_init(void);
 void HMC5883L_read(void);
-
 
 //--------------------------------------------------------------------------------
 void motorSpeed( int8_t speed );	
@@ -126,7 +123,7 @@ ISR(TIMER2_COMP_vect)
 	}
 	
 	// Update motor speed
-	handleSpeed();	
+	handleSpeed();
 }
 
 void handleSpeed()

@@ -7,11 +7,16 @@
 #include <avr/eeprom.h>
 #include <stdio.h>
 
-#include "simple_uart.h"
+//#include "simple_uart.h"
 #include "i2c_master.h"
 #include "servo.h"
 #include "calculations.h"
 #include "config.h"
+
+extern "C"
+{
+#include "uart.h"
+};
 
 // Pulse duration measure, Working (private) variables --------------------------
 // Timestamp of last measured pulse
@@ -38,27 +43,6 @@ void HMC5883L_init(void);
 void HMC5883L_read(void);
 
 
-//-------------------------------------------------------------------------------
-int uart_putchar(char c, FILE *stream);
-int uart_getchar(FILE *stream);
-
-int uart_putchar(char c, FILE *stream)
-{
-	if (c == '\n')
-	usart_send('\r');
-	
-	usart_send( c );
-	
-	return 0;
-}
-
-int uart_getchar(FILE *stream)
-{
-	return usart_receive();
-}
-
-static FILE mystdout;
-	
 //--------------------------------------------------------------------------------
 void motorSpeed( int8_t speed );	
 void handleSpeed(void);
@@ -106,7 +90,7 @@ ISR(TIMER1_CAPT_vect)
 		risingEdgeTimeStamp = 0;
 	
 		// Validate measured pulse duration. Accept only 500 - 2500 us range.	
-		if( pulseDuration >= 700 / PULSE_DURATION_SCALE && pulseDuration <= 2300 / PULSE_DURATION_SCALE )
+		if( pulseDuration >= 700 / PULSE_DURATION_SCALE && pulseDuration <= 2500 / PULSE_DURATION_SCALE )
 		{
 			g_pulseDuration = pulseDuration;	// Store pulse duration.
 			g_lastPulseTime = g_timeSec;		// Store pulse time stamp.
@@ -356,17 +340,12 @@ int main(void)
 	
 	OCR2 = 156;	// Approx 50 Hz.
 	
-	// USART
-	mystdout.put = uart_putchar;
-	mystdout.get = uart_getchar;
-	mystdout.flags = _FDEV_SETUP_RW;
-	stdin = stdout = &mystdout;
 	DDRE = 0x01; // PE0 = RxD = input, PE1 = TxD = output
 
-	usart_init( 9600, F_CPU );	
+	uart_init(UART_BAUD_SELECT(19200, F_CPU));
 	//---------------------
 	
-	HMC5883L_init();
+//	HMC5883L_init();
 	
 	
     while(1)
@@ -374,9 +353,9 @@ int main(void)
 		_delay_ms( 500 );
 		ucr0 = OCR0;
 
-		printf( "%d %d %d %d\n", g_pulseDuration * PULSE_DURATION_SCALE, g_speed, g_actualSpeed, ucr0 );
+//		printf( "%d %d %d %d\n", g_pulseDuration * PULSE_DURATION_SCALE, g_speed, g_actualSpeed, ucr0 );
 		
-		HMC5883L_read();		
+//		HMC5883L_read();
     }
 
 }

@@ -5,7 +5,18 @@ extern "C"
 #include "uart.h"	
 };
 
+char g_strbuf[32];
 
+void sendConfig()
+{
+	sprintf_P(g_strbuf, PSTR("%ld,%d,%d,"), g_config.pulse_min, g_config.pulse_center, g_config.pulse_max);
+	uart_puts(g_strbuf);
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_config.pulse_center_lo, g_config.pulse_center_hi, g_config.power);
+	uart_puts(g_strbuf);
+	sprintf_P(g_strbuf, PSTR("%d,%d"), g_config.expo_percent, g_config.crc);
+	uart_puts(g_strbuf);
+	uart_puts_p( PSTR("\r\n"));
+}
 
 void control()
 {
@@ -26,6 +37,7 @@ void control()
 		// First byte denotes a command
 		switch(c)
 		{
+		case 'c': sendConfig(); break;
 		}
 	}
 	while( 1 /*timeout > millis()*/ );	

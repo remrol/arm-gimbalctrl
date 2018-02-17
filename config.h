@@ -13,10 +13,15 @@ struct Config
 	
 	uint8_t  power; // 1..128
 	uint8_t  expo_percent;
+	
+	// crc
+	uint8_t crc;	
 };
 
+void configEepromLoad();
+void configEepromSave();
 
-void configLoad();
+void configLoadDefaults();
 
 extern Config g_config;
 

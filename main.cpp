@@ -12,6 +12,7 @@
 #include "servo.h"
 #include "calculations.h"
 #include "config.h"
+#include "control.h"
 
 extern "C"
 {
@@ -21,9 +22,6 @@ extern "C"
 // Pulse duration measure, Working (private) variables --------------------------
 // Timestamp of last measured pulse
 volatile uint16_t g_lastPulseTime = 0;
-
-volatile uint32_t risingEdgeTimeStamp = 0;		// Rising edge time stamp, 0 means non-valid.
-
 
 // Public value: last measured pulse duration in microseconds, 0 if not available.
 volatile uint16_t g_pulseDuration = 0;	// Last measured pulse duration.
@@ -48,13 +46,13 @@ void motorSpeed( int8_t speed );
 void handleSpeed(void);
 void processPulse( uint16_t pulseMs );
 
-volatile uint32_t timer1OverflowCount = 0;				// Timer 1 overflow count.
+volatile uint32_t g_timer1OverflowCount = 0;				// Timer 1 overflow count.
 
 ISR(TIMER1_OVF_vect)
 {	
 	TIFR &= 0xff ^ _BV(TOV1);				// Clear overflow flag.
 
-	timer1OverflowCount += 1;					// Increment overflows count.
+	g_timer1OverflowCount += 1;					// Increment overflows count.
 
 	//  If no response for 2 seconds then set pulse duration to invalid.
 	if( g_timeSec - g_lastPulseTime >= 2 )
@@ -66,15 +64,13 @@ ISR(TIMER1_OVF_vect)
 
 ISR(TIMER1_CAPT_vect)
 {
-	uint8_t risingEdge;
-	uint32_t timeStamp;
-	uint32_t pulseDuration;
+	static uint32_t risingEdgeTimeStamp = 0;// Rising edge time stamp, 0 means non-valid.
 	
 	// Critical operations.
-	risingEdge = TCCR1B & _BV( ICES1 );		// Read which edge has been captured.
+	uint8_t risingEdge = TCCR1B & _BV( ICES1 );		// Read which edge has been captured.
 	TCCR1B ^= _BV( ICES1 );					// Switch edge capture.
 	
-	timeStamp = timer1OverflowCount << 16;	// Compute precise 32 bit time stamp.
+	uint32_t timeStamp = g_timer1OverflowCount << 16;	// Compute precise 32 bit time stamp.
 	timeStamp |= ICR1;
 	
 	if( risingEdge ) // Read which edge has been captured.
@@ -85,7 +81,7 @@ ISR(TIMER1_CAPT_vect)
 	else if( risingEdgeTimeStamp != 0 )
 	{
 		// Compute pulse duration.
-		pulseDuration = ( timeStamp - risingEdgeTimeStamp ) / ( F_CPU / 4000000 );
+		uint32_t pulseDuration = ( timeStamp - risingEdgeTimeStamp ) / ( F_CPU / 4000000 );
 		// Clear rising edge.
 		risingEdgeTimeStamp = 0;
 	
@@ -245,14 +241,12 @@ void processPulse( uint16_t pulseMs )
 	}
 	else
 	{
-		if( pulseMs > g_config.pulse_max )
-			pulseMs = g_config.pulse_max;
-		if( pulseMs < g_config.pulse_min)
-			pulseMs = g_config.pulse_min;
-			
 		if( pulseMs >=  g_config.pulse_center_hi )
 		{
 			// Positive rotation.
+			if( pulseMs > g_config.pulse_max )
+				pulseMs = g_config.pulse_max;
+				
 //			diff = ( pulseMs - g_config.pulse_center_hi * g_config.power;
 //			diff /= ( g_config.pulse_max - g_config.pulse_center_hi );
 			
@@ -267,6 +261,9 @@ void processPulse( uint16_t pulseMs )
 		else if( pulseMs <= g_config.pulse_center_lo )
 		{
 			// Negative rotation.
+			if( pulseMs < g_config.pulse_min)
+				pulseMs = g_config.pulse_min;
+
 //			diff = ( g_config.pulse_center_lo - pulseMs ) * g_config.power;
 //			diff /= g_config.pulse_center_lo - g_config.pulse_min;
 
@@ -290,7 +287,7 @@ int16_t ucr0;
 
 int main(void)
 {
-	configLoad();
+	configEepromLoad();
 	
 	// OUTPUT --------------------------------------------------------------------
 	// WAVE out OC0 = PB4 (STEP)
@@ -350,12 +347,14 @@ int main(void)
 	
     while(1)
     {
-		_delay_ms( 500 );
 		ucr0 = OCR0;
-
-//		printf( "%d %d %d %d\n", g_pulseDuration * PULSE_DURATION_SCALE, g_speed, g_actualSpeed, ucr0 );
-		
 //		HMC5883L_read();
+
+		control();
+		
+//		printf( "%d %d %d %d\n", g_pulseDuration * PULSE_DURATION_SCALE, g_speed, g_actualSpeed, ucr0 );
+
+		_delay_ms( 10 );		
     }
 
 }

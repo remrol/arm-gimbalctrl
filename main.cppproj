@@ -184,6 +184,12 @@
     <Compile Include="config.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="control.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="control.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="i2c_master.cpp">
       <SubType>compile</SubType>
     </Compile>

@@ -15,11 +15,12 @@
 extern "C"
 {
 #include "uart.h"
+#include "time.h"
 };
 
 // Pulse duration measure, Working (private) variables --------------------------
 // Timestamp of last measured pulse
-volatile uint16_t g_lastPulseTime = 0;
+volatile uint32_t g_lastPulseTime = 0;
 
 // Public value: last measured pulse duration in microseconds, 0 if not available.
 volatile uint16_t g_pulseDuration = 0;	// Last measured pulse duration.
@@ -31,9 +32,6 @@ volatile int8_t g_speed = 0;
 
 // Motor position
 volatile uint16_t g_motorPosition = 0;
-
-// time since start in seconds
-volatile uint16_t g_timeSec = 0;
 
 void HMC5883L_init(void);
 void HMC5883L_read(void);
@@ -52,7 +50,7 @@ ISR(TIMER1_OVF_vect)
 	g_timer1OverflowCount += 1;					// Increment overflows count.
 
 	//  If no response for 2 seconds then set pulse duration to invalid.
-	if( g_timeSec - g_lastPulseTime >= 2 )
+	if( millis() > g_lastPulseTime + 2*1000 )
 	{
 		g_pulseDuration = 0;
 		processPulse( g_pulseDuration );
@@ -86,7 +84,7 @@ ISR(TIMER1_CAPT_vect)
 		if( pulseDuration >= 700 / PULSE_DURATION_SCALE && pulseDuration <= 2500 / PULSE_DURATION_SCALE )
 		{
 			g_pulseDuration = pulseDuration;	// Store pulse duration.
-			g_lastPulseTime = g_timeSec;		// Store pulse time stamp.
+			g_lastPulseTime = millis();		// Store pulse time stamp.
 			
 			processPulse( g_pulseDuration );
 		}
@@ -106,25 +104,6 @@ ISR(TIMER0_COMP_vect)
 
 //-------------------------------------------------------------------------------------
 
-// Timer2 interrupt, approx 200 times/second
-ISR(TIMER2_COMP_vect)
-{
-	static uint8_t slope = 0;
-	
-	// Update time stamp in seconds
-	if( slope == 200 )
-	{
-		slope = 0;
-		g_timeSec++;
-	}
-	else
-	{
-		++slope;
-	}
-	
-	// Update motor speed
-	handleSpeed();
-}
 
 void handleSpeed()
 {
@@ -157,7 +136,7 @@ void motorSpeed( int8_t speed )
 	uint8_t  portbState;
 	
 	// Time stamp of last motor move action.
-	static uint16_t moveTimeStamp = 0;
+	static uint32_t moveTimeStamp = 0;
 			
 	// Special handling for zero speed
 	if( speed == 0 )
@@ -171,7 +150,7 @@ void motorSpeed( int8_t speed )
 		}
 		
 		// Shutdown motor after 10 seconds to minimize power consumption
-		if( g_timeSec - moveTimeStamp >= 10 )
+		if( millis() > moveTimeStamp + 10*1000 )
 		{
 			PORTB |=  _BV(PB1); //0x02;			// set PB1 (NENABLE)
 		}
@@ -180,7 +159,7 @@ void motorSpeed( int8_t speed )
 	}
 	
 	// Remember motor move time stamp as we are moving now
-	moveTimeStamp = g_timeSec;
+	moveTimeStamp = millis();
 	
 	// Check if speed really differs
 	if( speed == g_actualSpeed )
@@ -313,16 +292,14 @@ int main(void)
 			 _BV( ICES1 );	// A rising edge is capture event.
 			 
 
-	// Interrupt generator ----------------------------------------------------
-	TCCR2 = _BV( WGM21 ) |				// CTC
-			_BV( COM20 ) |				// Toggle OC2
-			_BV( CS22 );				// Clock / 256
+	// Timer millis()
+	initTime();
 			
 	// Interrupts -------------------------------------------------------------
-	TIMSK = _BV( TOIE1 )  |	// Enable interrupt by timer1 overflow
+	TIMSK = _BV( TOIE2 ) |  // Enable overflow interrupt, for timer millis()
+	    	_BV( TOIE1 )  |	// Enable interrupt by timer1 overflow
 			_BV( TICIE1 ) | // Enable interrupt by timer1 capture event
-			_BV( OCIE0 )  |	// Enable interrupt by timer0 output compare match
-			_BV( OCIE2 );	// Enable interrupt by timer2 output compare match
+			_BV( OCIE0 );  	// Enable interrupt by timer0 output compare match
 	
 	TIFR = 0;				// Clear flags
 	
@@ -332,8 +309,6 @@ int main(void)
 	// Main loop --------------------------------------------------------------
 	sei();
 	
-	OCR2 = 156;	// Approx 50 Hz.
-	
 	DDRE = 0x01; // PE0 = RxD = input, PE1 = TxD = output
 
 	uart_init(UART_BAUD_SELECT(19200, F_CPU));
@@ -341,11 +316,19 @@ int main(void)
 	
 //	HMC5883L_init();
 	
+	uint32_t speedMillis = millis();
 	
     while(1)
     {
 		ucr0 = OCR0;
 //		HMC5883L_read();
+
+		uint32_t milisNow = millis();
+		if( milisNow > speedMillis + 1000 )
+		{
+			handleSpeed();
+			speedMillis = milisNow;
+		}
 
 		control();
 		

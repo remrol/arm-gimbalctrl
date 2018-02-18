@@ -5,7 +5,7 @@
 
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )						// 8
 #define clockCyclesToMicroseconds(a) ( ((a) * 1000L) / (F_CPU / 1000L) )		
-#define MICROSECONDS_PER_TIMER0_OVERFLOW (clockCyclesToMicroseconds(32 * 256))	// 1024
+#define MICROSECONDS_PER_TIMER0_OVERFLOW (clockCyclesToMicroseconds(64 * 256))	// 1024
 // the whole number of milliseconds per timer0 overflow
 #define MILLIS_INC (MICROSECONDS_PER_TIMER0_OVERFLOW / 1000)					// 1
 // the fractional number of milliseconds per timer0 overflow. we shift right

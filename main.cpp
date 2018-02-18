@@ -324,7 +324,7 @@ int main(void)
 //		HMC5883L_read();
 
 		uint32_t milisNow = millis();
-		if( milisNow > speedMillis + 1000 )
+		if( milisNow >= speedMillis + 10 )
 		{
 			handleSpeed();
 			speedMillis = milisNow;
@@ -334,7 +334,6 @@ int main(void)
 		
 //		printf( "%d %d %d %d\n", g_pulseDuration * PULSE_DURATION_SCALE, g_speed, g_actualSpeed, ucr0 );
 
-		_delay_ms( 10 );		
     }
 
 }

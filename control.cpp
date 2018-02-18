@@ -40,5 +40,5 @@ void control()
 		case 'c': sendConfig(); break;
 		}
 	}
-	while( 1 /*timeout > millis()*/ );	
+	while( 0 /*timeout > millis()*/ );	
 }

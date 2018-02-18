@@ -1,6 +1,8 @@
 #ifndef I2C_MASTER_H
 #define I2C_MASTER_H
 
+#include <stdint.h>
+
 #define I2C_READ 0x01
 #define I2C_WRITE 0x00
 

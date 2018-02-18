@@ -193,6 +193,12 @@
     <Compile Include="fcpu.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="HMC5883L.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="HMC5883L.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="i2c_master.cpp">
       <SubType>compile</SubType>
     </Compile>

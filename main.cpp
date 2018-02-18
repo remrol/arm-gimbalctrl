@@ -316,18 +316,17 @@ int main(void)
 	
 //	HMC5883L_init();
 	
-	uint32_t speedMillis = millis();
+	uint32_t handleSpeedTimeout = millis();
 	
     while(1)
     {
 		ucr0 = OCR0;
 //		HMC5883L_read();
 
-		uint32_t milisNow = millis();
-		if( milisNow >= speedMillis + 10 )
+		if( millis() >= handleSpeedTimeout )
 		{
 			handleSpeed();
-			speedMillis = milisNow;
+			handleSpeedTimeout += 10;
 		}
 
 		control();

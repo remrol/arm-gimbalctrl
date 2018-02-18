@@ -1,8 +1,10 @@
 #include "control.h"
 #include "config.h"
+
 extern "C"
 {
 #include "uart.h"	
+#include "time.h"
 };
 
 char g_strbuf[32];
@@ -20,8 +22,8 @@ void sendConfig()
 
 void control()
 {
-	// Timeout is 100 ms
-//	uint32_t timeout = millis() + 100;
+	// Timeout is 20 ms
+//	uint32_t timeout = millis() + 20;
 
 	do
 	{

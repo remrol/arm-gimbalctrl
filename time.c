@@ -16,7 +16,7 @@
 
 void initTime(void)
 {
-	TCCR2 = _BV( CS21 ) | _BV( CS20 );	// clock/32
+	TCCR2 = _BV( CS21 ) | _BV( CS20 );	// clock/64
 //	TIMSK = _BV(TOIE2);					// Enable overflow interrupt, set in main()
 }
 

@@ -18,40 +18,24 @@ extern "C"
 #include "time.h"
 };
 
-// Pulse duration measure, Working (private) variables --------------------------
-// Timestamp of last measured pulse
-volatile uint32_t g_lastPulseTime = 0;
-
-// Public value: last measured pulse duration in microseconds, 0 if not available.
-volatile uint16_t g_pulseDuration = 0;	// Last measured pulse duration.
-
-// Direction
-volatile int8_t g_actualDirection = 0;
-volatile int8_t g_actualSpeed = 0;
-volatile int8_t g_speed = 0;
-
-// Motor position
-volatile uint16_t g_motorPosition = 0;
-
 
 //--------------------------------------------------------------------------------
 void motorSpeed( int8_t speed );	
 void handleSpeed(void);
 void processPulse( uint16_t pulseMs );
 
-volatile uint32_t g_timer1OverflowCount = 0;				// Timer 1 overflow count.
 
 ISR(TIMER1_OVF_vect)
 {	
 	TIFR &= 0xff ^ _BV(TOV1);				// Clear overflow flag.
 
-	g_timer1OverflowCount += 1;					// Increment overflows count.
+	g_state.timer1OverflowCount += 1;					// Increment overflows count.
 
 	//  If no response for 2 seconds then set pulse duration to invalid.
-	if( millis() > g_lastPulseTime + 2*1000 )
+	if( millis() > g_state.lastPulseTime + 2*1000 )
 	{
-		g_pulseDuration = 0;
-		processPulse( g_pulseDuration );
+		g_state.pulseDuration = 0;
+		processPulse( g_state.pulseDuration );
 	}
 }	
 
@@ -63,7 +47,7 @@ ISR(TIMER1_CAPT_vect)
 	uint8_t risingEdge = TCCR1B & _BV( ICES1 );		// Read which edge has been captured.
 	TCCR1B ^= _BV( ICES1 );					// Switch edge capture.
 	
-	uint32_t timeStamp = g_timer1OverflowCount << 16;	// Compute precise 32 bit time stamp.
+	uint32_t timeStamp = g_state.timer1OverflowCount << 16;	// Compute precise 32 bit time stamp.
 	timeStamp |= ICR1;
 	
 	if( risingEdge ) // Read which edge has been captured.
@@ -81,10 +65,10 @@ ISR(TIMER1_CAPT_vect)
 		// Validate measured pulse duration. Accept only 500 - 2500 us range.	
 		if( pulseDuration >= 700 / PULSE_DURATION_SCALE && pulseDuration <= 2500 / PULSE_DURATION_SCALE )
 		{
-			g_pulseDuration = pulseDuration;	// Store pulse duration.
-			g_lastPulseTime = millis();		// Store pulse time stamp.
+			g_state.pulseDuration = pulseDuration;	// Store pulse duration.
+			g_state.lastPulseTime = millis();		// Store pulse time stamp.
 			
-			processPulse( g_pulseDuration );
+			processPulse( g_state.pulseDuration );
 		}
 	}
 	else
@@ -97,7 +81,9 @@ ISR(TIMER0_COMP_vect)
 {
 	// React only on rising edge
 	if( PORTB & _BV( 3 ) )
-		g_motorPosition += g_actualDirection;
+	{
+		g_state.motorPosition += g_state.actualDirection;
+	}
 }
 
 //-------------------------------------------------------------------------------------
@@ -107,20 +93,20 @@ void handleSpeed()
 {
 	int8_t dstSpd;
 	// Rewrite to get rid of overwrites
-	int8_t spd = g_speed;
+	int8_t spd = g_state.speed;
 	
-	if( spd == g_actualSpeed )
+	if( spd == g_state.actualSpeed )
 	{
-		motorSpeed( g_actualSpeed );	
+		motorSpeed( g_state.actualSpeed );	
 	}
-	else if( spd < g_actualSpeed )
+	else if( spd < g_state.actualSpeed )
 	{
-		dstSpd = g_actualSpeed - 1;
+		dstSpd = g_state.actualSpeed - 1;
 		motorSpeed( dstSpd > spd ? dstSpd : spd );
 	}
 	else
 	{
-		dstSpd = g_actualSpeed + 1;
+		dstSpd = g_state.actualSpeed + 1;
 		motorSpeed( dstSpd < spd ? dstSpd : spd );	
 	}
 }
@@ -140,10 +126,10 @@ void motorSpeed( int8_t speed )
 	if( speed == 0 )
 	{
 		// Stopping motor for the very first time
-		if( g_actualSpeed != 0 )
+		if( g_state.actualSpeed != 0 )
 		{
-			g_actualDirection = 0;
-			g_actualSpeed = 0;
+			g_state.actualDirection = 0;
+			g_state.actualSpeed = 0;
 			TCCR0 &= 0xff ^ ( _BV( CS02 ) | _BV( CS01 ) | _BV( CS00 ) );	// Stop clock
 		}
 		
@@ -160,16 +146,16 @@ void motorSpeed( int8_t speed )
 	moveTimeStamp = millis();
 	
 	// Check if speed really differs
-	if( speed == g_actualSpeed )
+	if( speed == g_state.actualSpeed )
 		return;	
 	
 	else if( speed > 0 )
 	{
 		int16_t ocr0 = ( ( ( int16_t ) FREF ) / speed ) - 1;
 		OCR0 = ocr0 < 255 ? ocr0 : 255;
-		g_actualDirection = 1;
+		g_state.actualDirection = 1;
 		
-		if( g_actualSpeed <= 0 ) // Handle speed direction change
+		if( g_state.actualSpeed <= 0 ) // Handle speed direction change
 		{
 			TCCR0 |= CLOCK0_SELECT;	// Set clock
 			portbState = PORTB;
@@ -182,9 +168,9 @@ void motorSpeed( int8_t speed )
 	{
 		int16_t ocr0 = ( ( ( int16_t ) FREF ) / -speed ) - 1;
 		OCR0 = ocr0 < 255 ? ocr0 : 255;
-		g_actualDirection = -1;
+		g_state.actualDirection = -1;
 		
-		if( g_actualSpeed >= 0 )	// Handle direction change
+		if( g_state.actualSpeed >= 0 )	// Handle direction change
 		{
 			TCCR0 |= CLOCK0_SELECT; 
 			portbState = PORTB;
@@ -194,7 +180,7 @@ void motorSpeed( int8_t speed )
 		}
 	}
 	
-	g_actualSpeed = speed;
+	g_state.actualSpeed = speed;
 }
 
 void processPulse( uint16_t pulseMs )
@@ -211,7 +197,7 @@ void processPulse( uint16_t pulseMs )
 	if( pulseMs == 0 )
 	{
 		// Stop motor if out of range.
-		g_speed = 0;
+		g_state.speed = 0;
 	}
 	else
 	{
@@ -230,7 +216,7 @@ void processPulse( uint16_t pulseMs )
 			if( diff > 127 )
 				diff = 127;
 				
-			g_speed = diff;
+			g_state.speed = diff;
 		}
 		else if( pulseMs <= g_config.pulse_center_lo )
 		{
@@ -247,12 +233,12 @@ void processPulse( uint16_t pulseMs )
 			if( diff > 127 )
 				diff = 127;
 				
-			g_speed = -diff;
+			g_state.speed = -diff;
 		}
 		else
 		{
 			// In dead band, stop the motor.
-			g_speed = 0;
+			g_state.speed = 0;
 		}
 	}	
 }
@@ -262,6 +248,7 @@ int16_t ucr0;
 int main(void)
 {
 	configEepromLoad();
+	stateInit();
 	
 	// OUTPUT --------------------------------------------------------------------
 	// WAVE out OC0 = PB4 (STEP)

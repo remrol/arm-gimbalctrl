@@ -4,7 +4,7 @@
 #include <util/crc16.h>
 
 Config g_config;
-
+State  g_state;
 
 uint8_t configComputeCrc(void)
 {
@@ -45,6 +45,7 @@ void configEepromLoad()
 
 	// .. otherwise fill with some default values.
 	configLoadDefaults();
+	configEepromSave();
 }
 
 
@@ -60,3 +61,13 @@ void configEepromSave()
 }
 
 
+void stateInit()
+{
+	g_state.motorPosition = 0;
+	g_state.lastPulseTime = 0;		
+	g_state.pulseDuration = 0;
+	g_state.actualDirection = 0;
+	g_state.actualSpeed = 0;
+	g_state.speed = 0;
+	g_state.timer1OverflowCount = 0;
+}

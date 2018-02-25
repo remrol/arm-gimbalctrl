@@ -70,4 +70,5 @@ void stateInit()
 	g_state.actualSpeed = 0;
 	g_state.speed = 0;
 	g_state.timer1OverflowCount = 0;
+	g_state.ocr0 = 0;
 }

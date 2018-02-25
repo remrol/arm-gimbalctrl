@@ -152,7 +152,8 @@ void motorSpeed( int8_t speed )
 	else if( speed > 0 )
 	{
 		int16_t ocr0 = ( ( ( int16_t ) FREF ) / speed ) - 1;
-		OCR0 = ocr0 < 255 ? ocr0 : 255;
+		g_state.ocr0 = ocr0 < 255 ? ocr0 : 255;
+		OCR0 = g_state.ocr0;		
 		g_state.actualDirection = 1;
 		
 		if( g_state.actualSpeed <= 0 ) // Handle speed direction change
@@ -167,7 +168,8 @@ void motorSpeed( int8_t speed )
 	else
 	{
 		int16_t ocr0 = ( ( ( int16_t ) FREF ) / -speed ) - 1;
-		OCR0 = ocr0 < 255 ? ocr0 : 255;
+		g_state.ocr0 = ocr0 < 255 ? ocr0 : 255;
+		OCR0 = g_state.ocr0;
 		g_state.actualDirection = -1;
 		
 		if( g_state.actualSpeed >= 0 )	// Handle direction change
@@ -305,7 +307,6 @@ int main(void)
 	
     while(1)
     {
-		ucr0 = OCR0;
 //		HMC5883L_read();
 
 		if( millis() >= handleSpeedTimeout )

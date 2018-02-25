@@ -36,6 +36,8 @@ struct State
 	volatile int8_t speed; // = 0;	
 	
 	volatile uint32_t timer1OverflowCount; // = 0;				// Timer 1 overflow count.	
+	
+	volatile uint8_t ocr0;
 };
 
 void stateInit();

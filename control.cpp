@@ -179,7 +179,7 @@ int16_t receiveInt16( uint32_t _timeout)
 
 void sendConfig()
 {
-	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_config.pulse_min, g_config.pulse_center, g_config.pulse_max);
+	sprintf_P(g_strbuf, PSTR("%d,%d,"), g_config.pulse_min, g_config.pulse_max);
 	uart_puts(g_strbuf);
 	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_config.pulse_center_lo, g_config.pulse_center_hi, g_config.power);
 	uart_puts(g_strbuf);
@@ -273,6 +273,65 @@ void receiveExpo()
 	sendExpo();
 }
 
+void sendPulse()
+{
+	sprintf_P(g_strbuf, PSTR("%d,%d,"), g_config.pulse_min, g_config.pulse_max);
+	uart_puts(g_strbuf);
+	sprintf_P(g_strbuf, PSTR("%d,%d"), g_config.pulse_center_lo, g_config.pulse_center_hi);
+	uart_puts(g_strbuf);
+	uart_puts_p( PSTR("\r\n"));
+}
+
+void receivePulse()
+{
+	// Timeout is 200 ms
+	uint32_t timeout = millis() + 100;
+
+	// Receive 
+	int16_t min = receiveInt16(timeout);
+	if( min == INT16_MIN || min < 100 || min > 2000 )
+	{
+		sprintf_P(g_strbuf, PSTR("MIN ERR %d\r\n"), g_lastErr);
+		uart_puts( g_strbuf );
+		return;
+	}
+
+	int16_t max = receiveInt16(timeout);
+	if( max == INT16_MIN || max < 100 || max > 2000 || max <= min )
+	{
+		sprintf_P(g_strbuf, PSTR("MAX ERR %d\r\n"), g_lastErr);
+		uart_puts( g_strbuf );
+		return;
+	}
+
+	int16_t clo = receiveInt16(timeout);
+	if( clo == INT16_MIN || clo < 100 || clo > 2000 ||  clo <= min || clo >= max )
+	{
+		sprintf_P(g_strbuf, PSTR("CLO ERR %d\r\n"), g_lastErr);
+		uart_puts( g_strbuf );
+		return;
+	}
+
+	int16_t chi = receiveInt16(timeout);
+	if( chi == INT16_MIN || chi < 100 || chi > 2000 ||  chi <= min || chi >= max || chi < clo)
+	{
+		sprintf_P(g_strbuf, PSTR("CLO ERR %d\r\n"), g_lastErr);
+		uart_puts( g_strbuf );
+		return;
+	}
+
+
+	// Write to config
+	g_config.pulse_min = min;
+	g_config.pulse_max = max;
+	g_config.pulse_center_lo = clo;
+	g_config.pulse_center_hi = chi;
+	
+	// Send back received values
+	sendPulse();
+
+}
+
 void control()
 {
 	// Timeout is 20 ms
@@ -327,6 +386,14 @@ void control()
 			
 		case 'E':
 			receiveExpo();
+			break;
+			
+		case 'l':
+			sendPulse();
+			break;
+			
+		case 'L':
+			receivePulse();
 			break;
 			
 		}

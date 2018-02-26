@@ -6,7 +6,6 @@
 struct Config
 {
 	uint16_t pulse_min;
-	uint16_t pulse_center;
 	uint16_t pulse_max;
 	uint16_t pulse_center_lo;
 	uint16_t pulse_center_hi;
@@ -20,24 +19,14 @@ struct Config
 
 struct State
 {
-	// Motor position
-	volatile uint16_t motorPosition; // =0
-	
-	// Timestamp of last measured pulse
-	volatile uint32_t lastPulseTime; // = 0;
-	
-	volatile uint16_t pulseDuration; // = 0;	// Last measured pulse duration in ms/2, 0 if not available.	
-	
-	
-	volatile int8_t actualDirection; // = 0;
-	
-	volatile int8_t actualSpeed; // = 0;	
-	
-	volatile int8_t speed; // = 0;	
-	
-	volatile uint32_t timer1OverflowCount; // = 0;				// Timer 1 overflow count.	
-	
-	volatile uint8_t ocr0;
+	volatile uint16_t motorPosition;	// Motor position
+	volatile uint32_t lastPulseTime;	// Timestamp of last measured pulse
+	volatile uint16_t pulseDuration;	// Last measured pulse duration in ms/2, 0 if not available.	
+	volatile int8_t	  actualDirection;
+	volatile int8_t   actualSpeed;
+	volatile int8_t   speed;
+	volatile uint32_t timer1OverflowCount; // Timer 1 overflow count.		
+	volatile uint8_t  ocr0;
 };
 
 void stateInit();

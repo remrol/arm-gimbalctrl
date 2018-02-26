@@ -179,13 +179,98 @@ int16_t receiveInt16( uint32_t _timeout)
 
 void sendConfig()
 {
-	sprintf_P(g_strbuf, PSTR("%ld,%d,%d,"), g_config.pulse_min, g_config.pulse_center, g_config.pulse_max);
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_config.pulse_min, g_config.pulse_center, g_config.pulse_max);
 	uart_puts(g_strbuf);
 	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_config.pulse_center_lo, g_config.pulse_center_hi, g_config.power);
 	uart_puts(g_strbuf);
 	sprintf_P(g_strbuf, PSTR("%d,%d"), g_config.expo_percent, g_config.crc);
 	uart_puts(g_strbuf);
 	uart_puts_p( PSTR("\r\n"));
+}
+
+void sendState()
+{
+	sprintf_P(g_strbuf, PSTR("%d,%ld,%d,"), g_state.motorPosition, g_state.lastPulseTime, g_state.pulseDuration);
+	uart_puts(g_strbuf);
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_state.actualDirection, g_state.actualSpeed, g_state.speed);
+	uart_puts(g_strbuf);
+	sprintf_P(g_strbuf, PSTR("%ld,%d"), g_state.timer1OverflowCount, g_state.ocr0);
+	uart_puts(g_strbuf);
+	uart_puts_p( PSTR("\r\n"));
+}
+
+void sendUptime()
+{
+	uint32_t msAbsolute = millis();
+	uint32_t ms = msAbsolute;
+	uint32_t sec  = ms / 1000;
+	ms = ms - 1000 * sec;
+	uint32_t minutes  = sec / 60;
+	sec = sec - 60 * minutes;
+	uint32_t hrs = minutes / 60;
+	minutes = minutes - 60 * hrs;
+	uint32_t days = hrs / 24;
+	hrs = hrs - 24 * days;
+
+	sprintf_P(g_strbuf, PSTR("%ld ms Uptime "), msAbsolute );
+	uart_puts(g_strbuf);
+	sprintf_P(g_strbuf, PSTR("%d day %d hour %d min"), (uint16_t) days, (uint16_t) hrs, (uint16_t) minutes );
+	uart_puts(g_strbuf);
+	sprintf_P(g_strbuf, PSTR(" %d sec %d ms\r\n"), (uint16_t) sec, (uint16_t) ms );
+	uart_puts(g_strbuf);
+}
+
+void sendInfo()
+{
+	uart_puts_p( PSTR("Gimbal ctrl build "));
+	uart_puts_p( PSTR(__DATE__));
+	uart_putc(' ');
+	uart_puts_p( PSTR(__TIME__));
+	uart_puts_p( PSTR("\r\n"));
+}
+
+void sendPower()
+{
+	sprintf_P(g_strbuf, PSTR("%d\r\n"), g_config.power);
+	uart_puts(g_strbuf);
+}
+
+void receivePower()
+{
+	uint32_t timeout = millis() + 100;
+
+	int16_t power = receiveInt16(timeout);
+	if( power == INT16_MIN || power < 0 || power > 255 )
+	{
+		sprintf_P( g_strbuf, PSTR("ERR %d %d\r\n"), g_lastErr, power);
+		uart_puts(g_strbuf);
+		return;
+	}
+
+	g_config.power = power;
+	sendPower();
+}
+
+void sendExpo()
+{
+	sprintf_P(g_strbuf, PSTR("%d\r\n"), g_config.expo_percent);
+	uart_puts(g_strbuf);
+}
+
+void receiveExpo()
+{
+	uint32_t timeout = millis() + 100;
+
+	int16_t expo = receiveInt16(timeout);
+	if( expo == INT16_MIN || expo < 0 || expo > 100 )
+	{
+		sprintf_P( g_strbuf, PSTR("ERR %d %d\r\n"), g_lastErr, expo);
+		uart_puts(g_strbuf);
+		return;
+	}
+
+	g_config.expo_percent = expo;
+	sendExpo();
 }
 
 void control()
@@ -207,7 +292,43 @@ void control()
 		// First byte denotes a command
 		switch(c)
 		{
-		case 'c': sendConfig(); break;
+		case 'c': 
+			sendConfig(); 
+			break;
+			
+		case 's': 
+			sendState(); 
+			break;
+			
+		case 'W': 
+			configEepromSave(); 
+			uart_puts_p( PSTR("1\r\n")); 
+			break;
+			
+		case 'u':
+			sendUptime(); 
+			break;
+			
+		case 'i':
+			sendInfo(); 
+			break;
+			
+		case 'P':
+			receivePower();
+			break;
+			
+		case 'p':
+			sendPower();
+			break;
+			
+		case 'e':
+			sendExpo();
+			break;
+			
+		case 'E':
+			receiveExpo();
+			break;
+			
 		}
 	}
 	while( timeout > millis() );	

@@ -41,8 +41,12 @@
 
 
 
-
-
+#include <vector>
+#include <string>
+#include <setupapi.h>
+#include <winspool.h>
+#include <WBemCli.h>
+#define NO_CENUMERATESERIAL_USING_COMDB
 
 
 #ifdef _UNICODE

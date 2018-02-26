@@ -2,3 +2,9 @@
 /Release
 /.vs/main/v14
 /.vs/gimbal/v14/.atsuo
+/pc-app/Debug
+/pc-app/Release
+/pc-app/GimbalCtrl.aps
+/pc-app/GimbalCtrl.opensdf
+/pc-app/GimbalCtrl.sdf
+/pc-app/GimbalCtrl.suo

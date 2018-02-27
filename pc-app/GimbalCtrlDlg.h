@@ -43,4 +43,5 @@ public:
   int m_servoDbandLo;
   int m_servoDbandHi;
   int m_servoMax;
+  afx_msg void OnBnClickedButtonConfigSaveeeprom();
 };

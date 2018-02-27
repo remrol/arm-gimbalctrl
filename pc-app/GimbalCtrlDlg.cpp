@@ -47,6 +47,7 @@ BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
   ON_BN_CLICKED(IDC_BUTTON_READ_STATE, &CGimbalCtrlDlg::OnBnClickedButtonReadState)
   ON_BN_CLICKED(IDC_BUTTON_SERVO_GET, &CGimbalCtrlDlg::OnBnClickedButtonServoGet)
   ON_BN_CLICKED(IDC_BUTTON_SERVO_SET, &CGimbalCtrlDlg::OnBnClickedButtonServoSet)
+  ON_BN_CLICKED(IDC_BUTTON_CONFIG_SAVEEEPROM, &CGimbalCtrlDlg::OnBnClickedButtonConfigSaveeeprom)
 END_MESSAGE_MAP()
 
 
@@ -184,14 +185,23 @@ void CGimbalCtrlDlg::OnBnClickedButtonReadState()
   }
 }
 
-
 void CGimbalCtrlDlg::OnBnClickedButtonServoGet()
 {
-
+	if( m_device.getServoRange(m_servoMin, m_servoDbandLo, m_servoDbandHi, m_servoMax ) )
+	{
+		UpdateData(FALSE);
+	}
 }
-
 
 void CGimbalCtrlDlg::OnBnClickedButtonServoSet()
 {
+	UpdateData(TRUE);
 
+	m_device.setServoRange( m_servoMin, m_servoDbandLo, m_servoDbandHi, m_servoMax );
+}
+
+
+void CGimbalCtrlDlg::OnBnClickedButtonConfigSaveeeprom()
+{
+	m_device.configSaveToEeprom();
 }

@@ -179,3 +179,20 @@ bool Device::setServoRange( int _min, int _dbandLo, int _dbandHi, int _max)
   return true;
 }
 
+bool Device::configSaveToEeprom()
+{
+	if( !isOpened())
+	{
+		L_ << "configSaveToEeprom, not connected";
+		return false;
+	}
+
+	std::string msg = sendReceive("W");
+	if( msg.empty() )
+	{
+		L_ << "configSaveToEeprom, unexpected status " << msg;
+		return false;
+	}
+
+	return true;
+}

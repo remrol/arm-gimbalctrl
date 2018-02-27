@@ -35,4 +35,6 @@ public:
   CComboBox m_comboComPorts;
   afx_msg void OnBnClickedButtonConnect();
   CButton m_buttonConnect;
+  afx_msg void OnBnClickedButtonReadConfig();
+  afx_msg void OnBnClickedButtonReadState();
 };

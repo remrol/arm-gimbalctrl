@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Serial.h"
+#include "structures.h"
 
 class Device
 {
@@ -12,7 +13,8 @@ public:
 
 	void close();
 
-
+  bool getConfig( Config& _config );
+  bool getState( State& _state );
 
 private:
 

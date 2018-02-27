@@ -48,7 +48,10 @@
 #include <WBemCli.h>
 #define NO_CENUMERATESERIAL_USING_COMDB
 
-
+#include <boost/filesystem.hpp>
+#include <boost/thread.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/optional.hpp>
 
 #include "Log.h"
 

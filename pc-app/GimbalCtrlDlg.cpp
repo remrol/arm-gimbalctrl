@@ -35,6 +35,8 @@ BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
   ON_BN_CLICKED(IDC_BUTTON_CONNECT, &CGimbalCtrlDlg::OnBnClickedButtonConnect)
+  ON_BN_CLICKED(IDC_BUTTON_READ_CONFIG, &CGimbalCtrlDlg::OnBnClickedButtonReadConfig)
+  ON_BN_CLICKED(IDC_BUTTON_READ_STATE, &CGimbalCtrlDlg::OnBnClickedButtonReadState)
 END_MESSAGE_MAP()
 
 
@@ -150,4 +152,24 @@ void CGimbalCtrlDlg::OnBnClickedButtonConnect()
 	}
 
 	L_ << "OnBnClickedButtonConnect end";
+}
+
+
+void CGimbalCtrlDlg::OnBnClickedButtonReadConfig()
+{
+  Config config;
+  if( m_device.getConfig(config))
+  {
+    GetDlgItem(IDC_EDIT_CONFIG)->SetWindowText(config.toDisplayableString().c_str());
+  }
+}
+
+
+void CGimbalCtrlDlg::OnBnClickedButtonReadState()
+{
+  State state;
+  if( m_device.getState(state))
+  {
+    GetDlgItem(IDC_EDIT_STATE)->SetWindowText(state.toDisplayableString().c_str());
+  }
 }

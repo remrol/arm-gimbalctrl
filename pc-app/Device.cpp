@@ -101,3 +101,39 @@ std::string Device::sendReceive( const std::string& _msg)
 
 	return recv;
 }
+
+bool Device::getConfig( Config& _config )
+{
+	if( !isOpened())
+	{
+		L_ << "getConfig, not connected";
+		return false;
+	}
+
+	std::string msg = sendReceive("c");
+	if( !_config.fromString( msg ) )
+	{
+		L_ << "getConfig, cannot parse message " << msg;
+		return false;
+	}
+
+	return true;
+}
+
+bool Device::getState( State& _state )
+{
+	if( !isOpened())
+	{
+		L_ << "getState, not connected";
+		return false;
+	}
+
+	std::string msg = sendReceive("s");
+	if( !_state.fromString( msg ) )
+	{
+		L_ << "getState, cannot parse message " << msg;
+		return false;
+	}
+
+	return true;
+}

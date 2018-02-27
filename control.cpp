@@ -179,24 +179,22 @@ int16_t receiveInt16( uint32_t _timeout)
 
 void sendConfig()
 {
-	sprintf_P(g_strbuf, PSTR("%d,%d,"), g_config.pulse_min, g_config.pulse_max);
+	sprintf_P(g_strbuf, PSTR("%d,%d,"), g_config.pulse_min * PULSE_DURATION_SCALE, g_config.pulse_max * PULSE_DURATION_SCALE);
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_config.pulse_center_lo, g_config.pulse_center_hi, g_config.power);
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_config.pulse_dband_lo * PULSE_DURATION_SCALE, g_config.pulse_dband_hi * PULSE_DURATION_SCALE, g_config.power);
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR("%d,%d"), g_config.expo_percent, g_config.crc);
+	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_config.expo_percent, g_config.crc);
 	uart_puts(g_strbuf);
-	uart_puts_p( PSTR("\r\n"));
 }
 
 void sendState()
 {
-	sprintf_P(g_strbuf, PSTR("%d,%ld,%d,"), g_state.motorPosition, g_state.lastPulseTime, g_state.pulseDuration);
+	sprintf_P(g_strbuf, PSTR("%ld,%d,%ld,"), millis(), g_state.motorPosition, g_state.lastPulseTime );
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_state.actualDirection, g_state.actualSpeed, g_state.speed);
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_state.pulseDuration * PULSE_DURATION_SCALE, g_state.actualDirection, g_state.actualSpeed );
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR("%ld,%d"), g_state.timer1OverflowCount, g_state.ocr0);
+	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_state.speed, g_state.ocr0);
 	uart_puts(g_strbuf);
-	uart_puts_p( PSTR("\r\n"));
 }
 
 void sendUptime()
@@ -275,11 +273,10 @@ void receiveExpo()
 
 void sendPulse()
 {
-	sprintf_P(g_strbuf, PSTR("%d,%d,"), g_config.pulse_min, g_config.pulse_max);
+	sprintf_P(g_strbuf, PSTR("%d,%d,"), g_config.pulse_min * PULSE_DURATION_SCALE, g_config.pulse_max * PULSE_DURATION_SCALE);
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR("%d,%d"), g_config.pulse_center_lo, g_config.pulse_center_hi);
+	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_config.pulse_dband_lo * PULSE_DURATION_SCALE, g_config.pulse_dband_hi * PULSE_DURATION_SCALE);
 	uart_puts(g_strbuf);
-	uart_puts_p( PSTR("\r\n"));
 }
 
 void receivePulse()
@@ -322,14 +319,13 @@ void receivePulse()
 
 
 	// Write to config
-	g_config.pulse_min = min;
-	g_config.pulse_max = max;
-	g_config.pulse_center_lo = clo;
-	g_config.pulse_center_hi = chi;
+	g_config.pulse_min = min / PULSE_DURATION_SCALE;
+	g_config.pulse_max = max / PULSE_DURATION_SCALE;
+	g_config.pulse_dband_lo = clo / PULSE_DURATION_SCALE;
+	g_config.pulse_dband_hi = chi / PULSE_DURATION_SCALE;
 	
 	// Send back received values
 	sendPulse();
-
 }
 
 void control()

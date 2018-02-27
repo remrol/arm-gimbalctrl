@@ -7,7 +7,6 @@
 
 //#include "simple_uart.h"
 #include "i2c_master.h"
-#include "servo.h"
 #include "calculations.h"
 #include "config.h"
 #include "control.h"
@@ -29,7 +28,7 @@ ISR(TIMER1_OVF_vect)
 {	
 	TIFR &= 0xff ^ _BV(TOV1);				// Clear overflow flag.
 
-	g_state.timer1OverflowCount += 1;					// Increment overflows count.
+	g_state.timer1OverflowCount += 0x10000;					// Increment overflows count.
 
 	//  If no response for 2 seconds then set pulse duration to invalid.
 	if( millis() > g_state.lastPulseTime + 2*1000 )
@@ -47,7 +46,7 @@ ISR(TIMER1_CAPT_vect)
 	uint8_t risingEdge = TCCR1B & _BV( ICES1 );		// Read which edge has been captured.
 	TCCR1B ^= _BV( ICES1 );					// Switch edge capture.
 	
-	uint32_t timeStamp = g_state.timer1OverflowCount << 16;	// Compute precise 32 bit time stamp.
+	uint32_t timeStamp = g_state.timer1OverflowCount;	// Compute precise 32 bit time stamp.
 	timeStamp |= ICR1;
 	
 	if( risingEdge ) // Read which edge has been captured.
@@ -63,7 +62,7 @@ ISR(TIMER1_CAPT_vect)
 		risingEdgeTimeStamp = 0;
 	
 		// Validate measured pulse duration. Accept only 500 - 2500 us range.	
-		if( pulseDuration >= 700 / PULSE_DURATION_SCALE && pulseDuration <= 2500 / PULSE_DURATION_SCALE )
+		if( pulseDuration >= 500 / PULSE_DURATION_SCALE && pulseDuration <= 2500 / PULSE_DURATION_SCALE )
 		{
 			g_state.pulseDuration = pulseDuration;	// Store pulse duration.
 			g_state.lastPulseTime = millis();		// Store pulse time stamp.
@@ -80,7 +79,7 @@ ISR(TIMER1_CAPT_vect)
 ISR(TIMER0_COMP_vect)
 {
 	// React only on rising edge
-	if( PORTB & _BV( 3 ) )
+//	if( PORTB & _BV( 3 ) )
 	{
 		g_state.motorPosition += g_state.actualDirection;
 	}
@@ -203,34 +202,34 @@ void processPulse( uint16_t pulseMs )
 	}
 	else
 	{
-		if( pulseMs >=  g_config.pulse_center_hi )
+		if( pulseMs >= g_config.pulse_dband_hi )
 		{
 			// Positive rotation.
 			if( pulseMs > g_config.pulse_max )
 				pulseMs = g_config.pulse_max;
 				
-//			diff = ( pulseMs - g_config.pulse_center_hi * g_config.power;
-//			diff /= ( g_config.pulse_max - g_config.pulse_center_hi );
+//			diff = ( pulseMs - g_config.pulse_dband_hi * g_config.power;
+//			diff /= ( g_config.pulse_max - g_config.pulse_dband_hi );
 			
-			diff = exponent(pulseMs - g_config.pulse_center_hi, g_config.pulse_max - g_config.pulse_center_hi, g_config.expo_percent );
-			diff = diff * g_config.power / ( g_config.pulse_max - g_config.pulse_center_hi );
+			diff = exponent(pulseMs - g_config.pulse_dband_hi, g_config.pulse_max - g_config.pulse_dband_hi, g_config.expo_percent );
+			diff = diff * g_config.power / ( g_config.pulse_max - g_config.pulse_dband_hi );
 
 			if( diff > 127 )
 				diff = 127;
 				
 			g_state.speed = diff;
 		}
-		else if( pulseMs <= g_config.pulse_center_lo )
+		else if( pulseMs <= g_config.pulse_dband_lo )
 		{
 			// Negative rotation.
 			if( pulseMs < g_config.pulse_min)
 				pulseMs = g_config.pulse_min;
 
-//			diff = ( g_config.pulse_center_lo - pulseMs ) * g_config.power;
-//			diff /= g_config.pulse_center_lo - g_config.pulse_min;
+//			diff = ( g_config.pulse_dband_lo - pulseMs ) * g_config.power;
+//			diff /= g_config.pulse_dband_lo - g_config.pulse_min;
 
-			diff = exponent( g_config.pulse_center_lo - pulseMs, g_config.pulse_center_lo - g_config.pulse_min, g_config.expo_percent );
-			diff = diff * g_config.power / ( g_config.pulse_center_lo - g_config.pulse_min );
+			diff = exponent( g_config.pulse_dband_lo - pulseMs, g_config.pulse_dband_lo - g_config.pulse_min, g_config.expo_percent );
+			diff = diff * g_config.power / ( g_config.pulse_dband_lo - g_config.pulse_min );
 			
 			if( diff > 127 )
 				diff = 127;

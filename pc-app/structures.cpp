@@ -13,8 +13,8 @@ bool Config::fromString( const std::string& _data )
 
 	pulse_min         = atoi( tokens[0].c_str() );
 	pulse_max         = atoi( tokens[1].c_str() );
-	pulse_center_lo   = atoi( tokens[2].c_str() );
-	pulse_center_hi   = atoi( tokens[3].c_str() );
+	pulse_dband_lo    = atoi( tokens[2].c_str() );
+	pulse_dband_hi    = atoi( tokens[3].c_str() );
 	power             = atoi( tokens[4].c_str() );
 	expo_percent      = atoi( tokens[5].c_str() );
 	crc               = atoi( tokens[6].c_str() );
@@ -28,11 +28,11 @@ std::string Config::toDisplayableString() const
 	ss << 
 		"Pulse min " << pulse_min << "\r\n" <<	
 		"Pulse max " << pulse_max << "\r\n" <<	
-		"Pulse center lo " << pulse_center_lo << "\r\n" <<	
-		"Pulse center hi " << pulse_center_hi << "\r\n" <<	
+		"Pulse dband lo " << pulse_dband_lo << "\r\n" <<	
+		"Pulse dband hi " << pulse_dband_hi << "\r\n" <<	
 		"Power " << power << "\r\n" <<	
 		"Expo " << expo_percent << "\r\n" <<	
-		"CRC8" << crc;	
+		"CRC8 " << crc;	
 
   return ss.str();
 }
@@ -47,14 +47,14 @@ bool State::fromString( const std::string& _data )
 		return false;
 	}
 
-	motorPosition       = atoi( tokens[0].c_str() );
-	lastPulseTimeMs     = atoi( tokens[1].c_str() );
-	pulseDuration       = atoi( tokens[2].c_str() );
-	actualDirection     = atoi( tokens[3].c_str() );
-	actualSpeed         = atoi( tokens[4].c_str() );
-	speed               = atoi( tokens[5].c_str() );
-	timer1OverflowCount = atoi( tokens[6].c_str() );
-  ocr0                = atoi( tokens[7].c_str() );
+	timeStampSec        = atoi( tokens[0].c_str() ) / 1000.0;
+	motorPosition       = atoi( tokens[1].c_str() );
+	lastPulseTimeSec    = atoi( tokens[2].c_str() ) / 1000.0;
+	pulseDuration       = atoi( tokens[3].c_str() );
+	actualDirection     = atoi( tokens[4].c_str() );
+	actualSpeed         = atoi( tokens[5].c_str() );
+	speed               = atoi( tokens[6].c_str() );
+	ocr0                = atoi( tokens[7].c_str() );
 
 	return true;
 }
@@ -63,14 +63,14 @@ std::string State::toDisplayableString() const
 {
 	std::stringstream ss;
 	ss << 
+		"Timestamp " << timeStampSec << "\r\n" <<	
 		"Motor pos " << motorPosition << "\r\n" <<	
-		"Last pulse time " << lastPulseTimeMs << "\r\n" <<	
+		"Last pulse time " << lastPulseTimeSec << "\r\n" <<	
 		"Pulse duration " << pulseDuration << "\r\n" <<	
 		"Actual direction " << actualDirection << "\r\n" <<	
 		"Actual speed " << actualSpeed << "\r\n" <<	
 		"Speed " << speed << "\r\n" <<	
-		"Timer1 overflow cnt " << timer1OverflowCount << "\r\n" <<	
-		"OCR0 pwm " << ocr0;
+		"OCR0 " << ocr0;
 
   return ss.str();
 }

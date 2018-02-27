@@ -1,5 +1,4 @@
 #include "calculations.h"
-#include "servo.h"
 
 /*
 uint16_t expo(uint16_t pulse_time_ms, uint8_t percent )

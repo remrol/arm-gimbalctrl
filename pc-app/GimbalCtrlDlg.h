@@ -37,4 +37,10 @@ public:
   CButton m_buttonConnect;
   afx_msg void OnBnClickedButtonReadConfig();
   afx_msg void OnBnClickedButtonReadState();
+  afx_msg void OnBnClickedButtonServoGet();
+  afx_msg void OnBnClickedButtonServoSet();
+  int m_servoMin;
+  int m_servoDbandLo;
+  int m_servoDbandHi;
+  int m_servoMax;
 };

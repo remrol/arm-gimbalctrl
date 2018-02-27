@@ -137,3 +137,45 @@ bool Device::getState( State& _state )
 
 	return true;
 }
+
+
+bool Device::getServoRange( int& _min, int& _dbandLo, int& _dbandHi, int& _max)
+{
+	if( !isOpened())
+	{
+		L_ << "getServoRange, not connected";
+		return false;
+	}
+
+	std::string msg = sendReceive("l");
+	std::vector< std::string > tokens;
+	boost::split( tokens, msg, boost::is_any_of( std::string(", ")));
+	if( tokens.size() != 4 )
+	{
+		L_ << "getServoRange, cannot parse msg";
+		return false;
+	}
+
+	_min = atoi( tokens[0].c_str() );
+	_max = atoi( tokens[1].c_str() );
+	_dbandLo = atoi( tokens[2].c_str() );
+	_dbandHi = atoi( tokens[3].c_str() );
+
+  return true;
+}
+
+bool Device::setServoRange( int _min, int _dbandLo, int _dbandHi, int _max)
+{
+	if( !isOpened())
+	{
+		L_ << "setServoRange, not connected";
+		return false;
+	}
+
+  std::stringstream ss;
+  ss << "L " << _min << " " << _max << " " << _dbandLo << " " << _dbandHi << "\r\n";
+
+  std::string msg = sendReceive( ss.str());
+  return true;
+}
+

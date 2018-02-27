@@ -20,6 +20,10 @@
 
 CGimbalCtrlDlg::CGimbalCtrlDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CGimbalCtrlDlg::IDD, pParent)
+  , m_servoMin(0)
+  , m_servoDbandLo(0)
+  , m_servoDbandHi(0)
+  , m_servoMax(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -29,6 +33,10 @@ void CGimbalCtrlDlg::DoDataExchange(CDataExchange* pDX)
   CDialogEx::DoDataExchange(pDX);
   DDX_Control(pDX, IDC_COMBO_COMPORTS, m_comboComPorts);
   DDX_Control(pDX, IDC_BUTTON_CONNECT, m_buttonConnect);
+  DDX_Text(pDX, IDC_EDIT_SERVO_MIN, m_servoMin);
+  DDX_Text(pDX, IDC_EDIT_SERVO_DBANDLO, m_servoDbandLo);
+  DDX_Text(pDX, IDC_EDIT_SERVO_DBANDHI, m_servoDbandHi);
+  DDX_Text(pDX, IDC_EDIT_SERVO_MAX, m_servoMax);
 }
 
 BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
@@ -37,6 +45,8 @@ BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
   ON_BN_CLICKED(IDC_BUTTON_CONNECT, &CGimbalCtrlDlg::OnBnClickedButtonConnect)
   ON_BN_CLICKED(IDC_BUTTON_READ_CONFIG, &CGimbalCtrlDlg::OnBnClickedButtonReadConfig)
   ON_BN_CLICKED(IDC_BUTTON_READ_STATE, &CGimbalCtrlDlg::OnBnClickedButtonReadState)
+  ON_BN_CLICKED(IDC_BUTTON_SERVO_GET, &CGimbalCtrlDlg::OnBnClickedButtonServoGet)
+  ON_BN_CLICKED(IDC_BUTTON_SERVO_SET, &CGimbalCtrlDlg::OnBnClickedButtonServoSet)
 END_MESSAGE_MAP()
 
 
@@ -172,4 +182,16 @@ void CGimbalCtrlDlg::OnBnClickedButtonReadState()
   {
     GetDlgItem(IDC_EDIT_STATE)->SetWindowText(state.toDisplayableString().c_str());
   }
+}
+
+
+void CGimbalCtrlDlg::OnBnClickedButtonServoGet()
+{
+
+}
+
+
+void CGimbalCtrlDlg::OnBnClickedButtonServoSet()
+{
+
 }

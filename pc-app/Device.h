@@ -15,6 +15,8 @@ public:
 
   bool getConfig( Config& _config );
   bool getState( State& _state );
+  bool getServoRange( int& _min, int& _dbandLo, int& _dbandHi, int& _max);
+  bool setServoRange( int _min, int _dbandLo, int _dbandHi, int _max);
 
 private:
 

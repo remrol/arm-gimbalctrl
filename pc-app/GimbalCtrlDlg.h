@@ -3,6 +3,8 @@
 //
 
 #pragma once
+#include "afxwin.h"
+#include "Device.h"
 
 
 // CGimbalCtrlDlg dialog
@@ -28,4 +30,9 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+  Device				m_device;
+  CComboBox m_comboComPorts;
+  afx_msg void OnBnClickedButtonConnect();
+  CButton m_buttonConnect;
 };

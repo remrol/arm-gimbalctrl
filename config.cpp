@@ -62,8 +62,10 @@ void configEepromSave()
 void stateInit()
 {
 	g_state.motorPosition = 0;
-	g_state.lastPulseTime = 0;		
+	g_state.pulseTimeStamp = 0;		
 	g_state.pulseDuration = 0;
+	g_state.pulseDurationSum = 0;
+	g_state.pulseDurationSumCount = 0;
 	g_state.actualDirection = 0;
 	g_state.actualSpeed = 0;
 	g_state.speed = 0;

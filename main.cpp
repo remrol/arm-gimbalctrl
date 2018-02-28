@@ -31,7 +31,7 @@ ISR(TIMER1_OVF_vect)
 	g_state.timer1OverflowCount += 0x10000;					// Increment overflows count.
 
 	//  If no response for 2 seconds then set pulse duration to invalid.
-	if( millis() > g_state.lastPulseTime + 2*1000 )
+	if( millis() > g_state.pulseTimeStamp + 2*1000 )
 	{
 		g_state.pulseDuration = 0;
 		processPulse( g_state.pulseDuration );
@@ -65,7 +65,9 @@ ISR(TIMER1_CAPT_vect)
 		if( pulseDuration >= 500 / PULSE_DURATION_SCALE && pulseDuration <= 2500 / PULSE_DURATION_SCALE )
 		{
 			g_state.pulseDuration = pulseDuration;	// Store pulse duration.
-			g_state.lastPulseTime = millis();		// Store pulse time stamp.
+			g_state.pulseDurationSum += pulseDuration;
+			g_state.pulseDurationSumCount += 1;
+			g_state.pulseTimeStamp = millis();		// Store pulse time stamp.
 			
 			processPulse( g_state.pulseDuration );
 		}

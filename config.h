@@ -22,8 +22,10 @@ struct Config
 struct State
 {
 	volatile uint16_t motorPosition;	// Motor position
-	volatile uint32_t lastPulseTime;	// Timestamp of last measured pulse
+	volatile uint32_t pulseTimeStamp;	// Timestamp of last measured pulse
 	volatile uint16_t pulseDuration;	// Last measured pulse duration in ms/2, 0 if not available.	
+	volatile uint32_t pulseDurationSum;
+	volatile uint16_t pulseDurationSumCount;
 	volatile int8_t	  actualDirection;
 	volatile int8_t   actualSpeed;
 	volatile int8_t   speed;

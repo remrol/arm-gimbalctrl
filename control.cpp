@@ -189,7 +189,7 @@ void sendConfig()
 
 void sendState()
 {
-	sprintf_P(g_strbuf, PSTR("%ld,%d,%ld,"), millis(), g_state.motorPosition, g_state.lastPulseTime );
+	sprintf_P(g_strbuf, PSTR("%ld,%d,%ld,"), millis(), g_state.motorPosition, g_state.pulseTimeStamp );
 	uart_puts(g_strbuf);
 	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_state.pulseDuration * PULSE_DURATION_SCALE, g_state.actualDirection, g_state.actualSpeed );
 	uart_puts(g_strbuf);

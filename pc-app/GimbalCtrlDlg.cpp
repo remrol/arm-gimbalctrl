@@ -24,6 +24,7 @@ CGimbalCtrlDlg::CGimbalCtrlDlg(CWnd* pParent /*=NULL*/)
   , m_servoDbandLo(0)
   , m_servoDbandHi(0)
   , m_servoMax(0)
+  , m_timer(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -42,6 +43,8 @@ void CGimbalCtrlDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_WM_DESTROY()
+	ON_WM_TIMER()
   ON_BN_CLICKED(IDC_BUTTON_CONNECT, &CGimbalCtrlDlg::OnBnClickedButtonConnect)
   ON_BN_CLICKED(IDC_BUTTON_READ_CONFIG, &CGimbalCtrlDlg::OnBnClickedButtonReadConfig)
   ON_BN_CLICKED(IDC_BUTTON_READ_STATE, &CGimbalCtrlDlg::OnBnClickedButtonReadState)
@@ -82,12 +85,23 @@ BOOL CGimbalCtrlDlg::OnInitDialog()
 		m_comboComPorts.SetCurSel(0);
 	}
 
-//	GetDlgItem(IDC_EDIT_DEVICE_INFO)->SetWindowText("Disconnected");
+	GetDlgItem(IDC_EDIT_DEVICE_INFO)->SetWindowText("Disconnected");
 
-//	m_timer = SetTimer( WORK_TIMER_ID, WORK_TIMER_INTERVAL_MS, nullptr );
-//	L_ << "Starting timer id " << WORK_TIMER_ID << " interval " << WORK_TIMER_INTERVAL_MS << " [ms] status " << m_timer;
+	m_timer = SetTimer( WORK_TIMER_ID, WORK_TIMER_INTERVAL_MS, nullptr );
+	L_ << "Starting timer id " << WORK_TIMER_ID << " interval " << WORK_TIMER_INTERVAL_MS << " [ms] status " << m_timer;
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
+}
+
+void CGimbalCtrlDlg::OnDestroy()
+{
+	if( m_timer )
+	{
+		KillTimer( m_timer );
+		L_ << "Stopped timer id " << m_timer;
+	}
+
+	CDialogEx::OnDestroy();
 }
 
 // If you add a minimize button to your dialog, you will need the code below
@@ -204,4 +218,23 @@ void CGimbalCtrlDlg::OnBnClickedButtonServoSet()
 void CGimbalCtrlDlg::OnBnClickedButtonConfigSaveeeprom()
 {
 	m_device.configSaveToEeprom();
+}
+
+void CGimbalCtrlDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	if( nIDEvent == WORK_TIMER_ID )
+	{
+		if( m_device.isOpened() )
+		{
+/*
+			double timeNow = TimeMeasure::now();
+			if( m_lastMeasureTime == 0 || timeNow >= m_lastMeasureTime + m_measureUpdateIntervalSec )
+			{
+				m_lastMeasureTime = timeNow;
+				readMeasurements();
+			} */
+		}
+	}
+
+	CDialogEx::OnTimer(nIDEvent);
 }

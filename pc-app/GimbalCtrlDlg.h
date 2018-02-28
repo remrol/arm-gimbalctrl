@@ -20,15 +20,19 @@ public:
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 
+	static const int WORK_TIMER_ID = 1;
+	static const int WORK_TIMER_INTERVAL_MS = 100;
 
 // Implementation
 protected:
 	HICON m_hIcon;
 
 	// Generated message map functions
+	afx_msg void OnDestroy();
 	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	DECLARE_MESSAGE_MAP()
 public:
   Device				m_device;
@@ -44,4 +48,6 @@ public:
   int m_servoDbandHi;
   int m_servoMax;
   afx_msg void OnBnClickedButtonConfigSaveeeprom();
+	UINT_PTR            m_timer;
+
 };

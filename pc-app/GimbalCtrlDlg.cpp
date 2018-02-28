@@ -226,6 +226,7 @@ void CGimbalCtrlDlg::OnTimer(UINT_PTR nIDEvent)
 	{
 		if( m_device.isOpened() )
 		{
+      OnBnClickedButtonReadState();
 /*
 			double timeNow = TimeMeasure::now();
 			if( m_lastMeasureTime == 0 || timeNow >= m_lastMeasureTime + m_measureUpdateIntervalSec )

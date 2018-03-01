@@ -19,7 +19,7 @@ extern "C"
 
 
 //--------------------------------------------------------------------------------
-void motorSpeed( int8_t speed );	
+void setMotorSpeed( int8_t speed );	
 void handleSpeedSmooth();
 void pulseDurationToSpeed( uint16_t pulseMs );
 
@@ -155,29 +155,7 @@ void pulseDurationToSpeed( uint16_t pulseMs )
 
 //-------------------------------------------------------------------------------------
 
-void handleSpeedSmooth()
-{
-	int8_t dstSpd;
-	// Rewrite to get rid of overwrites
-	int8_t spd = g_state.speed;
-	
-	if( spd == g_state.motorSpeed )
-	{
-		motorSpeed( g_state.motorSpeed );	
-	}
-	else if( spd < g_state.motorSpeed )
-	{
-		dstSpd = g_state.motorSpeed - 1;
-		motorSpeed( dstSpd > spd ? dstSpd : spd );
-	}
-	else
-	{
-		dstSpd = g_state.motorSpeed + 1;
-		motorSpeed( dstSpd < spd ? dstSpd : spd );	
-	}
-}
-
-void motorSpeed( int8_t speed )
+void setMotorSpeed( int8_t speed )
 {
 	#define FREF 800
 	// cpu clock / 64
@@ -187,7 +165,7 @@ void motorSpeed( int8_t speed )
 	
 	// Time stamp of last motor move action.
 	static uint32_t moveTimeStamp = 0;
-			
+	
 	// Special handling for zero speed
 	if( speed == 0 )
 	{
@@ -213,13 +191,13 @@ void motorSpeed( int8_t speed )
 	
 	// Check if speed really differs
 	if( speed == g_state.motorSpeed )
-		return;	
+	return;
 	
 	else if( speed > 0 )
 	{
 		int16_t ocr0 = ( ( ( int16_t ) FREF ) / speed ) - 1;
 		g_state.ocr0 = ocr0 < 255 ? ocr0 : 255;
-		OCR0 = g_state.ocr0;		
+		OCR0 = g_state.ocr0;
 		g_state.motorDirection = 1;
 		
 		if( g_state.motorSpeed <= 0 ) // Handle speed direction change
@@ -228,7 +206,7 @@ void motorSpeed( int8_t speed )
 			portbState = PORTB;
 			portbState |= _BV(PB2);			// Set PB2 (dir)
 			portbState &= 0xff ^ _BV(PB1);	// Clear PB1 (NENABLE)
-			PORTB = portbState;			
+			PORTB = portbState;
 		}
 	}
 	else
@@ -240,15 +218,38 @@ void motorSpeed( int8_t speed )
 		
 		if( g_state.motorSpeed >= 0 )	// Handle direction change
 		{
-			TCCR0 |= CLOCK0_SELECT; 
+			TCCR0 |= CLOCK0_SELECT;
 			portbState = PORTB;
 			portbState &= 0xff ^ _BV(PB2);	// Clear PB2 (dir)
 			portbState &= 0xff ^ _BV(PB1);	// Clear PB1 (NENABLE)
-			PORTB = portbState;			
+			PORTB = portbState;
 		}
 	}
 	
 	g_state.motorSpeed = speed;
+}
+
+
+void handleSpeedSmooth()
+{
+	int8_t dstSpd;
+	// Rewrite to get rid of overwrites
+	int8_t spd = g_state.speed;
+	
+	if( spd == g_state.motorSpeed )
+	{
+		setMotorSpeed( g_state.motorSpeed );	
+	}
+	else if( spd < g_state.motorSpeed )
+	{
+		dstSpd = g_state.motorSpeed - 1;
+		setMotorSpeed( dstSpd > spd ? dstSpd : spd );
+	}
+	else
+	{
+		dstSpd = g_state.motorSpeed + 1;
+		setMotorSpeed( dstSpd < spd ? dstSpd : spd );	
+	}
 }
 
 
@@ -283,6 +284,7 @@ uint32_t getPulseTimeStamp()
 
 	return pulseTimeStamp;
 }
+
 
 int main(void)
 {

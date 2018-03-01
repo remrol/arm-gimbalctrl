@@ -178,7 +178,7 @@ void setMotorSpeed( int8_t speed )
 		}
 		
 		// Shutdown motor after 10 seconds to minimize power consumption
-		if( millis() > moveTimeStamp + 10*1000 )
+		if( millis() > moveTimeStamp + MOT_DISABLE_TIMEOUT_MS )
 		{
 			PORTB |=  _BV(PB1); //0x02;			// set PB1 (NENABLE)
 		}
@@ -191,7 +191,7 @@ void setMotorSpeed( int8_t speed )
 	
 	// Check if speed really differs
 	if( speed == g_state.motorSpeed )
-	return;
+		return;
 	
 	else if( speed > 0 )
 	{
@@ -345,6 +345,7 @@ int main(void)
 	uint32_t handleSpeedSmoothTimeout, handlePulseTimeout;
 	handleSpeedSmoothTimeout = handlePulseTimeout = millis();
 	
+
     while(1)
     {
 		uint32_t now = millis();
@@ -357,20 +358,20 @@ int main(void)
 			{
 				pulseDurationToSpeed(g_state.pulseDuration);
 			}
-			else if( now > getPulseTimeStamp() + 2*1000)
+			else if( now > getPulseTimeStamp() + MOT_STOP_NO_PULSE_TIMEOUT_MS)
 			{
 				//  If no response for 2 seconds then set pulse duration to invalid.
 				pulseDurationToSpeed(g_state.pulseDuration);
 			}
 			
-			handlePulseTimeout += 100;
+			handlePulseTimeout += PROCESS_PULSE_DURATION_INTERVAL_MS;
 		}
 
 		// Periodically handle speed smoother 
 		if( now >= handleSpeedSmoothTimeout )
 		{
 			handleSpeedSmooth();
-			handleSpeedSmoothTimeout += 10;
+			handleSpeedSmoothTimeout += PROCESS_SMOOTH_SPEED_INTERVAL_MS;
 		}
 
 		// IO control

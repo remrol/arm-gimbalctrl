@@ -116,15 +116,13 @@ void pulseDurationToSpeed( uint16_t pulseMs )
 			// Positive rotation.
 			if( pulseMs > g_config.pulse_max )
 				pulseMs = g_config.pulse_max;
-			
-			//			diff = ( pulseMs - g_config.pulse_dband_hi * g_config.power;
-			//			diff /= ( g_config.pulse_max - g_config.pulse_dband_hi );
-			
+	
+			//	diff = ( pulseMs - g_config.pulse_dband_hi * g_config.power;  diff /= ( g_config.pulse_max - g_config.pulse_dband_hi );
 			diff = exponent(pulseMs - g_config.pulse_dband_hi, g_config.pulse_max - g_config.pulse_dband_hi, g_config.expo_percent );
 			diff = diff * g_config.power / ( g_config.pulse_max - g_config.pulse_dband_hi );
 
-			if( diff > 127 )
-				diff = 127;
+//			if( diff > 127 )
+//				diff = 127;
 			
 			g_state.speed = diff;
 		}
@@ -132,16 +130,14 @@ void pulseDurationToSpeed( uint16_t pulseMs )
 		{
 			// Negative rotation.
 			if( pulseMs < g_config.pulse_min)
-			pulseMs = g_config.pulse_min;
+				pulseMs = g_config.pulse_min;
 
-			//			diff = ( g_config.pulse_dband_lo - pulseMs ) * g_config.power;
-			//			diff /= g_config.pulse_dband_lo - g_config.pulse_min;
-
+			//			diff = ( g_config.pulse_dband_lo - pulseMs ) * g_config.power;	diff /= g_config.pulse_dband_lo - g_config.pulse_min;
 			diff = exponent( g_config.pulse_dband_lo - pulseMs, g_config.pulse_dband_lo - g_config.pulse_min, g_config.expo_percent );
 			diff = diff * g_config.power / ( g_config.pulse_dband_lo - g_config.pulse_min );
 			
-			if( diff > 127 )
-				diff = 127;
+//			if( diff > 127 )
+//				diff = 127;
 			
 			g_state.speed = -diff;
 		}

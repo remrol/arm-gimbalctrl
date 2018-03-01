@@ -20,22 +20,26 @@ extern "C"
 
 //--------------------------------------------------------------------------------
 void motorSpeed( int8_t speed );	
-void handleSpeed(void);
-void processPulse( uint16_t pulseMs );
+void handleSpeedSmooth();
+void pulseDurationToSpeed( uint16_t pulseMs );
 
 
 ISR(TIMER1_OVF_vect)
 {	
-	TIFR &= 0xff ^ _BV(TOV1);				// Clear overflow flag.
+	// Clear overflow flag.
+	TIFR &= 0xff ^ _BV(TOV1);				
 
-	g_state.timer1OverflowCount += 0x10000;					// Increment overflows count.
+	// Increment overflows count.
+	g_state.timer1OverflowCount += 0x10000;					
 
+/*
 	//  If no response for 2 seconds then set pulse duration to invalid.
 	if( millis() > g_state.pulseTimeStamp + 2*1000 )
 	{
 		g_state.pulseDuration = 0;
-		processPulse( g_state.pulseDuration );
+		pulseDurationToSpeed( g_state.pulseDuration );
 	}
+*/
 }	
 
 ISR(TIMER1_CAPT_vect)
@@ -64,12 +68,12 @@ ISR(TIMER1_CAPT_vect)
 		// Validate measured pulse duration. Accept only 500 - 2500 us range.	
 		if( pulseDuration >= 500 / PULSE_DURATION_SCALE && pulseDuration <= 2500 / PULSE_DURATION_SCALE )
 		{
-			g_state.pulseDuration = pulseDuration;	// Store pulse duration.
+//			g_state.pulseDuration = pulseDuration;	// Store pulse duration.
 			g_state.pulseDurationSum += pulseDuration;
 			g_state.pulseDurationSumCount += 1;
 			g_state.pulseTimeStamp = millis();		// Store pulse time stamp.
 			
-			processPulse( g_state.pulseDuration );
+//			pulseDurationToSpeed( g_state.pulseDuration );
 		}
 	}
 	else
@@ -83,31 +87,92 @@ ISR(TIMER0_COMP_vect)
 	// React only on rising edge
 //	if( PORTB & _BV( 3 ) )
 	{
-		g_state.motorPosition += g_state.actualDirection;
+		g_state.motorPosition += g_state.motorDirection;
 	}
 }
 
 //-------------------------------------------------------------------------------------
 
+void pulseDurationToSpeed( uint16_t pulseMs )
+{
+	static uint16_t lastPulseMs = 0;
+	uint16_t diff;
+	
+	// Skip processing if pulse haven't changed
+	if( pulseMs == lastPulseMs )
+		return;
+	
+	lastPulseMs = pulseMs;
+	
+	if( pulseMs == 0 )
+	{
+		// Stop motor if out of range.
+		g_state.speed = 0;
+	}
+	else
+	{
+		if( pulseMs >= g_config.pulse_dband_hi )
+		{
+			// Positive rotation.
+			if( pulseMs > g_config.pulse_max )
+			pulseMs = g_config.pulse_max;
+			
+			//			diff = ( pulseMs - g_config.pulse_dband_hi * g_config.power;
+			//			diff /= ( g_config.pulse_max - g_config.pulse_dband_hi );
+			
+			diff = exponent(pulseMs - g_config.pulse_dband_hi, g_config.pulse_max - g_config.pulse_dband_hi, g_config.expo_percent );
+			diff = diff * g_config.power / ( g_config.pulse_max - g_config.pulse_dband_hi );
 
-void handleSpeed()
+			if( diff > 127 )
+				diff = 127;
+			
+			g_state.speed = diff;
+		}
+		else if( pulseMs <= g_config.pulse_dband_lo )
+		{
+			// Negative rotation.
+			if( pulseMs < g_config.pulse_min)
+			pulseMs = g_config.pulse_min;
+
+			//			diff = ( g_config.pulse_dband_lo - pulseMs ) * g_config.power;
+			//			diff /= g_config.pulse_dband_lo - g_config.pulse_min;
+
+			diff = exponent( g_config.pulse_dband_lo - pulseMs, g_config.pulse_dband_lo - g_config.pulse_min, g_config.expo_percent );
+			diff = diff * g_config.power / ( g_config.pulse_dband_lo - g_config.pulse_min );
+			
+			if( diff > 127 )
+				diff = 127;
+			
+			g_state.speed = -diff;
+		}
+		else
+		{
+			// In dead band, stop the motor.
+			g_state.speed = 0;
+		}
+	}
+}
+
+//-------------------------------------------------------------------------------------
+
+void handleSpeedSmooth()
 {
 	int8_t dstSpd;
 	// Rewrite to get rid of overwrites
 	int8_t spd = g_state.speed;
 	
-	if( spd == g_state.actualSpeed )
+	if( spd == g_state.motorSpeed )
 	{
-		motorSpeed( g_state.actualSpeed );	
+		motorSpeed( g_state.motorSpeed );	
 	}
-	else if( spd < g_state.actualSpeed )
+	else if( spd < g_state.motorSpeed )
 	{
-		dstSpd = g_state.actualSpeed - 1;
+		dstSpd = g_state.motorSpeed - 1;
 		motorSpeed( dstSpd > spd ? dstSpd : spd );
 	}
 	else
 	{
-		dstSpd = g_state.actualSpeed + 1;
+		dstSpd = g_state.motorSpeed + 1;
 		motorSpeed( dstSpd < spd ? dstSpd : spd );	
 	}
 }
@@ -127,10 +192,10 @@ void motorSpeed( int8_t speed )
 	if( speed == 0 )
 	{
 		// Stopping motor for the very first time
-		if( g_state.actualSpeed != 0 )
+		if( g_state.motorSpeed != 0 )
 		{
-			g_state.actualDirection = 0;
-			g_state.actualSpeed = 0;
+			g_state.motorDirection = 0;
+			g_state.motorSpeed = 0;
 			TCCR0 &= 0xff ^ ( _BV( CS02 ) | _BV( CS01 ) | _BV( CS00 ) );	// Stop clock
 		}
 		
@@ -147,7 +212,7 @@ void motorSpeed( int8_t speed )
 	moveTimeStamp = millis();
 	
 	// Check if speed really differs
-	if( speed == g_state.actualSpeed )
+	if( speed == g_state.motorSpeed )
 		return;	
 	
 	else if( speed > 0 )
@@ -155,9 +220,9 @@ void motorSpeed( int8_t speed )
 		int16_t ocr0 = ( ( ( int16_t ) FREF ) / speed ) - 1;
 		g_state.ocr0 = ocr0 < 255 ? ocr0 : 255;
 		OCR0 = g_state.ocr0;		
-		g_state.actualDirection = 1;
+		g_state.motorDirection = 1;
 		
-		if( g_state.actualSpeed <= 0 ) // Handle speed direction change
+		if( g_state.motorSpeed <= 0 ) // Handle speed direction change
 		{
 			TCCR0 |= CLOCK0_SELECT;	// Set clock
 			portbState = PORTB;
@@ -171,9 +236,9 @@ void motorSpeed( int8_t speed )
 		int16_t ocr0 = ( ( ( int16_t ) FREF ) / -speed ) - 1;
 		g_state.ocr0 = ocr0 < 255 ? ocr0 : 255;
 		OCR0 = g_state.ocr0;
-		g_state.actualDirection = -1;
+		g_state.motorDirection = -1;
 		
-		if( g_state.actualSpeed >= 0 )	// Handle direction change
+		if( g_state.motorSpeed >= 0 )	// Handle direction change
 		{
 			TCCR0 |= CLOCK0_SELECT; 
 			portbState = PORTB;
@@ -183,70 +248,41 @@ void motorSpeed( int8_t speed )
 		}
 	}
 	
-	g_state.actualSpeed = speed;
+	g_state.motorSpeed = speed;
 }
 
-void processPulse( uint16_t pulseMs )
+
+uint16_t getPulseTime()
 {
-	static uint16_t lastPulseMs = 0;
-	uint16_t diff;
-		
-	// Skip processing if pulse haven't changed
-	if( pulseMs == lastPulseMs )
-		return;
-		
-	lastPulseMs = pulseMs;
-	
-	if( pulseMs == 0 )
-	{
-		// Stop motor if out of range.
-		g_state.speed = 0;
-	}
-	else
-	{
-		if( pulseMs >= g_config.pulse_dband_hi )
-		{
-			// Positive rotation.
-			if( pulseMs > g_config.pulse_max )
-				pulseMs = g_config.pulse_max;
-				
-//			diff = ( pulseMs - g_config.pulse_dband_hi * g_config.power;
-//			diff /= ( g_config.pulse_max - g_config.pulse_dband_hi );
-			
-			diff = exponent(pulseMs - g_config.pulse_dband_hi, g_config.pulse_max - g_config.pulse_dband_hi, g_config.expo_percent );
-			diff = diff * g_config.power / ( g_config.pulse_max - g_config.pulse_dband_hi );
+	uint32_t pulseDurationSum;
+	uint16_t pulseDurationSumCount;
 
-			if( diff > 127 )
-				diff = 127;
-				
-			g_state.speed = diff;
-		}
-		else if( pulseMs <= g_config.pulse_dband_lo )
-		{
-			// Negative rotation.
-			if( pulseMs < g_config.pulse_min)
-				pulseMs = g_config.pulse_min;
+	// Rewrite volatile vars with interrupts off.
+	uint8_t oldSREG = SREG;
+	cli();
+	pulseDurationSum = g_state.pulseDurationSum;
+	pulseDurationSumCount = g_state.pulseDurationSumCount;
+	g_state.pulseDurationSum = 0;
+	g_state.pulseDurationSumCount = 0;
+	SREG = oldSREG;
 
-//			diff = ( g_config.pulse_dband_lo - pulseMs ) * g_config.power;
-//			diff /= g_config.pulse_dband_lo - g_config.pulse_min;
+	// Calc avg pulse time
+	if( pulseDurationSumCount == 0 )
+		return 0;
 
-			diff = exponent( g_config.pulse_dband_lo - pulseMs, g_config.pulse_dband_lo - g_config.pulse_min, g_config.expo_percent );
-			diff = diff * g_config.power / ( g_config.pulse_dband_lo - g_config.pulse_min );
-			
-			if( diff > 127 )
-				diff = 127;
-				
-			g_state.speed = -diff;
-		}
-		else
-		{
-			// In dead band, stop the motor.
-			g_state.speed = 0;
-		}
-	}	
+	return pulseDurationSum / pulseDurationSumCount;
 }
 
-int16_t ucr0;
+uint32_t getPulseTimeStamp()
+{
+	uint32_t pulseTimeStamp;
+	uint8_t oldSREG = SREG;
+	cli();
+	pulseTimeStamp = g_state.pulseTimeStamp;
+	SREG = oldSREG;
+
+	return pulseTimeStamp;
+}
 
 int main(void)
 {
@@ -304,24 +340,40 @@ int main(void)
 	
 //	HMC5883L_init();
 	
-	uint32_t handleSpeedTimeout = millis();
+	uint32_t handleSpeedSmoothTimeout, handlePulseTimeout;
+	handleSpeedSmoothTimeout = handlePulseTimeout = millis();
 	
     while(1)
     {
-//		HMC5883L_read();
+		uint32_t now = millis();
 
-		if( millis() >= handleSpeedTimeout )
+		// Periodically pulse duration -> speed handler
+		if( now >= handlePulseTimeout )
 		{
-			handleSpeed();
-			handleSpeedTimeout += 10;
+			g_state.pulseDuration = getPulseTime();
+			if( g_state.pulseDuration > 0 )
+			{
+				pulseDurationToSpeed(g_state.pulseDuration);
+			}
+			else if( now > getPulseTimeStamp() + 2*1000)
+			{
+				//  If no response for 2 seconds then set pulse duration to invalid.
+				pulseDurationToSpeed(g_state.pulseDuration);
+			}
+			
+			handlePulseTimeout += 100;
 		}
 
+		// Periodically handle speed smoother 
+		if( now >= handleSpeedSmoothTimeout )
+		{
+			handleSpeedSmooth();
+			handleSpeedSmoothTimeout += 10;
+		}
+
+		// IO control
 		control();
-		
-//		printf( "%d %d %d %d\n", g_pulseDuration * PULSE_DURATION_SCALE, g_speed, g_actualSpeed, ucr0 );
-
     }
-
 }
 
 

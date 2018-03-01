@@ -26,8 +26,8 @@ struct State
 	volatile uint16_t pulseDuration;	// Last measured pulse duration in ms/2, 0 if not available.	
 	volatile uint32_t pulseDurationSum;
 	volatile uint16_t pulseDurationSumCount;
-	volatile int8_t	  actualDirection;
-	volatile int8_t   actualSpeed;
+	volatile int8_t	  motorDirection;
+	volatile int8_t   motorSpeed;
 	volatile int8_t   speed;
 	volatile uint32_t timer1OverflowCount; // Timer 1 overflow count.		
 	volatile uint8_t  ocr0;

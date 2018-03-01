@@ -66,9 +66,9 @@ void stateInit()
 	g_state.pulseDuration = 0;
 	g_state.pulseDurationSum = 0;
 	g_state.pulseDurationSumCount = 0;
-	g_state.actualDirection = 0;
-	g_state.actualSpeed = 0;
 	g_state.speed = 0;
+	g_state.motorDirection = 0;
+	g_state.motorSpeed = 0;
 	g_state.timer1OverflowCount = 0;
 	g_state.ocr0 = 0;
 }

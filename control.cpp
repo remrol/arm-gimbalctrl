@@ -191,7 +191,7 @@ void sendState()
 {
 	sprintf_P(g_strbuf, PSTR("%ld,%d,%ld,"), millis(), g_state.motorPosition, g_state.pulseTimeStamp );
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_state.pulseDuration * PULSE_DURATION_SCALE, g_state.actualDirection, g_state.actualSpeed );
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_state.pulseDuration * PULSE_DURATION_SCALE, g_state.motorDirection, g_state.motorSpeed );
 	uart_puts(g_strbuf);
 	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_state.speed, g_state.ocr0);
 	uart_puts(g_strbuf);

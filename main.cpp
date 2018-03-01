@@ -115,7 +115,7 @@ void pulseDurationToSpeed( uint16_t pulseMs )
 		{
 			// Positive rotation.
 			if( pulseMs > g_config.pulse_max )
-			pulseMs = g_config.pulse_max;
+				pulseMs = g_config.pulse_max;
 			
 			//			diff = ( pulseMs - g_config.pulse_dband_hi * g_config.power;
 			//			diff /= ( g_config.pulse_max - g_config.pulse_dband_hi );

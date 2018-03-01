@@ -28,16 +28,18 @@ struct Config
 
 struct State
 {
-	volatile uint16_t motorPosition;	// Motor position
-	volatile uint32_t pulseTimeStamp;	// Timestamp of last measured pulse
-	volatile uint16_t pulseDuration;	// Last measured pulse duration in ms/2, 0 if not available.	
-	volatile uint32_t pulseDurationSum;
-	volatile uint16_t pulseDurationSumCount;
-	volatile int8_t	  motorDirection;
-	volatile int8_t   motorSpeed;
-	volatile int8_t   speed;
-	volatile uint32_t timer1OverflowCount; // Timer 1 overflow count.		
-	volatile uint8_t  ocr0;
+	volatile uint32_t vT1OverflowCount; // Timer 1 overflow count.
+	volatile uint16_t vMotorPosition;	// Motor position
+
+	volatile uint32_t vPulseTimeStamp;	// Timestamp of last measured pulse
+	volatile uint32_t vPulseDurationSum;
+	volatile uint16_t vPulseDurationSumCount;
+
+	uint16_t pulseDuration;	// Last measured pulse duration in ms/2, 0 if not available.
+	int8_t	 motorDirection;
+	int16_t  motorSpeed;
+	int16_t  speed;
+	uint8_t  ocr0;
 };
 
 void stateInit();

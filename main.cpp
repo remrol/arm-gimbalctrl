@@ -19,7 +19,7 @@ extern "C"
 
 
 //--------------------------------------------------------------------------------
-void setMotorSpeed( int8_t speed );	
+void setMotorSpeed( int16_t speed );	
 void handleSpeedSmooth();
 void pulseDurationToSpeed( uint16_t pulseMs );
 
@@ -30,11 +30,11 @@ ISR(TIMER1_OVF_vect)
 	TIFR &= 0xff ^ _BV(TOV1);				
 
 	// Increment overflows count.
-	g_state.timer1OverflowCount += 0x10000;					
+	g_state.vT1OverflowCount += 0x10000;					
 
 /*
 	//  If no response for 2 seconds then set pulse duration to invalid.
-	if( millis() > g_state.pulseTimeStamp + 2*1000 )
+	if( millis() > g_state.vPulseTimeStamp + 2*1000 )
 	{
 		g_state.pulseDuration = 0;
 		pulseDurationToSpeed( g_state.pulseDuration );
@@ -50,7 +50,7 @@ ISR(TIMER1_CAPT_vect)
 	uint8_t risingEdge = TCCR1B & _BV( ICES1 );		// Read which edge has been captured.
 	TCCR1B ^= _BV( ICES1 );					// Switch edge capture.
 	
-	uint32_t timeStamp = g_state.timer1OverflowCount;	// Compute precise 32 bit time stamp.
+	uint32_t timeStamp = g_state.vT1OverflowCount;	// Compute precise 32 bit time stamp.
 	timeStamp |= ICR1;
 	
 	if( risingEdge ) // Read which edge has been captured.
@@ -69,9 +69,9 @@ ISR(TIMER1_CAPT_vect)
 		if( pulseDuration >= 500 / PULSE_DURATION_SCALE && pulseDuration <= 2500 / PULSE_DURATION_SCALE )
 		{
 //			g_state.pulseDuration = pulseDuration;	// Store pulse duration.
-			g_state.pulseDurationSum += pulseDuration;
-			g_state.pulseDurationSumCount += 1;
-			g_state.pulseTimeStamp = millis();		// Store pulse time stamp.
+			g_state.vPulseDurationSum += pulseDuration;
+			g_state.vPulseDurationSumCount += 1;
+			g_state.vPulseTimeStamp = millis();		// Store pulse time stamp.
 			
 //			pulseDurationToSpeed( g_state.pulseDuration );
 		}
@@ -87,7 +87,7 @@ ISR(TIMER0_COMP_vect)
 	// React only on rising edge
 //	if( PORTB & _BV( 3 ) )
 	{
-		g_state.motorPosition += g_state.motorDirection;
+		g_state.vMotorPosition += g_state.motorDirection;
 	}
 }
 
@@ -155,7 +155,7 @@ void pulseDurationToSpeed( uint16_t pulseMs )
 
 //-------------------------------------------------------------------------------------
 
-void setMotorSpeed( int8_t speed )
+void setMotorSpeed( int16_t speed )
 {
 	#define FREF 800
 	// cpu clock / 64
@@ -232,9 +232,9 @@ void setMotorSpeed( int8_t speed )
 
 void handleSpeedSmooth()
 {
-	int8_t dstSpd;
+	int16_t dstSpd;
 	// Rewrite to get rid of overwrites
-	int8_t spd = g_state.speed;
+	int16_t spd = g_state.speed;
 	
 	if( spd == g_state.motorSpeed )
 	{
@@ -261,10 +261,10 @@ uint16_t getPulseTime()
 	// Rewrite volatile vars with interrupts off.
 	uint8_t oldSREG = SREG;
 	cli();
-	pulseDurationSum = g_state.pulseDurationSum;
-	pulseDurationSumCount = g_state.pulseDurationSumCount;
-	g_state.pulseDurationSum = 0;
-	g_state.pulseDurationSumCount = 0;
+	pulseDurationSum = g_state.vPulseDurationSum;
+	pulseDurationSumCount = g_state.vPulseDurationSumCount;
+	g_state.vPulseDurationSum = 0;
+	g_state.vPulseDurationSumCount = 0;
 	SREG = oldSREG;
 
 	// Calc avg pulse time
@@ -279,7 +279,7 @@ uint32_t getPulseTimeStamp()
 	uint32_t pulseTimeStamp;
 	uint8_t oldSREG = SREG;
 	cli();
-	pulseTimeStamp = g_state.pulseTimeStamp;
+	pulseTimeStamp = g_state.vPulseTimeStamp;
 	SREG = oldSREG;
 
 	return pulseTimeStamp;

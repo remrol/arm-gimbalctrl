@@ -51,8 +51,8 @@ bool State::fromString( const std::string& _data )
 	motorPosition       = atoi( tokens[1].c_str() );
 	lastPulseTimeSec    = atoi( tokens[2].c_str() ) / 1000.0;
 	pulseDuration       = atoi( tokens[3].c_str() );
-	actualDirection     = atoi( tokens[4].c_str() );
-	actualSpeed         = atoi( tokens[5].c_str() );
+	motorDirection      = atoi( tokens[4].c_str() );
+	motorSpeed          = atoi( tokens[5].c_str() );
 	speed               = atoi( tokens[6].c_str() );
 	ocr0                = atoi( tokens[7].c_str() );
 
@@ -65,10 +65,10 @@ std::string State::toDisplayableString() const
 	ss << 
 		"Timestamp " << timeStampSec << "\r\n" <<	
 		"Motor pos " << motorPosition << "\r\n" <<	
-		"Last pulse time " << lastPulseTimeSec << "\r\n" <<	
+		"Motor direction " << motorDirection << "\r\n" <<	
+		"Motor speed " << motorSpeed << "\r\n" <<	
 		"Pulse duration " << pulseDuration << "\r\n" <<	
-		"Actual direction " << actualDirection << "\r\n" <<	
-		"Actual speed " << actualSpeed << "\r\n" <<	
+		"Pulse timestamp " << lastPulseTimeSec << "\r\n" <<	
 		"Speed " << speed << "\r\n" <<	
 		"OCR0 " << ocr0;
 

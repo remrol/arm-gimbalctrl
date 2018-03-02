@@ -9,6 +9,7 @@
 #define MOT_STOP_NO_PULSE_TIMEOUT_MS (2*1000)
 #define MOT_DISABLE_TIMEOUT_MS (10*1000)
 
+#define PWM_SCALE_FACTOR 1200
 
 struct Config
 {

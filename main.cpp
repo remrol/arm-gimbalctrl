@@ -133,7 +133,6 @@ void pulseDurationToSpeed( uint16_t pulseMs )
 
 void setMotorSpeed( int16_t speed )
 {
-	#define FREF 800
 	// cpu clock / 64
 	#define CLOCK0_SELECT ( _BV( CS02 ) | _BV( CS01 ) | _BV( CS00 ))
 	
@@ -171,7 +170,7 @@ void setMotorSpeed( int16_t speed )
 	
 	else if( speed > 0 )
 	{
-		int16_t ocr0 = ( ( ( int16_t ) FREF ) / speed ) - 1;
+		int16_t ocr0 = ( ( ( int16_t ) PWM_SCALE_FACTOR ) / speed ) - 1;
 		g_state.ocr0 = ocr0 < 255 ? ocr0 : 255;
 		OCR0 = g_state.ocr0;
 		g_state.motorDirection = 1;
@@ -187,7 +186,7 @@ void setMotorSpeed( int16_t speed )
 	}
 	else
 	{
-		int16_t ocr0 = ( ( ( int16_t ) FREF ) / -speed ) - 1;
+		int16_t ocr0 = ( ( ( int16_t ) PWM_SCALE_FACTOR ) / -speed ) - 1;
 		g_state.ocr0 = ocr0 < 255 ? ocr0 : 255;
 		OCR0 = g_state.ocr0;
 		g_state.motorDirection = -1;

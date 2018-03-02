@@ -170,7 +170,7 @@ void setMotorSpeed( int16_t speed )
 	
 	else if( speed > 0 )
 	{
-		int16_t ocr0 = ( ( ( int16_t ) PWM_SCALE_FACTOR ) / speed ) - 1;
+		int16_t ocr0 = ( g_config.pwm_scale_factor / speed ) - 1;
 		g_state.ocr0 = ocr0 < 255 ? ocr0 : 255;
 		OCR0 = g_state.ocr0;
 		g_state.motorDirection = 1;
@@ -186,7 +186,7 @@ void setMotorSpeed( int16_t speed )
 	}
 	else
 	{
-		int16_t ocr0 = ( ( ( int16_t ) PWM_SCALE_FACTOR ) / -speed ) - 1;
+		int16_t ocr0 = ( g_config.pwm_scale_factor / -speed ) - 1;
 		g_state.ocr0 = ocr0 < 255 ? ocr0 : 255;
 		OCR0 = g_state.ocr0;
 		g_state.motorDirection = -1;

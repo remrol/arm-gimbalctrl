@@ -24,6 +24,7 @@ void configLoadDefaults()
 	g_config.pulse_max = 2200;
 	g_config.pulse_dband_lo = ( ( g_config.pulse_min + g_config.pulse_max ) / 2 ) - 300 / 2;
 	g_config.pulse_dband_hi = ( ( g_config.pulse_min + g_config.pulse_max ) / 2 ) + 300 / 2;
+	g_config.pwm_scale_factor = 1200;
 	g_config.power = 128;
 	g_config.expo_percent = 0;
 	

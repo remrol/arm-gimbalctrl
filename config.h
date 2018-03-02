@@ -9,8 +9,6 @@
 #define MOT_STOP_NO_PULSE_TIMEOUT_MS (2*1000)
 #define MOT_DISABLE_TIMEOUT_MS (10*1000)
 
-#define PWM_SCALE_FACTOR 1200
-
 struct Config
 {
 	uint16_t pulse_min;
@@ -18,6 +16,7 @@ struct Config
 	uint16_t pulse_dband_lo;
 	uint16_t pulse_dband_hi;
 	
+	uint16_t pwm_scale_factor;
 	uint8_t  power; // 1..128
 	uint8_t  expo_percent;
 	

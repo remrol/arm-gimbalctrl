@@ -6,19 +6,22 @@ bool Config::fromString( const std::string& _data )
 	std::vector< std::string > tokens;
 	boost::split( tokens, _data, boost::is_any_of( std::string(", ")));
 
-	if( tokens.size() != 8 )
+	if( tokens.size() != 11 )
 	{
 		return false;
 	}
 
-	pulse_min         = atoi( tokens[0].c_str() );
-	pulse_max         = atoi( tokens[1].c_str() );
-	pulse_dband_lo    = atoi( tokens[2].c_str() );
-	pulse_dband_hi    = atoi( tokens[3].c_str() );
-	pwm_scale_factor  = atoi( tokens[4].c_str() );
-	power             = atoi( tokens[5].c_str() );
-	expo_percent      = atoi( tokens[6].c_str() );
-	crc               = atoi( tokens[7].c_str() );
+	pulse_min						= atoi( tokens[0].c_str() );
+	pulse_max						= atoi( tokens[1].c_str() );
+	pulse_dband_lo					= atoi( tokens[2].c_str() );
+	pulse_dband_hi					= atoi( tokens[3].c_str() );
+	pwm_scale_factor				= atoi( tokens[4].c_str() );
+	speed_smooth_factor				= atoi( tokens[5].c_str() );
+	power							= atoi( tokens[6].c_str() );
+	expo_percent					= atoi( tokens[7].c_str() );
+	process_pulse_interval_ms		= atoi( tokens[8].c_str() );
+	process_speedsmooth_interval_ms	= atoi( tokens[9].c_str() );
+	crc								= atoi( tokens[10].c_str() );
 
 	return true;
 }
@@ -32,8 +35,11 @@ std::string Config::toDisplayableString() const
 		"Pulse dband lo " << pulse_dband_lo << "\r\n" <<	
 		"Pulse dband hi " << pulse_dband_hi << "\r\n" <<	
 		"PWM scale factor " << pwm_scale_factor << "\r\n" <<
+		"Speed smooth factor " << speed_smooth_factor << "\r\n" <<
 		"Power " << power << "\r\n" <<	
 		"Expo " << expo_percent << "\r\n" <<	
+		"Process pulse interval " << process_pulse_interval_ms << " [ms]\r\n" <<	
+		"Process speed smooth interval " << process_speedsmooth_interval_ms << " [ms]\r\n" <<	
 		"CRC8 " << crc;	
 
   return ss.str();

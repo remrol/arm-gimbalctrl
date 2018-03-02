@@ -7,8 +7,11 @@ struct Config
 	int pulse_dband_lo;
 	int pulse_dband_hi;
 	int pwm_scale_factor;
+	int speed_smooth_factor;
 	int power; // 1..128
 	int expo_percent;
+	int process_pulse_interval_ms;
+	int process_speedsmooth_interval_ms;
 	int crc;	// crc
 
 	bool fromString( const std::string& _data );

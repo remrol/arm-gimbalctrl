@@ -209,21 +209,21 @@ void handleSpeedSmooth()
 {
 	int16_t dstSpd;
 	// Rewrite to get rid of overwrites
-	int16_t spd = g_state.speed;
+	int16_t speed = g_state.speed;
 	
-	if( spd == g_state.motorSpeed )
+	if( speed == g_state.motorSpeed )
 	{
 		setMotorSpeed( g_state.motorSpeed );	
 	}
-	else if( spd < g_state.motorSpeed )
+	else if( speed < g_state.motorSpeed )
 	{
-		dstSpd = g_state.motorSpeed - 1;
-		setMotorSpeed( dstSpd > spd ? dstSpd : spd );
+		dstSpd = g_state.motorSpeed - g_config.speed_smooth_factor;
+		setMotorSpeed( dstSpd > speed ? dstSpd : speed );
 	}
 	else
 	{
-		dstSpd = g_state.motorSpeed + 1;
-		setMotorSpeed( dstSpd < spd ? dstSpd : spd );	
+		dstSpd = g_state.motorSpeed + g_config.speed_smooth_factor;
+		setMotorSpeed( dstSpd < speed ? dstSpd : speed );	
 	}
 }
 
@@ -339,14 +339,14 @@ int main(void)
 				pulseDurationToSpeed(g_state.pulseDuration);
 			}
 			
-			handlePulseTimeout += PROCESS_PULSE_DURATION_INTERVAL_MS;
+			handlePulseTimeout += g_config.process_pulse_interval_ms;
 		}
 
 		// Periodically handle speed smoother 
 		if( now >= handleSpeedSmoothTimeout )
 		{
 			handleSpeedSmooth();
-			handleSpeedSmoothTimeout += PROCESS_SMOOTH_SPEED_INTERVAL_MS;
+			handleSpeedSmoothTimeout += g_config.process_speedsmooth_interval_ms;
 		}
 
 		// IO control

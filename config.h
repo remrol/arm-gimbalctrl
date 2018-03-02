@@ -3,9 +3,6 @@
 
 #include <stdio.h>
 
-#define PROCESS_PULSE_DURATION_INTERVAL_MS 100
-#define PROCESS_SMOOTH_SPEED_INTERVAL_MS 10
-
 #define MOT_STOP_NO_PULSE_TIMEOUT_MS (2*1000)
 #define MOT_DISABLE_TIMEOUT_MS (10*1000)
 
@@ -17,8 +14,12 @@ struct Config
 	uint16_t pulse_dband_hi;
 	
 	uint16_t pwm_scale_factor;
+	int8_t   speed_smooth_factor;
 	uint8_t  power; // 1..128
 	uint8_t  expo_percent;
+	
+	uint16_t process_pulse_interval_ms;
+	uint16_t process_speedsmooth_interval_ms;
 	
 	// crc
 	uint8_t crc;	

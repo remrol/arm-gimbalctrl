@@ -6,6 +6,7 @@ struct Config
 	int pulse_max;
 	int pulse_dband_lo;
 	int pulse_dband_hi;
+	int pwm_scale_factor;
 	int power; // 1..128
 	int expo_percent;
 	int crc;	// crc

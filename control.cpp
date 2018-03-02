@@ -181,9 +181,9 @@ void sendConfig()
 {
 	sprintf_P(g_strbuf, PSTR("%d,%d,"), g_config.pulse_min, g_config.pulse_max);
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_config.pulse_dband_lo, g_config.pulse_dband_hi, g_config.power);
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_config.pulse_dband_lo, g_config.pulse_dband_hi, g_config.pwm_scale_factor);
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_config.expo_percent, g_config.crc);
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d\r\n"), g_config.power, g_config.expo_percent, g_config.crc);
 	uart_puts(g_strbuf);
 }
 

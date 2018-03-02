@@ -176,6 +176,7 @@ bool Device::setServoRange( int _min, int _dbandLo, int _dbandHi, int _max)
   ss << "L " << _min << " " << _max << " " << _dbandLo << " " << _dbandHi << "\r\n";
 
   std::string msg = sendReceive( ss.str());
+  L_ << msg;
   return true;
 }
 

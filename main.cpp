@@ -31,15 +31,6 @@ ISR(TIMER1_OVF_vect)
 
 	// Increment overflows count.
 	g_state.vT1OverflowCount += 0x10000;					
-
-/*
-	//  If no response for 2 seconds then set pulse duration to invalid.
-	if( millis() > g_state.vPulseTimeStamp + 2*1000 )
-	{
-		g_state.pulseDuration = 0;
-		pulseDurationToSpeed( g_state.pulseDuration );
-	}
-*/
 }	
 
 ISR(TIMER1_CAPT_vect)
@@ -61,19 +52,16 @@ ISR(TIMER1_CAPT_vect)
 	else if( risingEdgeTimeStamp != 0 )
 	{
 		// Compute pulse duration.
-		uint32_t pulseDuration = ( timeStamp - risingEdgeTimeStamp ) / ( F_CPU / 4000000 );
+		uint32_t pulseDuration = ( timeStamp - risingEdgeTimeStamp ) / ( F_CPU / 8000000 );
 		// Clear rising edge.
 		risingEdgeTimeStamp = 0;
 	
 		// Validate measured pulse duration. Accept only 500 - 2500 us range.	
-		if( pulseDuration >= 500 / PULSE_DURATION_SCALE && pulseDuration <= 2500 / PULSE_DURATION_SCALE )
+		if( pulseDuration >= 500 && pulseDuration <= 2500 )
 		{
-//			g_state.pulseDuration = pulseDuration;	// Store pulse duration.
 			g_state.vPulseDurationSum += pulseDuration;
 			g_state.vPulseDurationSumCount += 1;
 			g_state.vPulseTimeStamp = millis();		// Store pulse time stamp.
-			
-//			pulseDurationToSpeed( g_state.pulseDuration );
 		}
 	}
 	else
@@ -120,10 +108,6 @@ void pulseDurationToSpeed( uint16_t pulseMs )
 			//	diff = ( pulseMs - g_config.pulse_dband_hi * g_config.power;  diff /= ( g_config.pulse_max - g_config.pulse_dband_hi );
 			diff = exponent(pulseMs - g_config.pulse_dband_hi, g_config.pulse_max - g_config.pulse_dband_hi, g_config.expo_percent );
 			diff = diff * g_config.power / ( g_config.pulse_max - g_config.pulse_dband_hi );
-
-//			if( diff > 127 )
-//				diff = 127;
-			
 			g_state.speed = diff;
 		}
 		else if( pulseMs <= g_config.pulse_dband_lo )
@@ -135,10 +119,6 @@ void pulseDurationToSpeed( uint16_t pulseMs )
 			//			diff = ( g_config.pulse_dband_lo - pulseMs ) * g_config.power;	diff /= g_config.pulse_dband_lo - g_config.pulse_min;
 			diff = exponent( g_config.pulse_dband_lo - pulseMs, g_config.pulse_dband_lo - g_config.pulse_min, g_config.expo_percent );
 			diff = diff * g_config.power / ( g_config.pulse_dband_lo - g_config.pulse_min );
-			
-//			if( diff > 127 )
-//				diff = 127;
-			
 			g_state.speed = -diff;
 		}
 		else

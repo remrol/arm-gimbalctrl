@@ -20,8 +20,8 @@ uint8_t configComputeCrc(void)
 
 void configLoadDefaults()
 {
-	g_config.pulse_min = 950 / PULSE_DURATION_SCALE;
-	g_config.pulse_max = 2200 / PULSE_DURATION_SCALE;
+	g_config.pulse_min = 950;
+	g_config.pulse_max = 2200;
 	g_config.pulse_dband_lo = ( ( g_config.pulse_min + g_config.pulse_max ) / 2 ) - 300 / 2;
 	g_config.pulse_dband_hi = ( ( g_config.pulse_min + g_config.pulse_max ) / 2 ) + 300 / 2;
 	g_config.power = 128;

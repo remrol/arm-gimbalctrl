@@ -179,9 +179,9 @@ int16_t receiveInt16( uint32_t _timeout)
 
 void sendConfig()
 {
-	sprintf_P(g_strbuf, PSTR("%d,%d,"), g_config.pulse_min * PULSE_DURATION_SCALE, g_config.pulse_max * PULSE_DURATION_SCALE);
+	sprintf_P(g_strbuf, PSTR("%d,%d,"), g_config.pulse_min, g_config.pulse_max);
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_config.pulse_dband_lo * PULSE_DURATION_SCALE, g_config.pulse_dband_hi * PULSE_DURATION_SCALE, g_config.power);
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_config.pulse_dband_lo, g_config.pulse_dband_hi, g_config.power);
 	uart_puts(g_strbuf);
 	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_config.expo_percent, g_config.crc);
 	uart_puts(g_strbuf);
@@ -191,7 +191,7 @@ void sendState()
 {
 	sprintf_P(g_strbuf, PSTR("%ld,%d,%ld,"), millis(), g_state.vMotorPosition, g_state.vPulseTimeStamp );
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_state.pulseDuration * PULSE_DURATION_SCALE, g_state.motorDirection, g_state.motorSpeed );
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_state.pulseDuration, g_state.motorDirection, g_state.motorSpeed );
 	uart_puts(g_strbuf);
 	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_state.speed, g_state.ocr0);
 	uart_puts(g_strbuf);
@@ -273,9 +273,9 @@ void receiveExpo()
 
 void sendPulse()
 {
-	sprintf_P(g_strbuf, PSTR("%d,%d,"), g_config.pulse_min * PULSE_DURATION_SCALE, g_config.pulse_max * PULSE_DURATION_SCALE);
+	sprintf_P(g_strbuf, PSTR("%d,%d,"), g_config.pulse_min, g_config.pulse_max);
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_config.pulse_dband_lo * PULSE_DURATION_SCALE, g_config.pulse_dband_hi * PULSE_DURATION_SCALE);
+	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_config.pulse_dband_lo, g_config.pulse_dband_hi);
 	uart_puts(g_strbuf);
 }
 
@@ -286,7 +286,7 @@ void receivePulse()
 
 	// Receive 
 	int16_t min = receiveInt16(timeout);
-	if( min == INT16_MIN || min < 100 || min > 2000 )
+	if( min == INT16_MIN || min < 100 || min > 5000 )
 	{
 		sprintf_P(g_strbuf, PSTR("MIN ERR %d\r\n"), g_lastErr);
 		uart_puts( g_strbuf );
@@ -294,7 +294,7 @@ void receivePulse()
 	}
 
 	int16_t max = receiveInt16(timeout);
-	if( max == INT16_MIN || max < 100 || max > 2000 || max <= min )
+	if( max == INT16_MIN || max < 100 || max > 5000 || max <= min )
 	{
 		sprintf_P(g_strbuf, PSTR("MAX ERR %d\r\n"), g_lastErr);
 		uart_puts( g_strbuf );
@@ -302,7 +302,7 @@ void receivePulse()
 	}
 
 	int16_t clo = receiveInt16(timeout);
-	if( clo == INT16_MIN || clo < 100 || clo > 2000 ||  clo <= min || clo >= max )
+	if( clo == INT16_MIN || clo < 100 || clo > 5000 ||  clo <= min || clo >= max )
 	{
 		sprintf_P(g_strbuf, PSTR("CLO ERR %d\r\n"), g_lastErr);
 		uart_puts( g_strbuf );
@@ -310,7 +310,7 @@ void receivePulse()
 	}
 
 	int16_t chi = receiveInt16(timeout);
-	if( chi == INT16_MIN || chi < 100 || chi > 2000 ||  chi <= min || chi >= max || chi < clo)
+	if( chi == INT16_MIN || chi < 100 || chi > 5000 ||  chi <= min || chi >= max || chi < clo)
 	{
 		sprintf_P(g_strbuf, PSTR("CLO ERR %d\r\n"), g_lastErr);
 		uart_puts( g_strbuf );
@@ -319,10 +319,10 @@ void receivePulse()
 
 
 	// Write to config
-	g_config.pulse_min = min / PULSE_DURATION_SCALE;
-	g_config.pulse_max = max / PULSE_DURATION_SCALE;
-	g_config.pulse_dband_lo = clo / PULSE_DURATION_SCALE;
-	g_config.pulse_dband_hi = chi / PULSE_DURATION_SCALE;
+	g_config.pulse_min = min;
+	g_config.pulse_max = max;
+	g_config.pulse_dband_lo = clo;
+	g_config.pulse_dband_hi = chi;
 	
 	// Send back received values
 	sendPulse();

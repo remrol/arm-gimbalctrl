@@ -3,8 +3,6 @@
 
 #include <stdio.h>
 
-#define PULSE_DURATION_SCALE 2
-
 #define PROCESS_PULSE_DURATION_INTERVAL_MS 100
 #define PROCESS_SMOOTH_SPEED_INTERVAL_MS 10
 
@@ -36,9 +34,9 @@ struct State
 	volatile uint16_t vPulseDurationSumCount;
 
 	uint16_t pulseDuration;	// Last measured pulse duration in ms/2, 0 if not available.
+	int16_t  speed;
 	int8_t	 motorDirection;
 	int16_t  motorSpeed;
-	int16_t  speed;
 	uint8_t  ocr0;
 };
 

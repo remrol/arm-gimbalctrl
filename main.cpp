@@ -1,3 +1,4 @@
+#define __STDC_LIMIT_MACROS
 #include "fcpu.h"
 #include <avr/io.h>
 #include <util/delay.h>
@@ -136,11 +137,12 @@ void setMotorSpeed( int16_t speed )
 	// cpu clock / 64
 	#define CLOCK0_SELECT ( _BV( CS02 ) | _BV( CS01 ) | _BV( CS00 ))
 	
-	uint8_t  portbState;
-	
 	// Time stamp of last motor move action.
 	static uint32_t moveTimeStamp = 0;
 	
+	// Diagnostics, get speed min/max
+	diagMinMax(speed);
+
 	// Special handling for zero speed
 	if( speed == 0 )
 	{
@@ -178,7 +180,7 @@ void setMotorSpeed( int16_t speed )
 		if( g_state.motorSpeed <= 0 ) // Handle speed direction change
 		{
 			TCCR0 |= CLOCK0_SELECT;	// Set clock
-			portbState = PORTB;
+			uint8_t portbState = PORTB;
 			portbState |= _BV(PB2);			// Set PB2 (dir)
 			portbState &= 0xff ^ _BV(PB1);	// Clear PB1 (NENABLE)
 			PORTB = portbState;
@@ -194,7 +196,7 @@ void setMotorSpeed( int16_t speed )
 		if( g_state.motorSpeed >= 0 )	// Handle direction change
 		{
 			TCCR0 |= CLOCK0_SELECT;
-			portbState = PORTB;
+			uint8_t portbState = PORTB;
 			portbState &= 0xff ^ _BV(PB2);	// Clear PB2 (dir)
 			portbState &= 0xff ^ _BV(PB1);	// Clear PB1 (NENABLE)
 			PORTB = portbState;

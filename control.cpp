@@ -391,7 +391,7 @@ void receiveProcessIntervals()
 void sendDiagnostics()
 {
 	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_state.diag0, g_state.diag1);
-	g_state.diag0 = g_state.diag1 = 0;
+	diagReset();
 	uart_puts(g_strbuf);
 }
 

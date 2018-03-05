@@ -1,3 +1,4 @@
+#define __STDC_LIMIT_MACROS
 #include "config.h"
 #include <avr/eeprom.h>
 #include <util/crc16.h>
@@ -76,6 +77,22 @@ void stateInit()
 	g_state.motorSpeed = 0;
 	g_state.vT1OverflowCount = 0;
 	g_state.ocr0 = 0;
-	g_state.diag0 = 0;
-	g_state.diag1 = 0;
+	g_state.diag0 = INT16_MIN;
+	g_state.diag1 = INT16_MIN;
 }
+
+void diagMinMax(int16_t value)
+{
+	if( g_state.diag0 == INT16_MIN || value < g_state.diag0)
+		g_state.diag0 = value;
+
+	if( g_state.diag1 == INT16_MIN || value > g_state.diag1)
+		g_state.diag1 = value;
+}
+
+void diagReset()
+{
+	g_state.diag0 = INT16_MIN;
+	g_state.diag1 = INT16_MIN;
+}
+

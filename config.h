@@ -51,6 +51,9 @@ void configEepromSave();
 
 void configLoadDefaults();
 
+void diagMinMax(int16_t value);
+void diagReset();
+
 extern Config g_config;
 extern State  g_state;
 

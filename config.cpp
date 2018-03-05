@@ -76,4 +76,6 @@ void stateInit()
 	g_state.motorSpeed = 0;
 	g_state.vT1OverflowCount = 0;
 	g_state.ocr0 = 0;
+	g_state.diag0 = 0;
+	g_state.diag1 = 0;
 }

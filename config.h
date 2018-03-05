@@ -34,11 +34,14 @@ struct State
 	volatile uint32_t vPulseDurationSum;
 	volatile uint16_t vPulseDurationSumCount;
 
-	uint16_t pulseDuration;	// Last measured pulse duration in ms/2, 0 if not available.
+	uint16_t pulseDuration;	// Last measured pulse duration in ms, 0 if not available.
 	int16_t  speed;
 	int8_t	 motorDirection;
 	int16_t  motorSpeed;
 	uint8_t  ocr0;
+
+	int16_t  diag0;
+	int16_t  diag1;
 };
 
 void stateInit();

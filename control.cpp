@@ -273,7 +273,29 @@ void receiveExpo()
 	sendExpo();
 }
 
-void sendPulse()
+void sendPwmScaleFactor()
+{
+	sprintf_P(g_strbuf, PSTR("%d\r\n"), g_config.pwm_scale_factor);
+	uart_puts(g_strbuf);
+}
+
+void receivePwmScaleFactor()
+{
+	uint32_t timeout = millis() + 100;
+
+	int16_t scf = receiveInt16(timeout);
+	if( scf == INT16_MIN || scf < 0 || scf > 10000 )
+	{
+		sprintf_P( g_strbuf, PSTR("ERR %d %d\r\n"), g_lastErr, scf);
+		uart_puts(g_strbuf);
+		return;
+	}
+
+	g_config.pwm_scale_factor = scf;
+	sendPwmScaleFactor();
+}
+
+void sendPulseRanges()
 {
 	sprintf_P(g_strbuf, PSTR("%d,%d,"), g_config.pulse_min, g_config.pulse_max);
 	uart_puts(g_strbuf);
@@ -281,7 +303,7 @@ void sendPulse()
 	uart_puts(g_strbuf);
 }
 
-void receivePulse()
+void receivePulseRanges()
 {
 	// Timeout is 200 ms
 	uint32_t timeout = millis() + 100;
@@ -327,7 +349,50 @@ void receivePulse()
 	g_config.pulse_dband_hi = chi;
 	
 	// Send back received values
-	sendPulse();
+	sendPulseRanges();
+}
+
+void sendProcessIntervals()
+{
+	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_config.process_pulse_interval_ms, g_config.process_speedsmooth_interval_ms);
+	uart_puts(g_strbuf);
+}
+
+void receiveProcessIntervals()
+{
+	// Timeout is 200 ms
+	uint32_t timeout = millis() + 100;
+
+	// Receive
+	int16_t pulseInterval = receiveInt16(timeout);
+	if( pulseInterval == INT16_MIN || pulseInterval < 0 || pulseInterval > 10000 )
+	{
+		sprintf_P(g_strbuf, PSTR("1 ERR %d\r\n"), g_lastErr);
+		uart_puts( g_strbuf );
+		return;
+	}
+
+	int16_t speedSmoothInterval = receiveInt16(timeout);
+	if( speedSmoothInterval == INT16_MIN || speedSmoothInterval < 0 || speedSmoothInterval > 10000 )
+	{
+		sprintf_P(g_strbuf, PSTR("2 ERR %d\r\n"), g_lastErr);
+		uart_puts( g_strbuf );
+		return;
+	}
+
+	// Write to config
+	g_config.process_pulse_interval_ms = pulseInterval;
+	g_config.process_speedsmooth_interval_ms = speedSmoothInterval;
+	
+	// Send back received values
+	sendProcessIntervals();
+}
+
+void sendDiagnostics()
+{
+	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_state.diag0, g_state.diag1);
+	g_state.diag0 = g_state.diag1 = 0;
+	uart_puts(g_strbuf);
 }
 
 void control()
@@ -350,49 +415,46 @@ void control()
 		switch(c)
 		{
 		case 'c': 
-			sendConfig(); 
-			break;
+			sendConfig(); 	break;
 			
 		case 's': 
-			sendState(); 
-			break;
+			sendState(); 	break;
 			
 		case 'W': 
-			configEepromSave(); 
-			uart_puts_p( PSTR("1\r\n")); 
-			break;
+			configEepromSave(); uart_puts_p( PSTR("1\r\n")); break;
+		case 'd':
+			configLoadDefaults(); uart_puts_p( PSTR("1\r\n")); break;
 			
 		case 'u':
-			sendUptime(); 
-			break;
+			sendUptime(); 	break;
 			
 		case 'i':
-			sendInfo(); 
-			break;
-			
-		case 'P':
-			receivePower();
-			break;
+			sendInfo(); 	break;
 			
 		case 'p':
-			sendPower();
-			break;
+			sendPower();	break;
+		case 'P':
+			receivePower();	break;
 			
 		case 'e':
-			sendExpo();
-			break;
-			
+			sendExpo();		break;			
 		case 'E':
-			receiveExpo();
-			break;
+			receiveExpo();	break;
 			
 		case 'l':
-			sendPulse();
-			break;
-			
+			sendPulseRanges(); 	break;
 		case 'L':
-			receivePulse();
-			break;
+			receivePulseRanges(); break;
+
+		case 'f':
+			sendPwmScaleFactor(); break;
+		case 'F':
+			receivePwmScaleFactor(); break;
+
+		case 'a':
+			sendProcessIntervals(); break;
+		case 'A':
+			receiveProcessIntervals(); break;
 			
 		}
 	}

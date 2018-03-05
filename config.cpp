@@ -32,6 +32,9 @@ void configLoadDefaults()
 	
 	g_config.process_pulse_interval_ms = 100;
 	g_config.process_speedsmooth_interval_ms = 10;
+
+	g_config.mot_stop_nopulse_timeout_ms = 2*1000;
+	g_config.mot_disable_stopped_timeout_ms = 10*1000;
 	
 	// Update crc
 	g_config.crc = configComputeCrc();	

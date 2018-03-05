@@ -3,9 +3,6 @@
 
 #include <stdio.h>
 
-#define MOT_STOP_NO_PULSE_TIMEOUT_MS (2*1000)
-#define MOT_DISABLE_TIMEOUT_MS (10*1000)
-
 struct Config
 {
 	uint16_t pulse_min;
@@ -20,6 +17,9 @@ struct Config
 	
 	uint16_t process_pulse_interval_ms;
 	uint16_t process_speedsmooth_interval_ms;
+
+	uint16_t mot_stop_nopulse_timeout_ms;
+	uint16_t mot_disable_stopped_timeout_ms;
 	
 	// crc
 	uint8_t crc;	

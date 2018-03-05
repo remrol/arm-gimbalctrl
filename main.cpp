@@ -155,7 +155,7 @@ void setMotorSpeed( int16_t speed )
 		}
 		
 		// Shutdown motor after 10 seconds to minimize power consumption
-		if( millis() > moveTimeStamp + MOT_DISABLE_TIMEOUT_MS )
+		if( millis() > moveTimeStamp + g_config.mot_disable_stopped_timeout_ms )
 		{
 			PORTB |=  _BV(PB1); //0x02;			// set PB1 (NENABLE)
 		}
@@ -335,9 +335,9 @@ int main(void)
 			{
 				pulseDurationToSpeed(g_state.pulseDuration);
 			}
-			else if( now > getPulseTimeStamp() + MOT_STOP_NO_PULSE_TIMEOUT_MS)
+			else if( now > getPulseTimeStamp() + g_config.mot_stop_nopulse_timeout_ms)
 			{
-				//  If no response for 2 seconds then set pulse duration to invalid.
+				//  If no response for timeout then set speed 0.
 				pulseDurationToSpeed(g_state.pulseDuration);
 			}
 			

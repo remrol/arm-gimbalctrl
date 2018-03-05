@@ -38,6 +38,7 @@ void CGimbalCtrlDlg::DoDataExchange(CDataExchange* pDX)
   DDX_Text(pDX, IDC_EDIT_SERVO_DBANDLO, m_servoDbandLo);
   DDX_Text(pDX, IDC_EDIT_SERVO_DBANDHI, m_servoDbandHi);
   DDX_Text(pDX, IDC_EDIT_SERVO_MAX, m_servoMax);
+  DDX_Control(pDX, IDC_LIST_DIAGNOSTICS, m_listDiagnostics);
 }
 
 BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
@@ -214,7 +215,6 @@ void CGimbalCtrlDlg::OnBnClickedButtonServoSet()
 	m_device.setServoRange( m_servoMin, m_servoDbandLo, m_servoDbandHi, m_servoMax );
 }
 
-
 void CGimbalCtrlDlg::OnBnClickedButtonConfigSaveeeprom()
 {
 	m_device.configSaveToEeprom();
@@ -227,6 +227,7 @@ void CGimbalCtrlDlg::OnTimer(UINT_PTR nIDEvent)
 		if( m_device.isOpened() )
 		{
       OnBnClickedButtonReadState();
+      readDiagnostics();
 /*
 			double timeNow = TimeMeasure::now();
 			if( m_lastMeasureTime == 0 || timeNow >= m_lastMeasureTime + m_measureUpdateIntervalSec )
@@ -238,4 +239,17 @@ void CGimbalCtrlDlg::OnTimer(UINT_PTR nIDEvent)
 	}
 
 	CDialogEx::OnTimer(nIDEvent);
+}
+
+
+void CGimbalCtrlDlg::readDiagnostics()
+{
+  int diag0, diag1;
+
+  if( m_device.getDiagnostics( diag0, diag1 ) )
+  {
+    std::stringstream ss;
+    ss << diag0 << "," << diag1;
+    m_listDiagnostics.AddString( ss.str().c_str() );
+  }
 }

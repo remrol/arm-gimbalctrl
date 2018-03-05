@@ -21,7 +21,7 @@ public:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 
 	static const int WORK_TIMER_ID = 1;
-	static const int WORK_TIMER_INTERVAL_MS = 100;
+	static const int WORK_TIMER_INTERVAL_MS = 200;
 
 // Implementation
 protected:
@@ -48,6 +48,9 @@ public:
   int m_servoDbandHi;
   int m_servoMax;
   afx_msg void OnBnClickedButtonConfigSaveeeprom();
+  void readDiagnostics();
+
 	UINT_PTR            m_timer;
 
+  CListBox m_listDiagnostics;
 };

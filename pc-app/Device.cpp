@@ -239,3 +239,153 @@ bool Device::configLoadDefaults()
   return true;
 }
 
+bool Device::getExpo( int& _expo )
+{
+	if( !isOpened())
+	{
+		L_ << "getExpo, not connected";
+		return false;
+	}
+	std::string msg = sendReceive("e");
+	std::vector< std::string > tokens;
+	boost::split( tokens, msg, boost::is_any_of( std::string(", ")));
+	if( tokens.size() != 1 )
+	{
+		L_ << "setExpo, cannot parse msg";
+		return false;
+	}
+
+  _expo = atoi( tokens[0].c_str());
+  return true;
+}
+
+bool Device::setExpo( int _expo )
+{
+	if( !isOpened())
+	{
+		L_ << "setExpo, not connected";
+		return false;
+	}
+
+  std::stringstream ss;
+  ss << "E " << _expo << "\r\n";
+
+  std::string msg = sendReceive( ss.str());
+  L_ << msg;
+
+  return true;
+}
+
+bool Device::getPower( int& _power )
+{
+	if( !isOpened())
+	{
+		L_ << "getPower, not connected";
+		return false;
+	}
+	std::string msg = sendReceive("p");
+	std::vector< std::string > tokens;
+	boost::split( tokens, msg, boost::is_any_of( std::string(", ")));
+	if( tokens.size() != 1 )
+	{
+		L_ << "getPower, cannot parse msg";
+		return false;
+	}
+
+  _power = atoi( tokens[0].c_str());
+  return true;
+}
+
+bool Device::setPower( int _power )
+{
+	if( !isOpened())
+	{
+		L_ << "setPower, not connected";
+		return false;
+	}
+
+  std::stringstream ss;
+  ss << "P " << _power << "\r\n";
+
+  std::string msg = sendReceive( ss.str());
+  L_ << msg;
+
+  return true;
+}
+
+bool Device::getPwmScaleFactor( int& _scaleFactor )
+{
+	if( !isOpened())
+	{
+		L_ << "getPwmScaleFactor, not connected";
+		return false;
+	}
+	std::string msg = sendReceive("f");
+	std::vector< std::string > tokens;
+	boost::split( tokens, msg, boost::is_any_of( std::string(", ")));
+	if( tokens.size() != 1 )
+	{
+		L_ << "getPwmScaleFactor, cannot parse msg";
+		return false;
+	}
+
+  _scaleFactor = atoi( tokens[0].c_str());
+  return true;
+}
+
+bool Device::setPwmScaleFactor( int _scaleFactor )
+{
+	if( !isOpened())
+	{
+		L_ << "setPwmScaleFactor, not connected";
+		return false;
+	}
+
+  std::stringstream ss;
+  ss << "F " << _scaleFactor << "\r\n";
+
+  std::string msg = sendReceive( ss.str());
+  L_ << msg;
+
+  return true;
+}
+
+
+bool Device::getProcessIntervals( int& _process_pulse_interval_ms, int& _process_speedsmooth_interval_ms)
+{
+	if( !isOpened())
+	{
+		L_ << "getProcessIntervals, not connected";
+		return false;
+	}
+	std::string msg = sendReceive("a");
+	std::vector< std::string > tokens;
+	boost::split( tokens, msg, boost::is_any_of( std::string(", ")));
+	if( tokens.size() != 2 )
+	{
+		L_ << "getProcessIntervals, cannot parse msg";
+		return false;
+	}
+
+  _process_pulse_interval_ms = atoi( tokens[0].c_str());
+  _process_speedsmooth_interval_ms = atoi( tokens[1].c_str());
+  return true;
+}
+
+bool Device::setProcessIntervals( int& _process_pulse_interval_ms, int& _process_speedsmooth_interval_ms)
+{
+	if( !isOpened())
+	{
+		L_ << "setProcessIntervals, not connected";
+		return false;
+	}
+
+  std::stringstream ss;
+  ss << "A " << _process_pulse_interval_ms << " " << _process_speedsmooth_interval_ms << "\r\n";
+
+  std::string msg = sendReceive( ss.str());
+  L_ << msg;
+
+  return true;
+}
+

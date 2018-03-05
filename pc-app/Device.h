@@ -18,6 +18,8 @@ public:
   bool getServoRange( int& _min, int& _dbandLo, int& _dbandHi, int& _max);
   bool setServoRange( int _min, int _dbandLo, int _dbandHi, int _max);
   bool configSaveToEeprom();
+  bool configLoadDefaults();
+  bool getDiagnostics( int& _diag0, int& _diag1 );
 
 
 private:

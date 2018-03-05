@@ -197,3 +197,45 @@ bool Device::configSaveToEeprom()
 
 	return true;
 }
+
+bool Device::getDiagnostics( int& _diag0, int& _diag1 )
+{
+	if( !isOpened())
+	{
+		L_ << "getDiagnostics, not connected";
+		return false;
+	}
+
+	std::string msg = sendReceive("b");
+	std::vector< std::string > tokens;
+	boost::split( tokens, msg, boost::is_any_of( std::string(", ")));
+	if( tokens.size() != 2 )
+	{
+		L_ << "getDiagnostics, cannot parse msg";
+		return false;
+	}
+
+	_diag0 = atoi( tokens[0].c_str() );
+	_diag1 = atoi( tokens[1].c_str() );
+
+  return true;
+}
+
+bool Device::configLoadDefaults()
+{
+	if( !isOpened())
+	{
+		L_ << "configLoadDefaults, not connected";
+		return false;
+	}
+
+	std::string msg = sendReceive("d");
+  if( msg.empty() || msg[0] != '1' )
+  {
+		L_ << "configLoadDefaults, unexpected status " << msg;
+		return false;
+  }
+
+  return true;
+}
+

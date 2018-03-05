@@ -455,6 +455,9 @@ void control()
 			sendProcessIntervals(); break;
 		case 'A':
 			receiveProcessIntervals(); break;
+
+		case 'b':
+			sendDiagnostics(); break;
 			
 		}
 	}

@@ -202,46 +202,33 @@ bool Device::checkStatus( const std::string& _status, int _v0, int _v1, int _v2,
   return true;
 }
 
+std::string Device::buildMessage( char cmd )
+{
+  std::string msg;
+  msg += cmd;
+  return msg;
+}
 
+std::string Device::buildMessage( char cmd, int _arg0 )
+{
+  std::stringstream ss;
+  ss << cmd << " " << _arg0 << "\r\n";
+  return ss.str();
+}
 
-#define VALIDATE_STATUS_4ARG(status, v0, v1, v2, v3)  \
-  std::vector<std::string> tokens = tokenize(status); \
-  if( tokens.empty())                                 \
-  {                                                   \
-    L_ << __FUNCTION__ << " empty status";            \
-    return false;                                     \
-  }                                                   \
-  if( isError(tokens[0] ) )                           \
-  {                                                   \
-    L_ << __FUNCTION__ << " error: " << status;       \
-    return false;                                     \
-  }                                                   \
-  if( tokens.size() < 4 )                             \
-  {                                                   \
-    L_ << __FUNCTION__ << " not enough args " << status; \
-    return false;                                     \
-  }                                                   \
-  if(atoi(tokens[0].c_str()) != v0)                   \
-  {                                                   \
-    L_ << __FUNCTION__ << " arg0 " << tokens[0] << " expected " << v0 << " status: " << status; \
-    return false;                                     \
-  }                                                   \
-  if(atoi(tokens[1].c_str()) != v1)                   \
-  {                                                   \
-    L_ << __FUNCTION__ << " arg1 " << tokens[1] << " expected " << v1 << " status: " << status; \
-    return false;                                     \
-  }                                                   \
-  if(atoi(tokens[2].c_str()) != v2)                   \
-  {                                                   \
-    L_ << __FUNCTION__ << " arg2 " << tokens[2] << " expected " << v2 << " status: " << status; \
-    return false;                                     \
-  }                                                   \
-  if(atoi(tokens[3].c_str()) != v3)                   \
-  {                                                   \
-    L_ << __FUNCTION__ << " arg3 " << tokens[3] << " expected " << v3 << " status: " << status; \
-    return false;                                     \
-  }
+std::string Device::buildMessage( char cmd, int _arg0, int _arg1 )
+{
+  std::stringstream ss;
+  ss << cmd << " " << _arg0 << " " << _arg1 << "\r\n";
+  return ss.str();
+}
 
+std::string Device::buildMessage( char cmd, int _arg0, int _arg1, int _arg2, int _arg3 )
+{
+  std::stringstream ss;
+  ss << cmd << " " << _arg0 << " " << _arg1 << " " << _arg2 << " " << _arg3 << "\r\n";
+  return ss.str();
+}
 
 bool Device::validateDevice(std::string& _status)
 {
@@ -249,7 +236,7 @@ bool Device::validateDevice(std::string& _status)
     return false;
 
 	// Get device info.
-	std::string msg = sendReceive( "i" );
+	std::string msg = sendReceive( buildMessage( 'i' ) );
 	// First word must be 'protocol'
 	if( msg.find( "Gimbal" ) == std::string::npos)
 	{
@@ -311,7 +298,7 @@ bool Device::getConfig( Config& _config )
   if( !checkConnected( __FUNCTION__ ) )
     return false;
 
-	std::string msg = sendReceive("c");
+	std::string msg = sendReceive( buildMessage( 'c' ) );
 	if( !_config.fromString( msg ) )
 	{
 		L_ << "getConfig, cannot parse message " << msg;
@@ -326,7 +313,7 @@ bool Device::getState( State& _state )
   if( !checkConnected( __FUNCTION__ ) )
     return false;
 
-	std::string msg = sendReceive("s");
+	std::string msg = sendReceive( buildMessage( 's' ) );
 	if( !_state.fromString( msg ) )
 	{
 		L_ << "getState, cannot parse message " << msg;
@@ -341,7 +328,7 @@ bool Device::getServoRange( int& _min, int& _dbandLo, int& _dbandHi, int& _max)
   if( !checkConnected( __FUNCTION__ ) )
     return false;
 
-	std::vector< std::string > tokens = tokenize( sendReceive("l") );
+	std::vector< std::string > tokens = tokenize( sendReceive( buildMessage( 'l') ) );
   if( !checkExpectedTokensCount( tokens, 4, __FUNCTION__ ) )
     return false;
 
@@ -358,10 +345,7 @@ bool Device::setServoRange( int _min, int _dbandLo, int _dbandHi, int _max)
   if( !checkConnected( __FUNCTION__ ) )
     return false;
 
-  std::stringstream ss;
-  ss << "L " << _min << " " << _max << " " << _dbandLo << " " << _dbandHi << "\r\n";
-
-  std::string msg = sendReceive( ss.str());
+  std::string msg = sendReceive( buildMessage( 'L', _min, _max, _dbandLo, _dbandHi ) );
   if( !checkStatus( msg, _min, _max, _dbandLo, _dbandHi, __FUNCTION__ ) )
     return false;
 
@@ -373,7 +357,7 @@ bool Device::configSaveToEeprom()
   if( !checkConnected( __FUNCTION__ ) )
     return false;
 
-	std::string msg = sendReceive("W");
+	std::string msg = sendReceive( buildMessage( 'W' ) );
   if( !checkStatus( msg, __FUNCTION__ ) )
     return false;
 
@@ -385,7 +369,7 @@ bool Device::getDiagnostics( int& _diag0, int& _diag1 )
   if( !checkConnected( __FUNCTION__ ) )
     return false;
 
-	std::vector< std::string > tokens = tokenize( sendReceive("b") );
+	std::vector< std::string > tokens = tokenize( sendReceive( buildMessage( 'b' ) ) );
   if( !checkExpectedTokensCount( tokens, 2, __FUNCTION__ ) )
     return false;
 
@@ -400,7 +384,7 @@ bool Device::configLoadDefaults()
   if( !checkConnected( __FUNCTION__ ) )
     return false;
 
-	std::string msg = sendReceive("d");
+	std::string msg = sendReceive( buildMessage( 'd' ) );
   if( !checkStatus( msg, __FUNCTION__ ) )
     return false;
 
@@ -412,7 +396,7 @@ bool Device::getExpo( int& _expo )
   if( !checkConnected( __FUNCTION__ ) )
     return false;
 
-	std::vector< std::string > tokens = tokenize( sendReceive("e") );
+	std::vector< std::string > tokens = tokenize( sendReceive( buildMessage( 'e' ) ) );
   if( !checkExpectedTokensCount( tokens, 1, __FUNCTION__ ) )
     return false;
 
@@ -425,10 +409,7 @@ bool Device::setExpo( int _expo )
   if( !checkConnected( __FUNCTION__ ) )
     return false;
 
-  std::stringstream ss;
-  ss << "E " << _expo << "\r\n";
-
-  std::string msg = sendReceive( ss.str());
+  std::string msg = sendReceive( buildMessage( 'E', _expo ) );
   if( !checkStatus( msg, _expo, __FUNCTION__ ) )
     return false;
 
@@ -440,7 +421,7 @@ bool Device::getPower( int& _power )
   if( !checkConnected( __FUNCTION__ ) )
     return false;
 
-	std::vector< std::string > tokens = tokenize( sendReceive("p") );
+	std::vector< std::string > tokens = tokenize( sendReceive( buildMessage( 'p' ) ) );
   if( !checkExpectedTokensCount( tokens, 1, __FUNCTION__ ) )
     return false;
 
@@ -453,10 +434,7 @@ bool Device::setPower( int _power )
   if( !checkConnected( __FUNCTION__ ) )
     return false;
 
-  std::stringstream ss;
-  ss << "P " << _power << "\r\n";
-
-  std::string msg = sendReceive( ss.str());
+  std::string msg = sendReceive( buildMessage( 'P', _power ) );
   if( !checkStatus( msg, _power, __FUNCTION__ ) )
     return false;
 
@@ -468,7 +446,7 @@ bool Device::getPwmScaleFactor( int& _scaleFactor )
   if( !checkConnected( __FUNCTION__ ) )
     return false;
 
-	std::vector< std::string > tokens = tokenize( sendReceive("f") );
+	std::vector< std::string > tokens = tokenize( sendReceive( buildMessage( 'f' ) ) );
   if( !checkExpectedTokensCount( tokens, 1, __FUNCTION__ ) )
     return false;
 
@@ -481,10 +459,7 @@ bool Device::setPwmScaleFactor( int _scaleFactor )
   if( !checkConnected( __FUNCTION__ ) )
     return false;
 
-  std::stringstream ss;
-  ss << "F " << _scaleFactor << "\r\n";
-
-  std::string msg = sendReceive( ss.str());
+  std::string msg = sendReceive( buildMessage( 'F', _scaleFactor ) );
   if( !checkStatus( msg, _scaleFactor, __FUNCTION__ ) )
     return false;
 
@@ -496,7 +471,7 @@ bool Device::getProcessIntervals( int& _process_pulse_interval_ms, int& _process
   if( !checkConnected( __FUNCTION__ ) )
     return false;
 
-  std::string msg = sendReceive("a");
+  std::string msg = sendReceive( buildMessage( 'a' ) );
 	std::vector< std::string > tokens = tokenize( msg );
   if( !checkExpectedTokensCount( tokens, 2, __FUNCTION__ ) )
     return false;
@@ -511,10 +486,7 @@ bool Device::setProcessIntervals( int& _process_pulse_interval_ms, int& _process
   if( !checkConnected( __FUNCTION__ ) )
     return false;
 
-  std::stringstream ss;
-  ss << "A " << _process_pulse_interval_ms << " " << _process_speedsmooth_interval_ms << "\r\n";
-
-  std::string msg = sendReceive( ss.str());
+  std::string msg = sendReceive( buildMessage( 'A', _process_pulse_interval_ms, _process_speedsmooth_interval_ms ) );
   if( !checkStatus( msg, _process_pulse_interval_ms, _process_speedsmooth_interval_ms, __FUNCTION__ ) )
     return false;
 

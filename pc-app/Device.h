@@ -45,6 +45,10 @@ private:
   bool checkStatus( const std::string& _status, int _v0, int _v1, const std::string& _signature );
   bool checkStatus( const std::string& _status, int _v0, int _v1, int _v2, int _v3, const std::string& _signature );
 
+  static std::string buildMessage( char cmd );
+  static std::string buildMessage( char cmd, int _arg0 );
+  static std::string buildMessage( char cmd, int _arg0, int _arg1 );
+  static std::string buildMessage( char cmd, int _arg0, int _arg1, int _arg2, int _arg3 );
 
 	bool validateDevice(std::string& _status);
 	std::string sendReceive( const std::string& _msg);

@@ -63,7 +63,7 @@ bool Device::checkExpectedTokensCount( const std::vector< std::string >& _tokens
 
 bool isError(const std::string& _token)
 {
-  if( _token == ""  || _token.substr(3) == "ERR" )
+  if( _token == ""  || _token.substr(0, 3) == "ERR" )
     return true;
 
   return false;

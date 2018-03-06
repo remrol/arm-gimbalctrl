@@ -142,13 +142,11 @@ bool Device::getState( State& _state )
 	return true;
 }
 
-
 bool Device::getServoRange( int& _min, int& _dbandLo, int& _dbandHi, int& _max)
 {
   ENSURE_CONNECTED;
 
-	std::string msg = sendReceive("l");
-	std::vector< std::string > tokens = tokenize( msg );
+	std::vector< std::string > tokens = tokenize( sendReceive("l") );
   EXPECT_TOKENS_COUNT(tokens, 4);
 
 	_min = atoi( tokens[0].c_str() );
@@ -189,8 +187,7 @@ bool Device::getDiagnostics( int& _diag0, int& _diag1 )
 {
   ENSURE_CONNECTED;
 
-	std::string msg = sendReceive("b");
-	std::vector< std::string > tokens = tokenize(msg);
+	std::vector< std::string > tokens = tokenize( sendReceive("b") );
   EXPECT_TOKENS_COUNT( tokens, 2);
 
 	_diag0 = atoi( tokens[0].c_str() );
@@ -217,8 +214,7 @@ bool Device::getExpo( int& _expo )
 {
   ENSURE_CONNECTED;
 
-  std::string msg = sendReceive("e");
-	std::vector< std::string > tokens = tokenize( msg );
+	std::vector< std::string > tokens = tokenize( sendReceive("e") );
   EXPECT_TOKENS_COUNT( tokens, 1 );
 
   _expo = atoi( tokens[0].c_str());
@@ -242,8 +238,7 @@ bool Device::getPower( int& _power )
 {
   ENSURE_CONNECTED;
 
-  std::string msg = sendReceive("p");
-	std::vector< std::string > tokens = tokenize( msg );
+	std::vector< std::string > tokens = tokenize( sendReceive("p") );
   EXPECT_TOKENS_COUNT( tokens, 1 );
 
   _power = atoi( tokens[0].c_str());
@@ -267,8 +262,7 @@ bool Device::getPwmScaleFactor( int& _scaleFactor )
 {
   ENSURE_CONNECTED;
 
-  std::string msg = sendReceive("f");
-	std::vector< std::string > tokens = tokenize( msg );
+	std::vector< std::string > tokens = tokenize( sendReceive("f") );
   EXPECT_TOKENS_COUNT( tokens, 1 );
 
   _scaleFactor = atoi( tokens[0].c_str());

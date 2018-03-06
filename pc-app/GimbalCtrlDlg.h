@@ -62,4 +62,8 @@ public:
   int m_expo;
   afx_msg void readExpo();
   afx_msg void OnBnClickedButtonExpoSet();
+  int m_intervalProcessPulseMs;
+  int m_intervalProcessSpeedSmooth;
+  afx_msg void readProcessingIntervals();
+  afx_msg void OnBnClickedButtonProcessingintervalsSet();
 };

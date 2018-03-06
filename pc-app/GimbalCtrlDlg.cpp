@@ -28,6 +28,8 @@ CGimbalCtrlDlg::CGimbalCtrlDlg(CWnd* pParent /*=NULL*/)
   , m_motorPower(0)
   , m_pwmScaleFactor(0)
   , m_expo(0)
+  , m_intervalProcessPulseMs(0)
+  , m_intervalProcessSpeedSmooth(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -45,6 +47,8 @@ void CGimbalCtrlDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_MOTOR_POWER, m_motorPower);
 	DDX_Text(pDX, IDC_EDIT_PWMSCALE, m_pwmScaleFactor);
 	DDX_Text(pDX, IDC_EDIT_EXPO, m_expo);
+	DDX_Text(pDX, IDC_EDIT_INTERVAL_PROCESSPULSE, m_intervalProcessPulseMs);
+	DDX_Text(pDX, IDC_EDIT_INTERVAL_PROCESSPEEDSMOOTH, m_intervalProcessSpeedSmooth);
 }
 
 BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
@@ -64,6 +68,8 @@ BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
   ON_BN_CLICKED(IDC_BUTTON_PWMSCALE_SET, &CGimbalCtrlDlg::OnBnClickedButtonPwmscaleSet)
   ON_BN_CLICKED(IDC_BUTTON_EXPO_GET, &CGimbalCtrlDlg::readExpo)
   ON_BN_CLICKED(IDC_BUTTON_EXPO_SET, &CGimbalCtrlDlg::OnBnClickedButtonExpoSet)
+  ON_BN_CLICKED(IDC_BUTTON_PROCESSINGINTERVALS_GET, &CGimbalCtrlDlg::readProcessingIntervals)
+  ON_BN_CLICKED(IDC_BUTTON_PROCESSINGINTERVALS_SET, &CGimbalCtrlDlg::OnBnClickedButtonProcessingintervalsSet)
 END_MESSAGE_MAP()
 
 
@@ -174,6 +180,7 @@ void CGimbalCtrlDlg::OnBnClickedButtonConnect()
 			readMotorPower();
 			readPwmScaleFactor();
 			readExpo();
+			readProcessingIntervals();
 		}
 		else
 		{
@@ -346,5 +353,29 @@ void CGimbalCtrlDlg::OnBnClickedButtonExpoSet()
 	else
 	{
 		readExpo();
+	}
+}
+
+
+void CGimbalCtrlDlg::readProcessingIntervals()
+{
+	if( m_device.getProcessIntervals( m_intervalProcessPulseMs, m_intervalProcessSpeedSmooth ) )
+	{
+		UpdateData(FALSE);
+	}
+}
+
+
+void CGimbalCtrlDlg::OnBnClickedButtonProcessingintervalsSet()
+{
+	UpdateData(TRUE);
+
+	if( m_device.setProcessIntervals( m_intervalProcessPulseMs, m_intervalProcessSpeedSmooth ) )
+	{
+		readConfig();
+	}
+	else
+	{
+		readProcessingIntervals();
 	}
 }

@@ -42,6 +42,15 @@ bool Device::open( int _port, int _baudRate, std::string& _message )
 		return false;                            \
 	} 
 
+#define EXPECT_TOKENS_COUNT(tokens, count)      \
+  if(tokens.size() != count)                    \
+  {                                             \
+    std::string ss;                             \
+    for( size_t i = 0; i < tokens.size(); ++i)  \
+      ss += tokens[i] + std::string(",");       \
+    L_ << __FUNCTION__ << ", unexpected tokens count " << count << " tokens:" << ss;  \
+    return false;                               \
+  }
 
 bool Device::validateDevice(std::string& _status)
 {
@@ -140,11 +149,7 @@ bool Device::getServoRange( int& _min, int& _dbandLo, int& _dbandHi, int& _max)
 
 	std::string msg = sendReceive("l");
 	std::vector< std::string > tokens = tokenize( msg );
-	if( tokens.size() != 4 )
-	{
-		L_ << "getServoRange, cannot parse msg " << msg;
-		return false;
-	}
+  EXPECT_TOKENS_COUNT(tokens, 4);
 
 	_min = atoi( tokens[0].c_str() );
 	_max = atoi( tokens[1].c_str() );
@@ -186,11 +191,7 @@ bool Device::getDiagnostics( int& _diag0, int& _diag1 )
 
 	std::string msg = sendReceive("b");
 	std::vector< std::string > tokens = tokenize(msg);
-	if( tokens.size() != 2 )
-	{
-		L_ << "getDiagnostics, cannot parse msg " << msg;
-		return false;
-	}
+  EXPECT_TOKENS_COUNT( tokens, 2);
 
 	_diag0 = atoi( tokens[0].c_str() );
 	_diag1 = atoi( tokens[1].c_str() );
@@ -218,11 +219,7 @@ bool Device::getExpo( int& _expo )
 
   std::string msg = sendReceive("e");
 	std::vector< std::string > tokens = tokenize( msg );
-	if( tokens.size() != 1 )
-	{
-		L_ << "setExpo, cannot parse msg " << msg;
-		return false;
-	}
+  EXPECT_TOKENS_COUNT( tokens, 1 );
 
   _expo = atoi( tokens[0].c_str());
   return true;
@@ -247,11 +244,7 @@ bool Device::getPower( int& _power )
 
   std::string msg = sendReceive("p");
 	std::vector< std::string > tokens = tokenize( msg );
-	if( tokens.size() != 1 )
-	{
-		L_ << "getPower, cannot parse msg " << msg;
-		return false;
-	}
+  EXPECT_TOKENS_COUNT( tokens, 1 );
 
   _power = atoi( tokens[0].c_str());
   return true;
@@ -276,11 +269,7 @@ bool Device::getPwmScaleFactor( int& _scaleFactor )
 
   std::string msg = sendReceive("f");
 	std::vector< std::string > tokens = tokenize( msg );
-	if( tokens.size() != 1 )
-	{
-		L_ << "getPwmScaleFactor, cannot parse msg " << msg;
-		return false;
-	}
+  EXPECT_TOKENS_COUNT( tokens, 1 );
 
   _scaleFactor = atoi( tokens[0].c_str());
   return true;
@@ -306,11 +295,7 @@ bool Device::getProcessIntervals( int& _process_pulse_interval_ms, int& _process
 
   std::string msg = sendReceive("a");
 	std::vector< std::string > tokens = tokenize( msg );
-	if( tokens.size() != 2 )
-	{
-		L_ << "getProcessIntervals, cannot parse msg " << msg;
-		return false;
-	}
+  EXPECT_TOKENS_COUNT( tokens, 2 );
 
   _process_pulse_interval_ms = atoi( tokens[0].c_str());
   _process_speedsmooth_interval_ms = atoi( tokens[1].c_str());

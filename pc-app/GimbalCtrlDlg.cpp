@@ -30,6 +30,8 @@ CGimbalCtrlDlg::CGimbalCtrlDlg(CWnd* pParent /*=NULL*/)
   , m_expo(0)
   , m_intervalProcessPulseMs(0)
   , m_intervalProcessSpeedSmooth(0)
+  , m_timeoutMotorStopIfNoPulse(0)
+  , m_timeoutMotorShutdownIfNoPulse(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -49,6 +51,8 @@ void CGimbalCtrlDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_EXPO, m_expo);
 	DDX_Text(pDX, IDC_EDIT_INTERVAL_PROCESSPULSE, m_intervalProcessPulseMs);
 	DDX_Text(pDX, IDC_EDIT_INTERVAL_PROCESSPEEDSMOOTH, m_intervalProcessSpeedSmooth);
+	DDX_Text(pDX, IDC_EDIT_TIMEOUT_STOPNOPULSE, m_timeoutMotorStopIfNoPulse);
+	DDX_Text(pDX, IDC_EDIT_TIMEOUT_DISABLENOPULSE, m_timeoutMotorShutdownIfNoPulse);
 }
 
 BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
@@ -70,6 +74,8 @@ BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
   ON_BN_CLICKED(IDC_BUTTON_EXPO_SET, &CGimbalCtrlDlg::OnBnClickedButtonExpoSet)
   ON_BN_CLICKED(IDC_BUTTON_PROCESSINGINTERVALS_GET, &CGimbalCtrlDlg::readProcessingIntervals)
   ON_BN_CLICKED(IDC_BUTTON_PROCESSINGINTERVALS_SET, &CGimbalCtrlDlg::OnBnClickedButtonProcessingintervalsSet)
+  ON_BN_CLICKED(IDC_BUTTON_MOTORTIMEOUTS_GET, &CGimbalCtrlDlg::readMotorTimeouts)
+  ON_BN_CLICKED(IDC_BUTTON_MOTORTIMEOUTS_SET, &CGimbalCtrlDlg::OnBnClickedButtonMotortimeoutsSet)
 END_MESSAGE_MAP()
 
 
@@ -181,6 +187,7 @@ void CGimbalCtrlDlg::OnBnClickedButtonConnect()
 			readPwmScaleFactor();
 			readExpo();
 			readProcessingIntervals();
+			readMotorTimeouts();
 		}
 		else
 		{
@@ -378,4 +385,16 @@ void CGimbalCtrlDlg::OnBnClickedButtonProcessingintervalsSet()
 	{
 		readProcessingIntervals();
 	}
+}
+
+
+void CGimbalCtrlDlg::readMotorTimeouts()
+{
+	// TODO: Add your control notification handler code here
+}
+
+
+void CGimbalCtrlDlg::OnBnClickedButtonMotortimeoutsSet()
+{
+	// TODO: Add your control notification handler code here
 }

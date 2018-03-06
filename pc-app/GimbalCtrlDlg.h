@@ -66,4 +66,8 @@ public:
   int m_intervalProcessSpeedSmooth;
   afx_msg void readProcessingIntervals();
   afx_msg void OnBnClickedButtonProcessingintervalsSet();
+  int m_timeoutMotorStopIfNoPulse;
+  int m_timeoutMotorShutdownIfNoPulse;
+  afx_msg void readMotorTimeouts();
+  afx_msg void OnBnClickedButtonMotortimeoutsSet();
 };

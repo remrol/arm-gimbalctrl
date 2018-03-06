@@ -38,6 +38,10 @@ public:
 
 private:
 
+  bool checkConnected( const std::string& _signature );
+  bool checkExpectedTokensCount( const std::vector< std::string >& _tokens, int _tokensCount, const std::string& _signature );
+
+
 	bool validateDevice(std::string& _status);
 	std::string sendReceive( const std::string& _msg);
 

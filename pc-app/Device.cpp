@@ -35,22 +35,31 @@ bool Device::open( int _port, int _baudRate, std::string& _message )
 	return true;
 }
 
-#define ENSURE_CONNECTED                     \
-	if( !isOpened())                           \
-	{                                          \
-    L_ << __FUNCTION__ << ", no connection"; \
-		return false;                            \
-	} 
+bool Device::checkConnected( const std::string& _signature )
+{
+	if( !isOpened())
+	{
+    L_ << _signature << ", no connection";
+		return false; 
+	}
 
-#define EXPECT_TOKENS_COUNT(tokens, count)      \
-  if(tokens.size() != count)                    \
-  {                                             \
-    std::string ss;                             \
-    for( size_t i = 0; i < tokens.size(); ++i)  \
-      ss += tokens[i] + std::string(",");       \
-    L_ << __FUNCTION__ << ", unexpected tokens count " << count << " tokens:" << ss;  \
-    return false;                               \
+  return true;
+}
+
+bool Device::checkExpectedTokensCount( const std::vector< std::string >& _tokens, int _tokensCount, const std::string& _signature )
+{
+  if(_tokens.size() != _tokensCount)
+  {
+    std::string ss;
+    for( size_t i = 0; i < _tokens.size(); ++i)
+      ss += _tokens[i] + std::string(",");
+
+    L_ << _signature << ", unexpected tokens count " << _tokensCount << " tokens:" << ss;
+    return false;
   }
+
+  return true;
+}
 
 bool isError(const std::string& _token)
 {
@@ -162,7 +171,8 @@ bool isError(const std::string& _token)
 
 bool Device::validateDevice(std::string& _status)
 {
-  ENSURE_CONNECTED;
+  if( !checkConnected( __FUNCTION__ ) )
+    return false;
 
 	// Get device info.
 	std::string msg = sendReceive( "i" );
@@ -224,7 +234,8 @@ std::string Device::sendReceive( const std::string& _msg)
 
 bool Device::getConfig( Config& _config )
 {
-  ENSURE_CONNECTED;
+  if( !checkConnected( __FUNCTION__ ) )
+    return false;
 
 	std::string msg = sendReceive("c");
 	if( !_config.fromString( msg ) )
@@ -238,7 +249,8 @@ bool Device::getConfig( Config& _config )
 
 bool Device::getState( State& _state )
 {
-  ENSURE_CONNECTED;
+  if( !checkConnected( __FUNCTION__ ) )
+    return false;
 
 	std::string msg = sendReceive("s");
 	if( !_state.fromString( msg ) )
@@ -252,10 +264,12 @@ bool Device::getState( State& _state )
 
 bool Device::getServoRange( int& _min, int& _dbandLo, int& _dbandHi, int& _max)
 {
-  ENSURE_CONNECTED;
+  if( !checkConnected( __FUNCTION__ ) )
+    return false;
 
 	std::vector< std::string > tokens = tokenize( sendReceive("l") );
-  EXPECT_TOKENS_COUNT(tokens, 4);
+  if( !checkExpectedTokensCount( tokens, 4, __FUNCTION__ ) )
+    return false;
 
 	_min = atoi( tokens[0].c_str() );
 	_max = atoi( tokens[1].c_str() );
@@ -267,7 +281,8 @@ bool Device::getServoRange( int& _min, int& _dbandLo, int& _dbandHi, int& _max)
 
 bool Device::setServoRange( int _min, int _dbandLo, int _dbandHi, int _max)
 {
-  ENSURE_CONNECTED;
+  if( !checkConnected( __FUNCTION__ ) )
+    return false;
 
   std::stringstream ss;
   ss << "L " << _min << " " << _max << " " << _dbandLo << " " << _dbandHi << "\r\n";
@@ -279,7 +294,8 @@ bool Device::setServoRange( int _min, int _dbandLo, int _dbandHi, int _max)
 
 bool Device::configSaveToEeprom()
 {
-  ENSURE_CONNECTED;
+  if( !checkConnected( __FUNCTION__ ) )
+    return false;
 
 	std::string msg = sendReceive("W");
   VALIDATE_STATUS_0ARG(msg);
@@ -289,10 +305,12 @@ bool Device::configSaveToEeprom()
 
 bool Device::getDiagnostics( int& _diag0, int& _diag1 )
 {
-  ENSURE_CONNECTED;
+  if( !checkConnected( __FUNCTION__ ) )
+    return false;
 
 	std::vector< std::string > tokens = tokenize( sendReceive("b") );
-  EXPECT_TOKENS_COUNT( tokens, 2);
+  if( !checkExpectedTokensCount( tokens, 2, __FUNCTION__ ) )
+    return false;
 
 	_diag0 = atoi( tokens[0].c_str() );
 	_diag1 = atoi( tokens[1].c_str() );
@@ -302,7 +320,8 @@ bool Device::getDiagnostics( int& _diag0, int& _diag1 )
 
 bool Device::configLoadDefaults()
 {
-  ENSURE_CONNECTED;
+  if( !checkConnected( __FUNCTION__ ) )
+    return false;
 
 	std::string msg = sendReceive("d");
   VALIDATE_STATUS_0ARG(msg);
@@ -312,10 +331,12 @@ bool Device::configLoadDefaults()
 
 bool Device::getExpo( int& _expo )
 {
-  ENSURE_CONNECTED;
+  if( !checkConnected( __FUNCTION__ ) )
+    return false;
 
 	std::vector< std::string > tokens = tokenize( sendReceive("e") );
-  EXPECT_TOKENS_COUNT( tokens, 1 );
+  if( !checkExpectedTokensCount( tokens, 1, __FUNCTION__ ) )
+    return false;
 
   _expo = atoi( tokens[0].c_str());
   return true;
@@ -323,7 +344,8 @@ bool Device::getExpo( int& _expo )
 
 bool Device::setExpo( int _expo )
 {
-  ENSURE_CONNECTED;
+  if( !checkConnected( __FUNCTION__ ) )
+    return false;
 
   std::stringstream ss;
   ss << "E " << _expo << "\r\n";
@@ -336,10 +358,12 @@ bool Device::setExpo( int _expo )
 
 bool Device::getPower( int& _power )
 {
-  ENSURE_CONNECTED;
+  if( !checkConnected( __FUNCTION__ ) )
+    return false;
 
 	std::vector< std::string > tokens = tokenize( sendReceive("p") );
-  EXPECT_TOKENS_COUNT( tokens, 1 );
+  if( !checkExpectedTokensCount( tokens, 1, __FUNCTION__ ) )
+    return false;
 
   _power = atoi( tokens[0].c_str());
   return true;
@@ -347,7 +371,8 @@ bool Device::getPower( int& _power )
 
 bool Device::setPower( int _power )
 {
-  ENSURE_CONNECTED;
+  if( !checkConnected( __FUNCTION__ ) )
+    return false;
 
   std::stringstream ss;
   ss << "P " << _power << "\r\n";
@@ -360,10 +385,12 @@ bool Device::setPower( int _power )
 
 bool Device::getPwmScaleFactor( int& _scaleFactor )
 {
-  ENSURE_CONNECTED;
+  if( !checkConnected( __FUNCTION__ ) )
+    return false;
 
 	std::vector< std::string > tokens = tokenize( sendReceive("f") );
-  EXPECT_TOKENS_COUNT( tokens, 1 );
+  if( !checkExpectedTokensCount( tokens, 1, __FUNCTION__ ) )
+    return false;
 
   _scaleFactor = atoi( tokens[0].c_str());
   return true;
@@ -371,7 +398,8 @@ bool Device::getPwmScaleFactor( int& _scaleFactor )
 
 bool Device::setPwmScaleFactor( int _scaleFactor )
 {
-  ENSURE_CONNECTED;
+  if( !checkConnected( __FUNCTION__ ) )
+    return false;
 
   std::stringstream ss;
   ss << "F " << _scaleFactor << "\r\n";
@@ -384,11 +412,13 @@ bool Device::setPwmScaleFactor( int _scaleFactor )
 
 bool Device::getProcessIntervals( int& _process_pulse_interval_ms, int& _process_speedsmooth_interval_ms)
 {
-  ENSURE_CONNECTED;
+  if( !checkConnected( __FUNCTION__ ) )
+    return false;
 
   std::string msg = sendReceive("a");
 	std::vector< std::string > tokens = tokenize( msg );
-  EXPECT_TOKENS_COUNT( tokens, 2 );
+  if( !checkExpectedTokensCount( tokens, 2, __FUNCTION__ ) )
+    return false;
 
   _process_pulse_interval_ms = atoi( tokens[0].c_str());
   _process_speedsmooth_interval_ms = atoi( tokens[1].c_str());
@@ -397,7 +427,8 @@ bool Device::getProcessIntervals( int& _process_pulse_interval_ms, int& _process
 
 bool Device::setProcessIntervals( int& _process_pulse_interval_ms, int& _process_speedsmooth_interval_ms)
 {
-  ENSURE_CONNECTED;
+  if( !checkConnected( __FUNCTION__ ) )
+    return false;
 
   std::stringstream ss;
   ss << "A " << _process_pulse_interval_ms << " " << _process_speedsmooth_interval_ms << "\r\n";

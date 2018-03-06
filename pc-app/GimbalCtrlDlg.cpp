@@ -250,6 +250,6 @@ void CGimbalCtrlDlg::readDiagnostics()
   {
     std::stringstream ss;
     ss << diag0 << "," << diag1;
-    m_listDiagnostics.AddString( ss.str().c_str() );
+	m_listDiagnostics.InsertString( 0, ss.str().c_str() );
   }
 }

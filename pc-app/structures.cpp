@@ -1,11 +1,17 @@
 #include "stdafx.h"
 #include "structures.h"
 
-bool Config::fromString( const std::string& _data )
+
+std::vector<std::string> tokenize( const std::string& _str)
 {
 	std::vector< std::string > tokens;
-	boost::split( tokens, _data, boost::is_any_of( std::string(", ")));
+	boost::split( tokens, _str, boost::is_any_of( std::string(", ")));
+  return tokens;
+}
 
+bool Config::fromString( const std::string& _data )
+{
+	std::vector< std::string > tokens = tokenize( _data );
 	if( tokens.size() != 11 )
 	{
 		return false;
@@ -47,9 +53,7 @@ std::string Config::toDisplayableString() const
 
 bool State::fromString( const std::string& _data )
 {
-	std::vector< std::string > tokens;
-	boost::split( tokens, _data, boost::is_any_of( std::string(", ")));
-
+	std::vector< std::string > tokens = tokenize( _data );
 	if( tokens.size() != 8 )
 	{
 		return false;

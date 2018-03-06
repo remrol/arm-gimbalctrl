@@ -33,3 +33,4 @@ struct State
 	std::string toDisplayableString() const;
 };
 
+std::vector<std::string> tokenize( const std::string& _str);

@@ -139,11 +139,10 @@ bool Device::getServoRange( int& _min, int& _dbandLo, int& _dbandHi, int& _max)
   ENSURE_CONNECTED;
 
 	std::string msg = sendReceive("l");
-	std::vector< std::string > tokens;
-	boost::split( tokens, msg, boost::is_any_of( std::string(", ")));
+	std::vector< std::string > tokens = tokenize( msg );
 	if( tokens.size() != 4 )
 	{
-		L_ << "getServoRange, cannot parse msg";
+		L_ << "getServoRange, cannot parse msg " << msg;
 		return false;
 	}
 
@@ -186,11 +185,10 @@ bool Device::getDiagnostics( int& _diag0, int& _diag1 )
   ENSURE_CONNECTED;
 
 	std::string msg = sendReceive("b");
-	std::vector< std::string > tokens;
-	boost::split( tokens, msg, boost::is_any_of( std::string(", ")));
+	std::vector< std::string > tokens = tokenize(msg);
 	if( tokens.size() != 2 )
 	{
-		L_ << "getDiagnostics, cannot parse msg";
+		L_ << "getDiagnostics, cannot parse msg " << msg;
 		return false;
 	}
 
@@ -219,11 +217,10 @@ bool Device::getExpo( int& _expo )
   ENSURE_CONNECTED;
 
   std::string msg = sendReceive("e");
-	std::vector< std::string > tokens;
-	boost::split( tokens, msg, boost::is_any_of( std::string(", ")));
+	std::vector< std::string > tokens = tokenize( msg );
 	if( tokens.size() != 1 )
 	{
-		L_ << "setExpo, cannot parse msg";
+		L_ << "setExpo, cannot parse msg " << msg;
 		return false;
 	}
 
@@ -249,11 +246,10 @@ bool Device::getPower( int& _power )
   ENSURE_CONNECTED;
 
   std::string msg = sendReceive("p");
-	std::vector< std::string > tokens;
-	boost::split( tokens, msg, boost::is_any_of( std::string(", ")));
+	std::vector< std::string > tokens = tokenize( msg );
 	if( tokens.size() != 1 )
 	{
-		L_ << "getPower, cannot parse msg";
+		L_ << "getPower, cannot parse msg " << msg;
 		return false;
 	}
 
@@ -279,11 +275,10 @@ bool Device::getPwmScaleFactor( int& _scaleFactor )
   ENSURE_CONNECTED;
 
   std::string msg = sendReceive("f");
-	std::vector< std::string > tokens;
-	boost::split( tokens, msg, boost::is_any_of( std::string(", ")));
+	std::vector< std::string > tokens = tokenize( msg );
 	if( tokens.size() != 1 )
 	{
-		L_ << "getPwmScaleFactor, cannot parse msg";
+		L_ << "getPwmScaleFactor, cannot parse msg " << msg;
 		return false;
 	}
 
@@ -310,11 +305,10 @@ bool Device::getProcessIntervals( int& _process_pulse_interval_ms, int& _process
   ENSURE_CONNECTED;
 
   std::string msg = sendReceive("a");
-	std::vector< std::string > tokens;
-	boost::split( tokens, msg, boost::is_any_of( std::string(", ")));
+	std::vector< std::string > tokens = tokenize( msg );
 	if( tokens.size() != 2 )
 	{
-		L_ << "getProcessIntervals, cannot parse msg";
+		L_ << "getProcessIntervals, cannot parse msg " << msg;
 		return false;
 	}
 

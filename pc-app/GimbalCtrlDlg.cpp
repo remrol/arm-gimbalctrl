@@ -25,20 +25,26 @@ CGimbalCtrlDlg::CGimbalCtrlDlg(CWnd* pParent /*=NULL*/)
   , m_servoDbandHi(0)
   , m_servoMax(0)
   , m_timer(0)
+  , m_motorPower(0)
+  , m_pwmScaleFactor(0)
+  , m_expo(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
 void CGimbalCtrlDlg::DoDataExchange(CDataExchange* pDX)
 {
-  CDialogEx::DoDataExchange(pDX);
-  DDX_Control(pDX, IDC_COMBO_COMPORTS, m_comboComPorts);
-  DDX_Control(pDX, IDC_BUTTON_CONNECT, m_buttonConnect);
-  DDX_Text(pDX, IDC_EDIT_SERVO_MIN, m_servoMin);
-  DDX_Text(pDX, IDC_EDIT_SERVO_DBANDLO, m_servoDbandLo);
-  DDX_Text(pDX, IDC_EDIT_SERVO_DBANDHI, m_servoDbandHi);
-  DDX_Text(pDX, IDC_EDIT_SERVO_MAX, m_servoMax);
-  DDX_Control(pDX, IDC_LIST_DIAGNOSTICS, m_listDiagnostics);
+	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_COMBO_COMPORTS, m_comboComPorts);
+	DDX_Control(pDX, IDC_BUTTON_CONNECT, m_buttonConnect);
+	DDX_Text(pDX, IDC_EDIT_SERVO_MIN, m_servoMin);
+	DDX_Text(pDX, IDC_EDIT_SERVO_DBANDLO, m_servoDbandLo);
+	DDX_Text(pDX, IDC_EDIT_SERVO_DBANDHI, m_servoDbandHi);
+	DDX_Text(pDX, IDC_EDIT_SERVO_MAX, m_servoMax);
+	DDX_Control(pDX, IDC_LIST_DIAGNOSTICS, m_listDiagnostics);
+	DDX_Text(pDX, IDC_EDIT_MOTOR_POWER, m_motorPower);
+	DDX_Text(pDX, IDC_EDIT_PWMSCALE, m_pwmScaleFactor);
+	DDX_Text(pDX, IDC_EDIT_EXPO, m_expo);
 }
 
 BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
@@ -47,11 +53,17 @@ BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
 	ON_WM_DESTROY()
 	ON_WM_TIMER()
   ON_BN_CLICKED(IDC_BUTTON_CONNECT, &CGimbalCtrlDlg::OnBnClickedButtonConnect)
-  ON_BN_CLICKED(IDC_BUTTON_READ_CONFIG, &CGimbalCtrlDlg::OnBnClickedButtonReadConfig)
-  ON_BN_CLICKED(IDC_BUTTON_READ_STATE, &CGimbalCtrlDlg::OnBnClickedButtonReadState)
-  ON_BN_CLICKED(IDC_BUTTON_SERVO_GET, &CGimbalCtrlDlg::OnBnClickedButtonServoGet)
+  ON_BN_CLICKED(IDC_BUTTON_READ_CONFIG, &CGimbalCtrlDlg::readConfig)
+  ON_BN_CLICKED(IDC_BUTTON_READ_STATE, &CGimbalCtrlDlg::readState)
+  ON_BN_CLICKED(IDC_BUTTON_SERVO_GET, &CGimbalCtrlDlg::readServoRanges)
   ON_BN_CLICKED(IDC_BUTTON_SERVO_SET, &CGimbalCtrlDlg::OnBnClickedButtonServoSet)
   ON_BN_CLICKED(IDC_BUTTON_CONFIG_SAVEEEPROM, &CGimbalCtrlDlg::OnBnClickedButtonConfigSaveeeprom)
+  ON_BN_CLICKED(IDC_BUTTON_MOTORPOWER_GET, &CGimbalCtrlDlg::readMotorPower)
+  ON_BN_CLICKED(IDC_BUTTON_MOTORPOWER_SET, &CGimbalCtrlDlg::OnBnClickedButtonMotorpowerSet)
+  ON_BN_CLICKED(IDC_BUTTON_PWMSCALE_GET, &CGimbalCtrlDlg::readPwmScaleFactor)
+  ON_BN_CLICKED(IDC_BUTTON_PWMSCALE_SET, &CGimbalCtrlDlg::OnBnClickedButtonPwmscaleSet)
+  ON_BN_CLICKED(IDC_BUTTON_EXPO_GET, &CGimbalCtrlDlg::readExpo)
+  ON_BN_CLICKED(IDC_BUTTON_EXPO_SET, &CGimbalCtrlDlg::OnBnClickedButtonExpoSet)
 END_MESSAGE_MAP()
 
 
@@ -157,7 +169,11 @@ void CGimbalCtrlDlg::OnBnClickedButtonConnect()
 			status = std::string( "Connected, " ) + status;
 			m_buttonConnect.SetWindowText("Disconnect");
 
-//			readConfig();
+			readServoRanges();
+			readConfig();
+			readMotorPower();
+			readPwmScaleFactor();
+			readExpo();
 		}
 		else
 		{
@@ -181,7 +197,7 @@ void CGimbalCtrlDlg::OnBnClickedButtonConnect()
 }
 
 
-void CGimbalCtrlDlg::OnBnClickedButtonReadConfig()
+void CGimbalCtrlDlg::readConfig()
 {
   Config config;
   if( m_device.getConfig(config))
@@ -191,7 +207,7 @@ void CGimbalCtrlDlg::OnBnClickedButtonReadConfig()
 }
 
 
-void CGimbalCtrlDlg::OnBnClickedButtonReadState()
+void CGimbalCtrlDlg::readState()
 {
   State state;
   if( m_device.getState(state))
@@ -200,7 +216,7 @@ void CGimbalCtrlDlg::OnBnClickedButtonReadState()
   }
 }
 
-void CGimbalCtrlDlg::OnBnClickedButtonServoGet()
+void CGimbalCtrlDlg::readServoRanges()
 {
 	if( m_device.getServoRange(m_servoMin, m_servoDbandLo, m_servoDbandHi, m_servoMax ) )
 	{
@@ -212,7 +228,14 @@ void CGimbalCtrlDlg::OnBnClickedButtonServoSet()
 {
 	UpdateData(TRUE);
 
-	m_device.setServoRange( m_servoMin, m_servoDbandLo, m_servoDbandHi, m_servoMax );
+	if( m_device.setServoRange( m_servoMin, m_servoDbandLo, m_servoDbandHi, m_servoMax ) )
+	{
+		readConfig();
+	}
+	else
+	{
+		readServoRanges();
+	}
 }
 
 void CGimbalCtrlDlg::OnBnClickedButtonConfigSaveeeprom()
@@ -226,8 +249,8 @@ void CGimbalCtrlDlg::OnTimer(UINT_PTR nIDEvent)
 	{
 		if( m_device.isOpened() )
 		{
-      OnBnClickedButtonReadState();
-      readDiagnostics();
+			readState();
+			readDiagnostics();
 /*
 			double timeNow = TimeMeasure::now();
 			if( m_lastMeasureTime == 0 || timeNow >= m_lastMeasureTime + m_measureUpdateIntervalSec )
@@ -252,4 +275,76 @@ void CGimbalCtrlDlg::readDiagnostics()
     ss << diag0 << "," << diag1;
 	m_listDiagnostics.InsertString( 0, ss.str().c_str() );
   }
+}
+
+
+void CGimbalCtrlDlg::readMotorPower()
+{
+	if( m_device.getPower( m_motorPower ) )
+	{
+		UpdateData(FALSE);
+	}
+}
+
+
+void CGimbalCtrlDlg::OnBnClickedButtonMotorpowerSet()
+{
+	UpdateData(TRUE);
+
+	if( m_device.setPower( m_motorPower ) )
+	{
+		readConfig();
+	}
+	else
+	{
+		readMotorPower();
+	}
+}
+
+
+void CGimbalCtrlDlg::readPwmScaleFactor()
+{
+	if( m_device.getPwmScaleFactor( m_pwmScaleFactor ) )
+	{
+		UpdateData(FALSE);
+	}
+}
+
+
+void CGimbalCtrlDlg::OnBnClickedButtonPwmscaleSet()
+{
+	UpdateData(TRUE);
+
+	if( m_device.setPwmScaleFactor( m_pwmScaleFactor ) )
+	{
+		readConfig();
+	}
+	else
+	{
+		readPwmScaleFactor();
+	}
+}
+
+
+void CGimbalCtrlDlg::readExpo()
+{
+	if( m_device.getExpo( m_expo ) )
+	{
+		UpdateData(FALSE);
+	}
+}
+
+
+void CGimbalCtrlDlg::OnBnClickedButtonExpoSet()
+{
+	UpdateData(TRUE);
+
+	if( m_device.setExpo( m_expo ) )
+	{
+		readConfig();
+	}
+	else
+	{
+		readExpo();
+	}
 }

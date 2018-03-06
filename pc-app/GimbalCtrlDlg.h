@@ -39,9 +39,9 @@ public:
   CComboBox m_comboComPorts;
   afx_msg void OnBnClickedButtonConnect();
   CButton m_buttonConnect;
-  afx_msg void OnBnClickedButtonReadConfig();
-  afx_msg void OnBnClickedButtonReadState();
-  afx_msg void OnBnClickedButtonServoGet();
+  afx_msg void readConfig();
+  afx_msg void readState();
+  afx_msg void readServoRanges();
   afx_msg void OnBnClickedButtonServoSet();
   int m_servoMin;
   int m_servoDbandLo;
@@ -53,4 +53,13 @@ public:
 	UINT_PTR            m_timer;
 
   CListBox m_listDiagnostics;
+  int m_motorPower;
+  int m_pwmScaleFactor;
+  afx_msg void readMotorPower();
+  afx_msg void OnBnClickedButtonMotorpowerSet();
+  afx_msg void readPwmScaleFactor();
+  afx_msg void OnBnClickedButtonPwmscaleSet();
+  int m_expo;
+  afx_msg void readExpo();
+  afx_msg void OnBnClickedButtonExpoSet();
 };

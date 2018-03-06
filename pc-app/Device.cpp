@@ -63,72 +63,146 @@ bool Device::checkExpectedTokensCount( const std::vector< std::string >& _tokens
 
 bool isError(const std::string& _token)
 {
-  if( _token == "" )
-    return true;
-  if( _token.substr(3) == "ERR" )
+  if( _token == ""  || _token.substr(3) == "ERR" )
     return true;
 
   return false;
 }
 
-#define VALIDATE_STATUS_0ARG(status)                  \
-  std::vector<std::string> tokens = tokenize(status); \
-  if( tokens.empty())                                 \
-  {                                                   \
-    L_ << __FUNCTION__ << " empty status";            \
-    return false;                                     \
-  }                                                   \
-  if( isError(tokens[0] ) )                           \
-  {                                                   \
-    L_ << __FUNCTION__ << " error: " << status;       \
-    return false;                                     \
+bool Device::checkStatus( const std::string& _status, const std::string& _signature )
+{
+  std::vector<std::string> tokens = tokenize( _status );
+  if( tokens.empty())
+  {
+    L_ << _signature << " empty status";
+    return false;
   }
 
-#define VALIDATE_STATUS_1ARG(status, v0)              \
-  std::vector<std::string> tokens = tokenize(status); \
-  if( tokens.empty())                                 \
-  {                                                   \
-    L_ << __FUNCTION__ << " empty status";            \
-    return false;                                     \
-  }                                                   \
-  if( isError(tokens[0] ) )                           \
-  {                                                   \
-    L_ << __FUNCTION__ << " error: " << status;       \
-    return false;                                     \
-  }                                                   \
-  if(atoi(tokens[0].c_str()) != v0)                   \
-  {                                                   \
-    L_ << __FUNCTION__ << " arg0 " << tokens[0] << " expected " << v0 << " status: " << status; \
-    return false;                                     \
+  if( isError(tokens[0] ) )
+  {
+    L_ << _signature << " error: " << _status;
+    return false;
   }
 
-#define VALIDATE_STATUS_2ARG(status, v0, v1)          \
-  std::vector<std::string> tokens = tokenize(status); \
-  if( tokens.empty())                                 \
-  {                                                   \
-    L_ << __FUNCTION__ << " empty status";            \
-    return false;                                     \
-  }                                                   \
-  if( isError(tokens[0] ) )                           \
-  {                                                   \
-    L_ << __FUNCTION__ << " error: " << status;       \
-    return false;                                     \
-  }                                                   \
-  if( tokens.size() < 2 )                             \
-  {                                                   \
-    L_ << __FUNCTION__ << " not enough args " << status; \
-    return false;                                     \
-  }                                                   \
-  if(atoi(tokens[0].c_str()) != v0)                   \
-  {                                                   \
-    L_ << __FUNCTION__ << " arg0 " << tokens[0] << " expected " << v0 << " status: " << status; \
-    return false;                                     \
-  }                                                   \
-  if(atoi(tokens[1].c_str()) != v1)                   \
-  {                                                   \
-    L_ << __FUNCTION__ << " arg1 " << tokens[1] << " expected " << v1 << " status: " << status; \
-    return false;                                     \
+  return true;
+}
+
+bool Device::checkStatus( const std::string& _status, int _v0, const std::string& _signature )
+{
+  std::vector<std::string> tokens = tokenize(_status);
+  if( tokens.empty())
+  {
+    L_ << _signature << " empty status";
+    return false;
   }
+
+  if( isError(tokens[0] ) )
+  {
+    L_ << _signature << " error: " << _status;
+    return false;
+  }
+
+  if( tokens.size() < 1 )
+  {
+    L_ << _signature << " not enough args " << _status;
+    return false;
+  }
+
+  if(atoi(tokens[0].c_str()) != _v0)
+  {
+    L_ << _signature << " arg0 " << tokens[0] << " expected " << _v0 << " status: " << _status;
+    return false;
+  }
+
+  return true;
+}
+
+
+bool Device::checkStatus( const std::string& _status, int _v0, int _v1, const std::string& _signature )
+{
+  std::vector<std::string> tokens = tokenize(_status);
+  if( tokens.empty())
+  {
+    L_ << _signature << " empty status";
+    return false;
+  }
+
+  if( isError(tokens[0] ) )
+  {
+    L_ << _signature << " error: " << _status;
+    return false;
+  }
+
+  if( tokens.size() < 2 )
+  {
+    L_ << _signature << " not enough args " << _status;
+    return false;
+  }
+
+  if(atoi(tokens[0].c_str()) != _v0)
+  {
+    L_ << _signature << " arg0 " << tokens[0] << " expected " << _v0 << " status: " << _status;
+    return false;
+  }
+
+  if(atoi(tokens[1].c_str()) != _v1)
+  {
+    L_ << _signature << " arg1 " << tokens[1] << " expected " << _v1 << " status: " << _status;
+    return false;
+  }
+
+  return true;
+}
+
+bool Device::checkStatus( const std::string& _status, int _v0, int _v1, int _v2, int _v3, const std::string& _signature )
+{
+  std::vector<std::string> tokens = tokenize(_status);
+  if( tokens.empty())
+  {
+    L_ << _signature << " empty status";
+    return false;
+  }
+
+  if( isError(tokens[0] ) )
+  {
+    L_ << _signature << " error: " << _status;
+    return false;
+  }
+
+  if( tokens.size() < 4 )
+  {
+    L_ << _signature << " not enough args " << _status;
+    return false;
+  }
+
+  if(atoi(tokens[0].c_str()) != _v0)
+  {
+    L_ << _signature << " arg0 " << tokens[0] << " expected " << _v0 << " status: " << _status;
+    return false;
+  }
+
+  if(atoi(tokens[1].c_str()) != _v1)
+  {
+    L_ << _signature << " arg1 " << tokens[1] << " expected " << _v1 << " status: " << _status;
+    return false;
+  }
+
+  if(atoi(tokens[2].c_str()) != _v2)
+  {
+    L_ << _signature << " arg2 " << tokens[2] << " expected " << _v2 << " status: " << _status;
+    return false;
+  }
+
+  if(atoi(tokens[3].c_str()) != _v3)
+  {
+    L_ << _signature << " arg3 " << tokens[3] << " expected " << _v3 << " status: " << _status;
+    return false;
+  }
+
+  return true;
+}
+
+
 
 #define VALIDATE_STATUS_4ARG(status, v0, v1, v2, v3)  \
   std::vector<std::string> tokens = tokenize(status); \
@@ -288,7 +362,9 @@ bool Device::setServoRange( int _min, int _dbandLo, int _dbandHi, int _max)
   ss << "L " << _min << " " << _max << " " << _dbandLo << " " << _dbandHi << "\r\n";
 
   std::string msg = sendReceive( ss.str());
-  VALIDATE_STATUS_4ARG( msg, _min, _max, _dbandLo, _dbandHi);
+  if( !checkStatus( msg, _min, _max, _dbandLo, _dbandHi, __FUNCTION__ ) )
+    return false;
+
   return true;
 }
 
@@ -298,7 +374,8 @@ bool Device::configSaveToEeprom()
     return false;
 
 	std::string msg = sendReceive("W");
-  VALIDATE_STATUS_0ARG(msg);
+  if( !checkStatus( msg, __FUNCTION__ ) )
+    return false;
 
 	return true;
 }
@@ -324,7 +401,8 @@ bool Device::configLoadDefaults()
     return false;
 
 	std::string msg = sendReceive("d");
-  VALIDATE_STATUS_0ARG(msg);
+  if( !checkStatus( msg, __FUNCTION__ ) )
+    return false;
 
   return true;
 }
@@ -351,7 +429,8 @@ bool Device::setExpo( int _expo )
   ss << "E " << _expo << "\r\n";
 
   std::string msg = sendReceive( ss.str());
-  VALIDATE_STATUS_1ARG( msg, _expo);
+  if( !checkStatus( msg, _expo, __FUNCTION__ ) )
+    return false;
 
   return true;
 }
@@ -378,7 +457,8 @@ bool Device::setPower( int _power )
   ss << "P " << _power << "\r\n";
 
   std::string msg = sendReceive( ss.str());
-  VALIDATE_STATUS_1ARG( msg, _power );
+  if( !checkStatus( msg, _power, __FUNCTION__ ) )
+    return false;
 
   return true;
 }
@@ -405,7 +485,8 @@ bool Device::setPwmScaleFactor( int _scaleFactor )
   ss << "F " << _scaleFactor << "\r\n";
 
   std::string msg = sendReceive( ss.str());
-  VALIDATE_STATUS_1ARG( msg, _scaleFactor );
+  if( !checkStatus( msg, _scaleFactor, __FUNCTION__ ) )
+    return false;
 
   return true;
 }
@@ -434,7 +515,8 @@ bool Device::setProcessIntervals( int& _process_pulse_interval_ms, int& _process
   ss << "A " << _process_pulse_interval_ms << " " << _process_speedsmooth_interval_ms << "\r\n";
 
   std::string msg = sendReceive( ss.str());
-  VALIDATE_STATUS_2ARG( msg, _process_pulse_interval_ms, _process_speedsmooth_interval_ms);
+  if( !checkStatus( msg, _process_pulse_interval_ms, _process_speedsmooth_interval_ms, __FUNCTION__ ) )
+    return false;
 
   return true;
 }

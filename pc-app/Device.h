@@ -40,6 +40,10 @@ private:
 
   bool checkConnected( const std::string& _signature );
   bool checkExpectedTokensCount( const std::vector< std::string >& _tokens, int _tokensCount, const std::string& _signature );
+  bool checkStatus( const std::string& _status, const std::string& _signature );
+  bool checkStatus( const std::string& _status, int _v0, const std::string& _signature );
+  bool checkStatus( const std::string& _status, int _v0, int _v1, const std::string& _signature );
+  bool checkStatus( const std::string& _status, int _v0, int _v1, int _v2, int _v3, const std::string& _signature );
 
 
 	bool validateDevice(std::string& _status);

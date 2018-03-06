@@ -312,7 +312,7 @@ void receivePulseRanges()
 	int16_t min = receiveInt16(timeout);
 	if( min == INT16_MIN || min < 100 || min > 5000 )
 	{
-		sprintf_P(g_strbuf, PSTR("MIN ERR %d\r\n"), g_lastErr);
+		sprintf_P(g_strbuf, PSTR("ERR0 %d %d\r\n"), g_lastErr, min);
 		uart_puts( g_strbuf );
 		return;
 	}
@@ -320,7 +320,7 @@ void receivePulseRanges()
 	int16_t max = receiveInt16(timeout);
 	if( max == INT16_MIN || max < 100 || max > 5000 || max <= min )
 	{
-		sprintf_P(g_strbuf, PSTR("MAX ERR %d\r\n"), g_lastErr);
+		sprintf_P(g_strbuf, PSTR("ERR1 %d %d\r\n"), g_lastErr, max);
 		uart_puts( g_strbuf );
 		return;
 	}
@@ -328,7 +328,7 @@ void receivePulseRanges()
 	int16_t clo = receiveInt16(timeout);
 	if( clo == INT16_MIN || clo < 100 || clo > 5000 ||  clo <= min || clo >= max )
 	{
-		sprintf_P(g_strbuf, PSTR("CLO ERR %d\r\n"), g_lastErr);
+		sprintf_P(g_strbuf, PSTR("ERR2 %d %d\r\n"), g_lastErr, clo);
 		uart_puts( g_strbuf );
 		return;
 	}
@@ -336,7 +336,7 @@ void receivePulseRanges()
 	int16_t chi = receiveInt16(timeout);
 	if( chi == INT16_MIN || chi < 100 || chi > 5000 ||  chi <= min || chi >= max || chi < clo)
 	{
-		sprintf_P(g_strbuf, PSTR("CLO ERR %d\r\n"), g_lastErr);
+		sprintf_P(g_strbuf, PSTR("ERR3 %d %d\r\n"), g_lastErr, chi);
 		uart_puts( g_strbuf );
 		return;
 	}
@@ -367,7 +367,7 @@ void receiveProcessIntervals()
 	int16_t pulseInterval = receiveInt16(timeout);
 	if( pulseInterval == INT16_MIN || pulseInterval < 0 || pulseInterval > 10000 )
 	{
-		sprintf_P(g_strbuf, PSTR("1 ERR %d\r\n"), g_lastErr);
+		sprintf_P(g_strbuf, PSTR("ERR0 %d %d\r\n"), g_lastErr, pulseInterval);
 		uart_puts( g_strbuf );
 		return;
 	}
@@ -375,7 +375,7 @@ void receiveProcessIntervals()
 	int16_t speedSmoothInterval = receiveInt16(timeout);
 	if( speedSmoothInterval == INT16_MIN || speedSmoothInterval < 0 || speedSmoothInterval > 10000 )
 	{
-		sprintf_P(g_strbuf, PSTR("2 ERR %d\r\n"), g_lastErr);
+		sprintf_P(g_strbuf, PSTR("ERR1 %d\r\n"), g_lastErr, speedSmoothInterval);
 		uart_puts( g_strbuf );
 		return;
 	}

@@ -10,3 +10,6 @@
 /pc-app/GimbalCtrl.suo
 /pc-app/ipch/gimbalctrl-16a74398/*.ipch
 /pc-app/ipch/gimbalctrl-9832d09a/*.ipch
+/pc-app/GimbalCtrl.VC.db
+/pc-app/x64/Debug
+/pc-app/x64/Release

@@ -199,10 +199,10 @@
     <Compile Include="fcpu.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="HMC5883L.cpp">
+    <Compile Include="HMC5883L_1.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="HMC5883L.h">
+    <Compile Include="HMC5883L_1.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="i2c_master.cpp">

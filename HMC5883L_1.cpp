@@ -1,4 +1,4 @@
-#include "HMC5883L.h"
+#include "HMC5883L_1.h"
 #include "i2c_master.h"
 
 void HMC5883L_init(void)

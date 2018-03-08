@@ -154,6 +154,49 @@ bool Device::checkStatus( const std::string& _status, int _v0, int _v1, const st
     return true;
 }
 
+bool Device::checkStatus( const std::string& _status, int _v0, int _v1, int _v2, const std::string& _signature )
+{
+    std::vector<std::string> tokens = tokenize(_status);
+    if( tokens.empty())
+    {
+        L_ << _signature << " empty status";
+        return false;
+    }
+
+    if( isError(tokens[0] ) )
+    {
+        L_ << _signature << " error: " << _status;
+        return false;
+    }
+
+    if( tokens.size() < 3 )
+    {
+        L_ << _signature << " not enough args " << _status;
+        return false;
+    }
+
+    if(atoi(tokens[0].c_str()) != _v0)
+    {
+        L_ << _signature << " arg0 " << tokens[0] << " expected " << _v0 << " status: " << _status;
+        return false;
+    }
+
+    if(atoi(tokens[1].c_str()) != _v1)
+    {
+        L_ << _signature << " arg1 " << tokens[1] << " expected " << _v1 << " status: " << _status;
+        return false;
+    }
+
+    if(atoi(tokens[2].c_str()) != _v2)
+    {
+        L_ << _signature << " arg2 " << tokens[2] << " expected " << _v2 << " status: " << _status;
+        return false;
+    }
+
+    return true;
+}
+
+
 bool Device::checkStatus( const std::string& _status, int _v0, int _v1, int _v2, int _v3, const std::string& _signature )
 {
     std::vector<std::string> tokens = tokenize(_status);
@@ -220,6 +263,13 @@ std::string Device::buildMessage( char cmd, int _arg0, int _arg1 )
 {
     std::stringstream ss;
     ss << cmd << " " << _arg0 << " " << _arg1 << "\r\n";
+    return ss.str();
+}
+
+std::string Device::buildMessage( char cmd, int _arg0, int _arg1, int _arg2 )
+{
+    std::stringstream ss;
+    ss << cmd << " " << _arg0 << " " << _arg1 << " " << _arg2 << "\r\n";
     return ss.str();
 }
 
@@ -493,3 +543,31 @@ bool Device::setProcessIntervals( int& _process_pulse_interval_ms, int& _process
     return true;
 }
 
+bool Device::getMotorParams( int& _power, int& _scaleFactor, int& _expo )
+{
+    if( !checkConnected( __FUNCTION__ ) )
+        return false;
+
+    std::string msg = sendReceive( buildMessage( 'm' ) );
+	std::vector< std::string > tokens = tokenize( msg );
+    if( !checkExpectedTokensCount( tokens, 3, __FUNCTION__ ) )
+        return false;
+
+    _power = atoi( tokens[0].c_str());
+    _scaleFactor = atoi( tokens[1].c_str());
+    _expo = atoi( tokens[2].c_str());
+
+    return true;
+}
+
+bool Device::setMotorParams( int _power, int _scaleFactor, int _expo )
+{
+    if( !checkConnected( __FUNCTION__ ) )
+        return false;
+
+    std::string msg = sendReceive( buildMessage( 'A', _power, _scaleFactor, _expo ) );
+    if( !checkStatus( msg, _power, _scaleFactor, _expo, __FUNCTION__ ) )
+        return false;
+
+    return true;
+}

@@ -565,7 +565,7 @@ bool Device::setMotorParams( int _power, int _scaleFactor, int _expo )
     if( !checkConnected( __FUNCTION__ ) )
         return false;
 
-    std::string msg = sendReceive( buildMessage( 'A', _power, _scaleFactor, _expo ) );
+    std::string msg = sendReceive( buildMessage( 'M', _power, _scaleFactor, _expo ) );
     if( !checkStatus( msg, _power, _scaleFactor, _expo, __FUNCTION__ ) )
         return false;
 

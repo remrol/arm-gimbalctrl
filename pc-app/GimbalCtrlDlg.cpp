@@ -294,7 +294,7 @@ void CGimbalCtrlDlg::readDiagnostics()
 
 void CGimbalCtrlDlg::readMotorPower()
 {
-	if( m_device.getPower( m_motorPower ) )
+	if( m_device.getMotorParams( m_motorPower, m_pwmScaleFactor, m_expo ) )
 	{
 		UpdateData(FALSE);
 	}
@@ -305,7 +305,7 @@ void CGimbalCtrlDlg::OnBnClickedButtonMotorpowerSet()
 {
 	UpdateData(TRUE);
 
-	if( m_device.setPower( m_motorPower ) )
+	if( m_device.setMotorParams( m_motorPower, m_pwmScaleFactor, m_expo ) )
 	{
 		readConfig();
 	}

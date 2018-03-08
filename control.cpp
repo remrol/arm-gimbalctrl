@@ -352,6 +352,48 @@ void receivePulseRanges()
 	sendPulseRanges();
 }
 
+void sendMotorParams()
+{
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d\r\n"), g_config.power, g_config.pwm_scale_factor, g_config.expo_percent);
+	uart_puts(g_strbuf);
+}
+
+void receiveMotorParams()
+{
+	// Timeout is 200 ms
+	uint32_t timeout = millis() + 100;
+
+	int16_t power = receiveInt16(timeout);
+	if( power == INT16_MIN || power < 0 || power > 255 )
+	{
+		sprintf_P( g_strbuf, PSTR("ERR0 %d %d\r\n"), g_lastErr, power);
+		uart_puts(g_strbuf);
+		return;
+	}
+
+	int16_t scf = receiveInt16(timeout);
+	if( scf == INT16_MIN || scf < 0 || scf > 10000 )
+	{
+		sprintf_P( g_strbuf, PSTR("ERR1 %d %d\r\n"), g_lastErr, scf);
+		uart_puts(g_strbuf);
+		return;
+	}
+
+	int16_t expo = receiveInt16(timeout);
+	if( expo == INT16_MIN || expo < 0 || expo > 100 )
+	{
+		sprintf_P( g_strbuf, PSTR("ERR2 %d %d\r\n"), g_lastErr, expo);
+		uart_puts(g_strbuf);
+		return;
+	}
+
+	g_config.power = power;
+	g_config.pwm_scale_factor = scf;
+	g_config.expo_percent = expo;
+
+	sendMotorParams();
+}
+
 void sendProcessIntervals()
 {
 	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_config.process_pulse_interval_ms, g_config.process_speedsmooth_interval_ms);
@@ -458,6 +500,11 @@ void control()
 
 		case 'b':
 			sendDiagnostics(); break;
+
+		case 'm':
+			sendMotorParams(); break;
+		case 'M':
+			receiveMotorParams(); break;
 			
 		}
 	}

@@ -60,22 +60,22 @@ BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_WM_DESTROY()
 	ON_WM_TIMER()
-  ON_BN_CLICKED(IDC_BUTTON_CONNECT, &CGimbalCtrlDlg::OnBnClickedButtonConnect)
-  ON_BN_CLICKED(IDC_BUTTON_READ_CONFIG, &CGimbalCtrlDlg::readConfig)
-  ON_BN_CLICKED(IDC_BUTTON_READ_STATE, &CGimbalCtrlDlg::readState)
-  ON_BN_CLICKED(IDC_BUTTON_SERVO_GET, &CGimbalCtrlDlg::readServoRanges)
-  ON_BN_CLICKED(IDC_BUTTON_SERVO_SET, &CGimbalCtrlDlg::OnBnClickedButtonServoSet)
-  ON_BN_CLICKED(IDC_BUTTON_CONFIG_SAVEEEPROM, &CGimbalCtrlDlg::OnBnClickedButtonConfigSaveeeprom)
-  ON_BN_CLICKED(IDC_BUTTON_MOTORPOWER_GET, &CGimbalCtrlDlg::readMotorPower)
-  ON_BN_CLICKED(IDC_BUTTON_MOTORPOWER_SET, &CGimbalCtrlDlg::OnBnClickedButtonMotorpowerSet)
-  ON_BN_CLICKED(IDC_BUTTON_PWMSCALE_GET, &CGimbalCtrlDlg::readPwmScaleFactor)
-  ON_BN_CLICKED(IDC_BUTTON_PWMSCALE_SET, &CGimbalCtrlDlg::OnBnClickedButtonPwmscaleSet)
-  ON_BN_CLICKED(IDC_BUTTON_EXPO_GET, &CGimbalCtrlDlg::readExpo)
-  ON_BN_CLICKED(IDC_BUTTON_EXPO_SET, &CGimbalCtrlDlg::OnBnClickedButtonExpoSet)
-  ON_BN_CLICKED(IDC_BUTTON_PROCESSINGINTERVALS_GET, &CGimbalCtrlDlg::readProcessingIntervals)
-  ON_BN_CLICKED(IDC_BUTTON_PROCESSINGINTERVALS_SET, &CGimbalCtrlDlg::OnBnClickedButtonProcessingintervalsSet)
-  ON_BN_CLICKED(IDC_BUTTON_MOTORTIMEOUTS_GET, &CGimbalCtrlDlg::readMotorTimeouts)
-  ON_BN_CLICKED(IDC_BUTTON_MOTORTIMEOUTS_SET, &CGimbalCtrlDlg::OnBnClickedButtonMotortimeoutsSet)
+    ON_BN_CLICKED(IDC_BUTTON_CONNECT, &CGimbalCtrlDlg::OnBnClickedButtonConnect)
+    ON_BN_CLICKED(IDC_BUTTON_READ_CONFIG, &CGimbalCtrlDlg::readConfig)
+    ON_BN_CLICKED(IDC_BUTTON_READ_STATE, &CGimbalCtrlDlg::readState)
+    ON_BN_CLICKED(IDC_BUTTON_SERVO_GET, &CGimbalCtrlDlg::readServoRanges)
+    ON_BN_CLICKED(IDC_BUTTON_SERVO_SET, &CGimbalCtrlDlg::OnBnClickedButtonServoSet)
+    ON_BN_CLICKED(IDC_BUTTON_CONFIG_SAVEEEPROM, &CGimbalCtrlDlg::OnBnClickedButtonConfigSaveeeprom)
+    ON_BN_CLICKED(IDC_BUTTON_MOTORPOWER_GET, &CGimbalCtrlDlg::readMotorPower)
+    ON_BN_CLICKED(IDC_BUTTON_MOTORPOWER_SET, &CGimbalCtrlDlg::OnBnClickedButtonMotorpowerSet)
+    ON_BN_CLICKED(IDC_BUTTON_PWMSCALE_GET, &CGimbalCtrlDlg::readPwmScaleFactor)
+    ON_BN_CLICKED(IDC_BUTTON_PWMSCALE_SET, &CGimbalCtrlDlg::OnBnClickedButtonPwmscaleSet)
+    ON_BN_CLICKED(IDC_BUTTON_EXPO_GET, &CGimbalCtrlDlg::readExpo)
+    ON_BN_CLICKED(IDC_BUTTON_EXPO_SET, &CGimbalCtrlDlg::OnBnClickedButtonExpoSet)
+    ON_BN_CLICKED(IDC_BUTTON_PROCESSINGINTERVALS_GET, &CGimbalCtrlDlg::readProcessingIntervals)
+    ON_BN_CLICKED(IDC_BUTTON_PROCESSINGINTERVALS_SET, &CGimbalCtrlDlg::OnBnClickedButtonProcessingintervalsSet)
+    ON_BN_CLICKED(IDC_BUTTON_MOTORTIMEOUTS_GET, &CGimbalCtrlDlg::readMotorTimeouts)
+    ON_BN_CLICKED(IDC_BUTTON_MOTORTIMEOUTS_SET, &CGimbalCtrlDlg::OnBnClickedButtonMotortimeoutsSet)
 END_MESSAGE_MAP()
 
 
@@ -213,21 +213,21 @@ void CGimbalCtrlDlg::OnBnClickedButtonConnect()
 
 void CGimbalCtrlDlg::readConfig()
 {
-  Config config;
-  if( m_device.getConfig(config))
-  {
-    GetDlgItem(IDC_EDIT_CONFIG)->SetWindowText(config.toDisplayableString().c_str());
-  }
+    Config config;
+    if( m_device.getConfig(config))
+    {
+        GetDlgItem(IDC_EDIT_CONFIG)->SetWindowText(config.toDisplayableString().c_str());
+    }
 }
 
 
 void CGimbalCtrlDlg::readState()
 {
-  State state;
-  if( m_device.getState(state))
-  {
-    GetDlgItem(IDC_EDIT_STATE)->SetWindowText(state.toDisplayableString().c_str());
-  }
+    State state;
+    if( m_device.getState(state))
+    {
+        GetDlgItem(IDC_EDIT_STATE)->SetWindowText(state.toDisplayableString().c_str());
+    }
 }
 
 void CGimbalCtrlDlg::readServoRanges()
@@ -281,14 +281,14 @@ void CGimbalCtrlDlg::OnTimer(UINT_PTR nIDEvent)
 
 void CGimbalCtrlDlg::readDiagnostics()
 {
-  int diag0, diag1;
+    int diag0, diag1;
 
-  if( m_device.getDiagnostics( diag0, diag1 ) )
-  {
-    std::stringstream ss;
-    ss << diag0 << "," << diag1;
-	m_listDiagnostics.InsertString( 0, ss.str().c_str() );
-  }
+    if( m_device.getDiagnostics( diag0, diag1 ) )
+    {
+        std::stringstream ss;
+        ss << diag0 << "," << diag1;
+	    m_listDiagnostics.InsertString( 0, ss.str().c_str() );
+    }
 }
 
 

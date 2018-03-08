@@ -11,6 +11,7 @@
 #include "calculations.h"
 #include "config.h"
 #include "control.h"
+#include "HMC5883L_1.h"
 
 extern "C"
 {

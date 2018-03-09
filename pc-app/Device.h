@@ -24,15 +24,6 @@ public:
 
     bool getDiagnostics( int& _diag0, int& _diag1 );
 
-    bool getExpo( int& _expo );
-    bool setExpo( int _expo );
-
-    bool getPower( int& _power );
-    bool setPower( int _power );
-
-    bool getPwmScaleFactor( int& _scaleFactor );
-    bool setPwmScaleFactor( int _scaleFactor );
-
     bool getProcessIntervals( int& _process_pulse_interval_ms, int& _process_speedsmooth_interval_ms);
     bool setProcessIntervals( int& _process_pulse_interval_ms, int& _process_speedsmooth_interval_ms);
 

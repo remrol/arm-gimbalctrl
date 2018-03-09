@@ -55,13 +55,9 @@ public:
     CListBox m_listDiagnostics;
     int m_motorPower;
     int m_pwmScaleFactor;
-    afx_msg void readMotorPower();
-    afx_msg void OnBnClickedButtonMotorpowerSet();
-    afx_msg void readPwmScaleFactor();
-    afx_msg void OnBnClickedButtonPwmscaleSet();
+    afx_msg void readMotorParams();
+    afx_msg void OnBnClickedButtonMotorParamsSet();
     int m_expo;
-    afx_msg void readExpo();
-    afx_msg void OnBnClickedButtonExpoSet();
     int m_intervalProcessPulseMs;
     int m_intervalProcessSpeedSmooth;
     afx_msg void readProcessingIntervals();

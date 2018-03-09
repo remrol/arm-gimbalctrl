@@ -66,12 +66,8 @@ BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
     ON_BN_CLICKED(IDC_BUTTON_SERVO_GET, &CGimbalCtrlDlg::readServoRanges)
     ON_BN_CLICKED(IDC_BUTTON_SERVO_SET, &CGimbalCtrlDlg::OnBnClickedButtonServoSet)
     ON_BN_CLICKED(IDC_BUTTON_CONFIG_SAVEEEPROM, &CGimbalCtrlDlg::OnBnClickedButtonConfigSaveeeprom)
-    ON_BN_CLICKED(IDC_BUTTON_MOTORPOWER_GET, &CGimbalCtrlDlg::readMotorPower)
-    ON_BN_CLICKED(IDC_BUTTON_MOTORPOWER_SET, &CGimbalCtrlDlg::OnBnClickedButtonMotorpowerSet)
-    ON_BN_CLICKED(IDC_BUTTON_PWMSCALE_GET, &CGimbalCtrlDlg::readPwmScaleFactor)
-    ON_BN_CLICKED(IDC_BUTTON_PWMSCALE_SET, &CGimbalCtrlDlg::OnBnClickedButtonPwmscaleSet)
-    ON_BN_CLICKED(IDC_BUTTON_EXPO_GET, &CGimbalCtrlDlg::readExpo)
-    ON_BN_CLICKED(IDC_BUTTON_EXPO_SET, &CGimbalCtrlDlg::OnBnClickedButtonExpoSet)
+    ON_BN_CLICKED(IDC_BUTTON_MOTORPOWER_GET, &CGimbalCtrlDlg::readMotorParams)
+    ON_BN_CLICKED(IDC_BUTTON_MOTORPOWER_SET, &CGimbalCtrlDlg::OnBnClickedButtonMotorParamsSet)
     ON_BN_CLICKED(IDC_BUTTON_PROCESSINGINTERVALS_GET, &CGimbalCtrlDlg::readProcessingIntervals)
     ON_BN_CLICKED(IDC_BUTTON_PROCESSINGINTERVALS_SET, &CGimbalCtrlDlg::OnBnClickedButtonProcessingintervalsSet)
     ON_BN_CLICKED(IDC_BUTTON_MOTORTIMEOUTS_GET, &CGimbalCtrlDlg::readMotorTimeouts)
@@ -183,9 +179,7 @@ void CGimbalCtrlDlg::OnBnClickedButtonConnect()
 
 			readServoRanges();
 			readConfig();
-			readMotorPower();
-			readPwmScaleFactor();
-			readExpo();
+			readMotorParams();
 			readProcessingIntervals();
 			readMotorTimeouts();
 		}
@@ -292,7 +286,7 @@ void CGimbalCtrlDlg::readDiagnostics()
 }
 
 
-void CGimbalCtrlDlg::readMotorPower()
+void CGimbalCtrlDlg::readMotorParams()
 {
 	if( m_device.getMotorParams( m_motorPower, m_pwmScaleFactor, m_expo ) )
 	{
@@ -301,7 +295,7 @@ void CGimbalCtrlDlg::readMotorPower()
 }
 
 
-void CGimbalCtrlDlg::OnBnClickedButtonMotorpowerSet()
+void CGimbalCtrlDlg::OnBnClickedButtonMotorParamsSet()
 {
 	UpdateData(TRUE);
 
@@ -311,58 +305,9 @@ void CGimbalCtrlDlg::OnBnClickedButtonMotorpowerSet()
 	}
 	else
 	{
-		readMotorPower();
+		readMotorParams();
 	}
 }
-
-
-void CGimbalCtrlDlg::readPwmScaleFactor()
-{
-	if( m_device.getPwmScaleFactor( m_pwmScaleFactor ) )
-	{
-		UpdateData(FALSE);
-	}
-}
-
-
-void CGimbalCtrlDlg::OnBnClickedButtonPwmscaleSet()
-{
-	UpdateData(TRUE);
-
-	if( m_device.setPwmScaleFactor( m_pwmScaleFactor ) )
-	{
-		readConfig();
-	}
-	else
-	{
-		readPwmScaleFactor();
-	}
-}
-
-
-void CGimbalCtrlDlg::readExpo()
-{
-	if( m_device.getExpo( m_expo ) )
-	{
-		UpdateData(FALSE);
-	}
-}
-
-
-void CGimbalCtrlDlg::OnBnClickedButtonExpoSet()
-{
-	UpdateData(TRUE);
-
-	if( m_device.setExpo( m_expo ) )
-	{
-		readConfig();
-	}
-	else
-	{
-		readExpo();
-	}
-}
-
 
 void CGimbalCtrlDlg::readProcessingIntervals()
 {

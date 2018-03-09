@@ -229,72 +229,6 @@ void sendInfo()
 	uart_puts_p( PSTR("\r\n"));
 }
 
-void sendPower()
-{
-	sprintf_P(g_strbuf, PSTR("%d\r\n"), g_config.power);
-	uart_puts(g_strbuf);
-}
-
-void receivePower()
-{
-	uint32_t timeout = millis() + 100;
-
-	int16_t power = receiveInt16(timeout);
-	if( power == INT16_MIN || power < 0 || power > 255 )
-	{
-		sprintf_P( g_strbuf, PSTR("ERR %d %d\r\n"), g_lastErr, power);
-		uart_puts(g_strbuf);
-		return;
-	}
-
-	g_config.power = power;
-	sendPower();
-}
-
-void sendExpo()
-{
-	sprintf_P(g_strbuf, PSTR("%d\r\n"), g_config.expo_percent);
-	uart_puts(g_strbuf);
-}
-
-void receiveExpo()
-{
-	uint32_t timeout = millis() + 100;
-
-	int16_t expo = receiveInt16(timeout);
-	if( expo == INT16_MIN || expo < 0 || expo > 100 )
-	{
-		sprintf_P( g_strbuf, PSTR("ERR %d %d\r\n"), g_lastErr, expo);
-		uart_puts(g_strbuf);
-		return;
-	}
-
-	g_config.expo_percent = expo;
-	sendExpo();
-}
-
-void sendPwmScaleFactor()
-{
-	sprintf_P(g_strbuf, PSTR("%d\r\n"), g_config.pwm_scale_factor);
-	uart_puts(g_strbuf);
-}
-
-void receivePwmScaleFactor()
-{
-	uint32_t timeout = millis() + 100;
-
-	int16_t scf = receiveInt16(timeout);
-	if( scf == INT16_MIN || scf < 0 || scf > 10000 )
-	{
-		sprintf_P( g_strbuf, PSTR("ERR %d %d\r\n"), g_lastErr, scf);
-		uart_puts(g_strbuf);
-		return;
-	}
-
-	g_config.pwm_scale_factor = scf;
-	sendPwmScaleFactor();
-}
-
 void sendPulseRanges()
 {
 	sprintf_P(g_strbuf, PSTR("%d,%d,"), g_config.pulse_min, g_config.pulse_max);
@@ -472,26 +406,11 @@ void control()
 			
 		case 'i':
 			sendInfo(); 	break;
-			
-		case 'p':
-			sendPower();	break;
-		case 'P':
-			receivePower();	break;
-			
-		case 'e':
-			sendExpo();		break;			
-		case 'E':
-			receiveExpo();	break;
-			
+				
 		case 'l':
 			sendPulseRanges(); 	break;
 		case 'L':
 			receivePulseRanges(); break;
-
-		case 'f':
-			sendPwmScaleFactor(); break;
-		case 'F':
-			receivePwmScaleFactor(); break;
 
 		case 'a':
 			sendProcessIntervals(); break;

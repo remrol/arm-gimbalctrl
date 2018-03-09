@@ -32,27 +32,29 @@ CGimbalCtrlDlg::CGimbalCtrlDlg(CWnd* pParent /*=NULL*/)
   , m_intervalProcessSpeedSmooth(0)
   , m_timeoutMotorStopIfNoPulse(0)
   , m_timeoutMotorShutdownIfNoPulse(0)
+  , m_speedSmoothRatio(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
 void CGimbalCtrlDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_COMBO_COMPORTS, m_comboComPorts);
-	DDX_Control(pDX, IDC_BUTTON_CONNECT, m_buttonConnect);
-	DDX_Text(pDX, IDC_EDIT_SERVO_MIN, m_servoMin);
-	DDX_Text(pDX, IDC_EDIT_SERVO_DBANDLO, m_servoDbandLo);
-	DDX_Text(pDX, IDC_EDIT_SERVO_DBANDHI, m_servoDbandHi);
-	DDX_Text(pDX, IDC_EDIT_SERVO_MAX, m_servoMax);
-	DDX_Control(pDX, IDC_LIST_DIAGNOSTICS, m_listDiagnostics);
-	DDX_Text(pDX, IDC_EDIT_MOTOR_POWER, m_motorPower);
-	DDX_Text(pDX, IDC_EDIT_PWMSCALE, m_pwmScaleFactor);
-	DDX_Text(pDX, IDC_EDIT_EXPO, m_expo);
-	DDX_Text(pDX, IDC_EDIT_INTERVAL_PROCESSPULSE, m_intervalProcessPulseMs);
-	DDX_Text(pDX, IDC_EDIT_INTERVAL_PROCESSPEEDSMOOTH, m_intervalProcessSpeedSmooth);
-	DDX_Text(pDX, IDC_EDIT_TIMEOUT_STOPNOPULSE, m_timeoutMotorStopIfNoPulse);
-	DDX_Text(pDX, IDC_EDIT_TIMEOUT_DISABLENOPULSE, m_timeoutMotorShutdownIfNoPulse);
+    CDialogEx::DoDataExchange(pDX);
+    DDX_Control(pDX, IDC_COMBO_COMPORTS, m_comboComPorts);
+    DDX_Control(pDX, IDC_BUTTON_CONNECT, m_buttonConnect);
+    DDX_Text(pDX, IDC_EDIT_SERVO_MIN, m_servoMin);
+    DDX_Text(pDX, IDC_EDIT_SERVO_DBANDLO, m_servoDbandLo);
+    DDX_Text(pDX, IDC_EDIT_SERVO_DBANDHI, m_servoDbandHi);
+    DDX_Text(pDX, IDC_EDIT_SERVO_MAX, m_servoMax);
+    DDX_Control(pDX, IDC_LIST_DIAGNOSTICS, m_listDiagnostics);
+    DDX_Text(pDX, IDC_EDIT_MOTOR_POWER, m_motorPower);
+    DDX_Text(pDX, IDC_EDIT_PWMSCALE, m_pwmScaleFactor);
+    DDX_Text(pDX, IDC_EDIT_EXPO, m_expo);
+    DDX_Text(pDX, IDC_EDIT_INTERVAL_PROCESSPULSE, m_intervalProcessPulseMs);
+    DDX_Text(pDX, IDC_EDIT_INTERVAL_PROCESSPEEDSMOOTH, m_intervalProcessSpeedSmooth);
+    DDX_Text(pDX, IDC_EDIT_TIMEOUT_STOPNOPULSE, m_timeoutMotorStopIfNoPulse);
+    DDX_Text(pDX, IDC_EDIT_TIMEOUT_DISABLENOPULSE, m_timeoutMotorShutdownIfNoPulse);
+    DDX_Text(pDX, IDC_EDIT_PROCESSPEEDSMOOTH_RATIO, m_speedSmoothRatio);
 }
 
 BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
@@ -66,8 +68,8 @@ BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
     ON_BN_CLICKED(IDC_BUTTON_SERVO_GET, &CGimbalCtrlDlg::readServoRanges)
     ON_BN_CLICKED(IDC_BUTTON_SERVO_SET, &CGimbalCtrlDlg::OnBnClickedButtonServoSet)
     ON_BN_CLICKED(IDC_BUTTON_CONFIG_SAVEEEPROM, &CGimbalCtrlDlg::OnBnClickedButtonConfigSaveeeprom)
-    ON_BN_CLICKED(IDC_BUTTON_MOTORPOWER_GET, &CGimbalCtrlDlg::readMotorParams)
-    ON_BN_CLICKED(IDC_BUTTON_MOTORPOWER_SET, &CGimbalCtrlDlg::OnBnClickedButtonMotorParamsSet)
+    ON_BN_CLICKED(IDC_BUTTON_MOTORPARAMS_GET, &CGimbalCtrlDlg::readMotorParams)
+    ON_BN_CLICKED(IDC_BUTTON_MOTORPARAMS_SET, &CGimbalCtrlDlg::OnBnClickedButtonMotorParamsSet)
     ON_BN_CLICKED(IDC_BUTTON_PROCESSINGINTERVALS_GET, &CGimbalCtrlDlg::readProcessingIntervals)
     ON_BN_CLICKED(IDC_BUTTON_PROCESSINGINTERVALS_SET, &CGimbalCtrlDlg::OnBnClickedButtonProcessingintervalsSet)
     ON_BN_CLICKED(IDC_BUTTON_MOTORTIMEOUTS_GET, &CGimbalCtrlDlg::readMotorTimeouts)

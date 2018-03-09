@@ -66,4 +66,5 @@ public:
     int m_timeoutMotorShutdownIfNoPulse;
     afx_msg void readMotorTimeouts();
     afx_msg void OnBnClickedButtonMotortimeoutsSet();
+    CString m_speedSmoothRatio;
 };

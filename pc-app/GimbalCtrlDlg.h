@@ -60,11 +60,11 @@ public:
     int m_expo;
     int m_intervalProcessPulseMs;
     int m_intervalProcessSpeedSmooth;
-    afx_msg void readProcessingIntervals();
+    afx_msg void readProcessing();
     afx_msg void OnBnClickedButtonProcessingintervalsSet();
     int m_timeoutMotorStopIfNoPulse;
     int m_timeoutMotorShutdownIfNoPulse;
     afx_msg void readMotorTimeouts();
     afx_msg void OnBnClickedButtonMotortimeoutsSet();
-    CString m_speedSmoothRatio;
+    int m_speedSmoothRatio;
 };

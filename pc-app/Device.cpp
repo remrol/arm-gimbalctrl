@@ -441,28 +441,30 @@ bool Device::configLoadDefaults()
     return true;
 }
 
-bool Device::getProcessIntervals( int& _process_pulse_interval_ms, int& _process_speedsmooth_interval_ms)
+bool Device::getProcessing( int& _process_pulse_interval_ms, int& _process_speedsmooth_interval_ms, int& _speedSmoothRatio)
 {
     if( !checkConnected( __FUNCTION__ ) )
         return false;
 
     std::string msg = sendReceive( buildMessage( 'a' ) );
 	std::vector< std::string > tokens = tokenize( msg );
-    if( !checkExpectedTokensCount( tokens, 2, __FUNCTION__ ) )
+    if( !checkExpectedTokensCount( tokens, 3, __FUNCTION__ ) )
         return false;
 
     _process_pulse_interval_ms = atoi( tokens[0].c_str());
     _process_speedsmooth_interval_ms = atoi( tokens[1].c_str());
+    _speedSmoothRatio = atoi( tokens[2].c_str());
+
     return true;
 }
 
-bool Device::setProcessIntervals( int& _process_pulse_interval_ms, int& _process_speedsmooth_interval_ms)
+bool Device::setProcessing( int& _process_pulse_interval_ms, int& _process_speedsmooth_interval_ms, int _speedSmoothRatio)
 {
     if( !checkConnected( __FUNCTION__ ) )
         return false;
 
-    std::string msg = sendReceive( buildMessage( 'A', _process_pulse_interval_ms, _process_speedsmooth_interval_ms ) );
-    if( !checkStatus( msg, _process_pulse_interval_ms, _process_speedsmooth_interval_ms, __FUNCTION__ ) )
+    std::string msg = sendReceive( buildMessage( 'A', _process_pulse_interval_ms, _process_speedsmooth_interval_ms, _speedSmoothRatio ) );
+    if( !checkStatus( msg, _process_pulse_interval_ms, _process_speedsmooth_interval_ms, _speedSmoothRatio, __FUNCTION__ ) )
         return false;
 
     return true;

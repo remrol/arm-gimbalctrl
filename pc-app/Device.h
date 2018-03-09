@@ -24,8 +24,8 @@ public:
 
     bool getDiagnostics( int& _diag0, int& _diag1 );
 
-    bool getProcessIntervals( int& _process_pulse_interval_ms, int& _process_speedsmooth_interval_ms);
-    bool setProcessIntervals( int& _process_pulse_interval_ms, int& _process_speedsmooth_interval_ms);
+    bool getProcessing( int& _process_pulse_interval_ms, int& _process_speedsmooth_interval_ms, int& _speedSmoothRatio);
+    bool setProcessing( int& _process_pulse_interval_ms, int& _process_speedsmooth_interval_ms, int _speedSmoothRatio);
 
     bool getMotorParams( int& _power, int& _scaleFactor, int& _expo );
     bool setMotorParams( int _power, int _scaleFactor, int _expo );

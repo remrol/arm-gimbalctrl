@@ -328,13 +328,13 @@ void receiveMotorParams()
 	sendMotorParams();
 }
 
-void sendProcessIntervals()
+void sendProcessing()
 {
-	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_config.process_pulse_interval_ms, g_config.process_speedsmooth_interval_ms);
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d\r\n"), g_config.process_pulse_interval_ms, g_config.process_speedsmooth_interval_ms, g_config.speed_smooth_factor);
 	uart_puts(g_strbuf);
 }
 
-void receiveProcessIntervals()
+void receiveProcessing()
 {
 	// Timeout is 200 ms
 	uint32_t timeout = millis() + 100;
@@ -356,12 +356,21 @@ void receiveProcessIntervals()
 		return;
 	}
 
+	int16_t speedSmoothFactor = receiveInt16(timeout);
+	if( speedSmoothFactor == INT16_MIN || speedSmoothFactor < 0 || speedSmoothFactor > 127 )
+	{
+		sprintf_P(g_strbuf, PSTR("ERR2 %d %d\r\n"), g_lastErr, speedSmoothFactor);
+		uart_puts( g_strbuf );
+		return;
+	}
+
 	// Write to config
 	g_config.process_pulse_interval_ms = pulseInterval;
 	g_config.process_speedsmooth_interval_ms = speedSmoothInterval;
+	g_config.speed_smooth_factor = speedSmoothFactor;
 	
 	// Send back received values
-	sendProcessIntervals();
+	sendProcessing();
 }
 
 void sendDiagnostics()
@@ -413,9 +422,9 @@ void control()
 			receivePulseRanges(); break;
 
 		case 'a':
-			sendProcessIntervals(); break;
+			sendProcessing(); break;
 		case 'A':
-			receiveProcessIntervals(); break;
+			receiveProcessing(); break;
 
 		case 'b':
 			sendDiagnostics(); break;

@@ -32,7 +32,7 @@ CGimbalCtrlDlg::CGimbalCtrlDlg(CWnd* pParent /*=NULL*/)
   , m_intervalProcessSpeedSmooth(0)
   , m_timeoutMotorStopIfNoPulse(0)
   , m_timeoutMotorShutdownIfNoPulse(0)
-  , m_speedSmoothRatio(_T(""))
+  , m_speedSmoothRatio(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -70,7 +70,7 @@ BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
     ON_BN_CLICKED(IDC_BUTTON_CONFIG_SAVEEEPROM, &CGimbalCtrlDlg::OnBnClickedButtonConfigSaveeeprom)
     ON_BN_CLICKED(IDC_BUTTON_MOTORPARAMS_GET, &CGimbalCtrlDlg::readMotorParams)
     ON_BN_CLICKED(IDC_BUTTON_MOTORPARAMS_SET, &CGimbalCtrlDlg::OnBnClickedButtonMotorParamsSet)
-    ON_BN_CLICKED(IDC_BUTTON_PROCESSINGINTERVALS_GET, &CGimbalCtrlDlg::readProcessingIntervals)
+    ON_BN_CLICKED(IDC_BUTTON_PROCESSINGINTERVALS_GET, &CGimbalCtrlDlg::readProcessing)
     ON_BN_CLICKED(IDC_BUTTON_PROCESSINGINTERVALS_SET, &CGimbalCtrlDlg::OnBnClickedButtonProcessingintervalsSet)
     ON_BN_CLICKED(IDC_BUTTON_MOTORTIMEOUTS_GET, &CGimbalCtrlDlg::readMotorTimeouts)
     ON_BN_CLICKED(IDC_BUTTON_MOTORTIMEOUTS_SET, &CGimbalCtrlDlg::OnBnClickedButtonMotortimeoutsSet)
@@ -182,7 +182,7 @@ void CGimbalCtrlDlg::OnBnClickedButtonConnect()
 			readServoRanges();
 			readConfig();
 			readMotorParams();
-			readProcessingIntervals();
+			readProcessing();
 			readMotorTimeouts();
 		}
 		else
@@ -311,9 +311,9 @@ void CGimbalCtrlDlg::OnBnClickedButtonMotorParamsSet()
 	}
 }
 
-void CGimbalCtrlDlg::readProcessingIntervals()
+void CGimbalCtrlDlg::readProcessing()
 {
-	if( m_device.getProcessIntervals( m_intervalProcessPulseMs, m_intervalProcessSpeedSmooth ) )
+    if( m_device.getProcessing( m_intervalProcessPulseMs, m_intervalProcessSpeedSmooth, m_speedSmoothRatio ) )
 	{
 		UpdateData(FALSE);
 	}
@@ -324,13 +324,13 @@ void CGimbalCtrlDlg::OnBnClickedButtonProcessingintervalsSet()
 {
 	UpdateData(TRUE);
 
-	if( m_device.setProcessIntervals( m_intervalProcessPulseMs, m_intervalProcessSpeedSmooth ) )
+	if( m_device.setProcessing( m_intervalProcessPulseMs, m_intervalProcessSpeedSmooth, m_speedSmoothRatio ) )
 	{
 		readConfig();
 	}
 	else
 	{
-		readProcessingIntervals();
+		readProcessing();
 	}
 }
 

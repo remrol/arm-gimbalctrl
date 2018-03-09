@@ -30,6 +30,9 @@ public:
     bool getMotorParams( int& _power, int& _scaleFactor, int& _expo );
     bool setMotorParams( int _power, int _scaleFactor, int _expo );
 
+    bool getTimeouts( int& _mot_stop_nopulse_timeout_ms, int& _mot_disable_stopped_timeout_ms );
+    bool setTimeouts( int _mot_stop_nopulse_timeout_ms, int _mot_disable_stopped_timeout_ms );
+
 private:
 
     bool checkConnected( const std::string& _signature );

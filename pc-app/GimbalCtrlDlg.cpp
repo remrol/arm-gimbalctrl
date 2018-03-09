@@ -337,11 +337,21 @@ void CGimbalCtrlDlg::OnBnClickedButtonProcessingintervalsSet()
 
 void CGimbalCtrlDlg::readMotorTimeouts()
 {
-	// TODO: Add your control notification handler code here
+    if( m_device.getTimeouts( m_timeoutMotorStopIfNoPulse, m_timeoutMotorShutdownIfNoPulse ) )
+    {
+        UpdateData(FALSE);
+    }
 }
 
 
 void CGimbalCtrlDlg::OnBnClickedButtonMotortimeoutsSet()
 {
-	// TODO: Add your control notification handler code here
+	if( m_device.setTimeouts( m_timeoutMotorStopIfNoPulse, m_timeoutMotorShutdownIfNoPulse ) )
+	{
+		readConfig();
+	}
+	else
+	{
+		readMotorTimeouts();
+	}
 }

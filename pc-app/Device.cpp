@@ -498,3 +498,31 @@ bool Device::setMotorParams( int _power, int _scaleFactor, int _expo )
 
     return true;
 }
+
+
+bool Device::getTimeouts( int& _mot_stop_nopulse_timeout_ms, int& _mot_disable_stopped_timeout_ms )
+{
+    if( !checkConnected( __FUNCTION__ ) )
+        return false;
+    std::string msg = sendReceive( buildMessage( 't' ) );
+	std::vector< std::string > tokens = tokenize( msg );
+    if( !checkExpectedTokensCount( tokens, 2, __FUNCTION__ ) )
+        return false;
+
+    _mot_stop_nopulse_timeout_ms = atoi( tokens[0].c_str());
+    _mot_disable_stopped_timeout_ms = atoi( tokens[1].c_str());
+
+    return true;
+}
+
+bool Device::setTimeouts( int _mot_stop_nopulse_timeout_ms, int _mot_disable_stopped_timeout_ms )
+{
+    if( !checkConnected( __FUNCTION__ ) )
+        return false;
+
+    std::string msg = sendReceive( buildMessage( 'T', _mot_stop_nopulse_timeout_ms, _mot_disable_stopped_timeout_ms) );
+    if( !checkStatus( msg, _mot_stop_nopulse_timeout_ms, _mot_disable_stopped_timeout_ms, __FUNCTION__ ) )
+        return false;
+
+    return true;
+}

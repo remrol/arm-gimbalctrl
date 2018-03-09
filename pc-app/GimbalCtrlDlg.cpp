@@ -346,6 +346,8 @@ void CGimbalCtrlDlg::readMotorTimeouts()
 
 void CGimbalCtrlDlg::OnBnClickedButtonMotortimeoutsSet()
 {
+	UpdateData(TRUE);
+
 	if( m_device.setTimeouts( m_timeoutMotorStopIfNoPulse, m_timeoutMotorShutdownIfNoPulse ) )
 	{
 		readConfig();

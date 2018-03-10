@@ -199,10 +199,37 @@
     <Compile Include="fcpu.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="HMC5883L_1.cpp">
+    <Compile Include="i2cdevlib\BMP085.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="HMC5883L_1.h">
+    <Compile Include="i2cdevlib\BMP085.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="i2cdevlib\helper_3dmath.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="i2cdevlib\HMC5883L.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="i2cdevlib\HMC5883L.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="i2cdevlib\I2Cdev.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="i2cdevlib\I2Cdev.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="i2cdevlib\MPU6050.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="i2cdevlib\MPU6050.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="i2cdevlib\MPU6050_6Axis_MotionApps20.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="i2cdevlib\MPU6050_9Axis_MotionApps41.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="i2c_master.cpp">
@@ -226,6 +253,9 @@
     <Compile Include="uart.h">
       <SubType>compile</SubType>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="i2cdevlib" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

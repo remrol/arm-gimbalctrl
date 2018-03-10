@@ -26,12 +26,12 @@ void configLoadDefaults()
 	g_config.pulse_dband_lo = ( ( g_config.pulse_min + g_config.pulse_max ) / 2 ) - 300 / 2;
 	g_config.pulse_dband_hi = ( ( g_config.pulse_min + g_config.pulse_max ) / 2 ) + 300 / 2;
 	g_config.pwm_scale_factor = 1200;
-	g_config.speed_smooth_factor = 2;
+	g_config.speed_smooth_factor = 5;
 	g_config.power = 128;
-	g_config.expo_percent = 0;
+	g_config.expo_percent = 40;
 	
 	g_config.process_pulse_interval_ms = 100;
-	g_config.process_speedsmooth_interval_ms = 10;
+	g_config.process_speedsmooth_interval_ms = 20;
 
 	g_config.mot_stop_nopulse_timeout_ms = 2*1000;
 	g_config.mot_disable_stopped_timeout_ms = 10*1000;

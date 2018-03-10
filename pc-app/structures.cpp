@@ -12,7 +12,7 @@ std::vector<std::string> tokenize( const std::string& _str)
 bool Config::fromString( const std::string& _data )
 {
 	std::vector< std::string > tokens = tokenize( _data );
-	if( tokens.size() != 11 )
+	if( tokens.size() != 13 )
 	{
 		return false;
 	}
@@ -27,7 +27,9 @@ bool Config::fromString( const std::string& _data )
 	expo_percent					= atoi( tokens[7].c_str() );
 	process_pulse_interval_ms		= atoi( tokens[8].c_str() );
 	process_speedsmooth_interval_ms	= atoi( tokens[9].c_str() );
-	crc								= atoi( tokens[10].c_str() );
+	mot_stop_nopulse_timeout_ms		= atoi( tokens[10].c_str() );
+	mot_disable_stopped_timeout_ms	= atoi( tokens[11].c_str() );
+	crc								= atoi( tokens[12].c_str() );
 
 	return true;
 }
@@ -46,6 +48,8 @@ std::string Config::toDisplayableString() const
 		"Expo " << expo_percent << "\r\n" <<	
 		"Process pulse interval " << process_pulse_interval_ms << " [ms]\r\n" <<	
 		"Process speed smooth interval " << process_speedsmooth_interval_ms << " [ms]\r\n" <<	
+		"Motor stop if no pulse timeout " << mot_stop_nopulse_timeout_ms << " [ms]\r\n" <<	
+		"Motor disable if no pulse timeout " << mot_disable_stopped_timeout_ms << " [ms]\r\n" <<	
 		"CRC8 " << crc;	
 
   return ss.str();

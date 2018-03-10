@@ -185,7 +185,9 @@ void sendConfig()
 	uart_puts(g_strbuf);
 	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_config.speed_smooth_factor, g_config.power, g_config.expo_percent);
 	uart_puts(g_strbuf);	
-	sprintf_P(g_strbuf, PSTR("%d,%d,%d\r\n"), g_config.process_pulse_interval_ms, g_config.process_speedsmooth_interval_ms, g_config.crc);
+	sprintf_P(g_strbuf, PSTR("%d,%d,"), g_config.process_pulse_interval_ms, g_config.process_speedsmooth_interval_ms);
+	uart_puts(g_strbuf);
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d\r\n"), g_config.mot_stop_nopulse_timeout_ms, g_config.mot_disable_stopped_timeout_ms, g_config.crc);
 	uart_puts(g_strbuf);
 }
 
@@ -410,7 +412,6 @@ void receiveTimeouts()
 void sendDiagnostics()
 {
 	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_state.diag0, g_state.diag1);
-	diagReset();
 	uart_puts(g_strbuf);
 }
 

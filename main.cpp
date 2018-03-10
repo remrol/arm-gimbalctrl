@@ -11,7 +11,11 @@
 #include "calculations.h"
 #include "config.h"
 #include "control.h"
-#include "HMC5883L_1.h"
+
+#include "i2cdevlib/I2Cdev.h"
+#include "i2cdevlib/HMC5883L.h"
+#include "i2cdevlib/BMP085.h"
+#include "i2cdevlib/MPU6050.h"
 
 extern "C"
 {
@@ -142,7 +146,6 @@ void setMotorSpeed( int16_t speed )
 	static uint32_t moveTimeStamp = 0;
 	
 	// Diagnostics, get speed min/max
-	diagMinMax(speed);
 
 	// Special handling for zero speed
 	if( speed == 0 )
@@ -263,7 +266,10 @@ uint32_t getPulseTimeStamp()
 	return pulseTimeStamp;
 }
 
-
+HMC5883L magn;
+BMP085 bpm;
+MPU6050 mpu;
+	
 int main(void)
 {
 	configEepromLoad();
@@ -308,7 +314,15 @@ int main(void)
 	TIFR = 0;				// Clear flags
 	
 	// I2C --------------------------------------------------------------------
-	i2c_init();
+//	i2c_init();
+
+	Fastwire::setup(400, true);
+	
+
+	magn.initialize();
+	bpm.initialize();
+	mpu.initialize();
+	
 	
 	// Main loop --------------------------------------------------------------
 	sei();
@@ -351,6 +365,16 @@ int main(void)
 			handleSpeedSmooth();
 			handleSpeedSmoothTimeout += g_config.process_speedsmooth_interval_ms;
 		}
+
+		//---------------------------
+		/*
+		bpm.setControl(BMP085_MODE_TEMPERATURE);
+		g_state.diag0 = bpm.getTemperatureC() * 100;
+		bpm.setControl(BMP085_MODE_PRESSURE_3);
+		g_state.diag1 = 10 * bpm.getAltitude(bpm.getPressure());
+		*/
+		//---------------------------
+
 
 		// IO control
 		control();

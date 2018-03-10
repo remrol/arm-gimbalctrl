@@ -12,6 +12,8 @@ struct Config
 	int expo_percent;
 	int process_pulse_interval_ms;
 	int process_speedsmooth_interval_ms;
+	int mot_stop_nopulse_timeout_ms;
+	int mot_disable_stopped_timeout_ms;
 	int crc;	// crc
 
 	bool fromString( const std::string& _data );

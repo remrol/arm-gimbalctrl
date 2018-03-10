@@ -8,8 +8,9 @@
 extern "C"
 {
 #include "uart.h"	
-#include "time.h"
 };
+
+#include "time.h"
 
 char g_strbuf[32];
 

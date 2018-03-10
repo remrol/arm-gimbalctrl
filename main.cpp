@@ -11,17 +11,14 @@
 #include "calculations.h"
 #include "config.h"
 #include "control.h"
-
-#include "i2cdevlib/I2Cdev.h"
-#include "i2cdevlib/HMC5883L.h"
-#include "i2cdevlib/BMP085.h"
-#include "i2cdevlib/MPU6050.h"
+#include "sensors.h"
 
 extern "C"
 {
 #include "uart.h"
-#include "time.h"
 };
+
+#include "time.h"
 
 
 //--------------------------------------------------------------------------------
@@ -266,9 +263,7 @@ uint32_t getPulseTimeStamp()
 	return pulseTimeStamp;
 }
 
-HMC5883L magn;
-BMP085 bpm;
-MPU6050 mpu;
+
 	
 int main(void)
 {
@@ -313,17 +308,9 @@ int main(void)
 	
 	TIFR = 0;				// Clear flags
 	
-	// I2C --------------------------------------------------------------------
-//	i2c_init();
+	// I2C and sensors --------------------------------------------------------
+	sensorsInit();
 
-	Fastwire::setup(400, true);
-	
-
-	magn.initialize();
-	bpm.initialize();
-	mpu.initialize();
-	
-	
 	// Main loop --------------------------------------------------------------
 	sei();
 	
@@ -366,14 +353,8 @@ int main(void)
 			handleSpeedSmoothTimeout += g_config.process_speedsmooth_interval_ms;
 		}
 
-		//---------------------------
-		/*
-		bpm.setControl(BMP085_MODE_TEMPERATURE);
-		g_state.diag0 = bpm.getTemperatureC() * 100;
-		bpm.setControl(BMP085_MODE_PRESSURE_3);
-		g_state.diag1 = 10 * bpm.getAltitude(bpm.getPressure());
-		*/
-		//---------------------------
+		// Read sensors
+		sensorsRead();
 
 
 		// IO control

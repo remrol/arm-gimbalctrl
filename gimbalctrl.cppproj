@@ -232,13 +232,13 @@
     <Compile Include="i2cdevlib\MPU6050_9Axis_MotionApps41.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="i2c_master.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="i2c_master.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="main.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="sensors.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="sensors.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="time.c">

@@ -416,6 +416,12 @@ void sendDiagnostics()
 	uart_puts(g_strbuf);
 }
 
+void sendSensors()
+{
+	sprintf_P(g_strbuf, PSTR("%ld,%d,%ld\r\n"), g_state.baroTimeStamp, g_state.baroTempX10, g_state.baroPressure);
+	uart_puts(g_strbuf);
+}
+
 void control()
 {
 	// Timeout is 20 ms
@@ -474,6 +480,9 @@ void control()
 			sendTimeouts(); break;
 		case 'T':
 			receiveTimeouts(); break;	
+			
+		case 'e':
+			sendSensors(); break;
 		}
 	}
 	while( timeout > millis() );	

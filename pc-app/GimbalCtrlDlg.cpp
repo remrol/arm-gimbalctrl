@@ -261,6 +261,7 @@ void CGimbalCtrlDlg::OnTimer(UINT_PTR nIDEvent)
 		{
 			readState();
 			readDiagnostics();
+
 /*
 			double timeNow = TimeMeasure::now();
 			if( m_lastMeasureTime == 0 || timeNow >= m_lastMeasureTime + m_measureUpdateIntervalSec )
@@ -277,6 +278,17 @@ void CGimbalCtrlDlg::OnTimer(UINT_PTR nIDEvent)
 
 void CGimbalCtrlDlg::readDiagnostics()
 {
+	double pTS;
+	int pT, pP;
+	if( m_device.getSensors( pTS, pT, pP ) )
+	{
+        std::stringstream ss;
+        ss << pTS << " " << pT / 10.0 << " " << pP;
+	    m_listDiagnostics.InsertString( 0, ss.str().c_str() );
+	}
+
+
+/*
     int diag0, diag1;
 
     if( m_device.getDiagnostics( diag0, diag1 ) )
@@ -285,6 +297,8 @@ void CGimbalCtrlDlg::readDiagnostics()
         ss << diag0 << "," << diag1;
 	    m_listDiagnostics.InsertString( 0, ss.str().c_str() );
     }
+
+*/
 }
 
 

@@ -526,3 +526,20 @@ bool Device::setTimeouts( int _mot_stop_nopulse_timeout_ms, int _mot_disable_sto
 
     return true;
 }
+
+
+bool Device::getSensors( double& _baroTimeStampSec, int& _baroTemperature, int& _baroPressure )
+{
+    if( !checkConnected( __FUNCTION__ ) )
+        return false;
+    std::string msg = sendReceive( buildMessage( 'e' ) );
+	std::vector< std::string > tokens = tokenize( msg );
+    if( !checkExpectedTokensCount( tokens, 3, __FUNCTION__ ) )
+        return false;
+
+    _baroTimeStampSec = atoi( tokens[0].c_str()) / 1000.0;
+    _baroTemperature = atoi( tokens[1].c_str());
+    _baroPressure = atoi( tokens[2].c_str());
+
+    return true;
+}

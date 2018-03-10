@@ -42,6 +42,10 @@ struct State
 
 	int16_t  diag0;
 	int16_t  diag1;
+	
+	uint32_t baroTimeStamp;
+	int32_t  baroPressure;
+	int16_t  baroTempX10;
 };
 
 void stateInit();

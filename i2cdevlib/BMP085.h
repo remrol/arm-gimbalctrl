@@ -110,6 +110,7 @@ class BMP085 {
         void        loadCalibration();
         uint16_t    getRawTemperature();
         float       getTemperatureC();
+        int16_t     getTemperatureC_x10();
         float       getTemperatureF();
         uint32_t    getRawPressure();
         int32_t     getPressure();

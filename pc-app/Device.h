@@ -33,6 +33,8 @@ public:
     bool getTimeouts( int& _mot_stop_nopulse_timeout_ms, int& _mot_disable_stopped_timeout_ms );
     bool setTimeouts( int _mot_stop_nopulse_timeout_ms, int _mot_disable_stopped_timeout_ms );
 
+	bool getSensors( double& _baroTimeStampSec, int& _baroTemperature, int& _baroPressure );
+
 private:
 
     bool checkConnected( const std::string& _signature );

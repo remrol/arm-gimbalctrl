@@ -218,10 +218,27 @@ float BMP085::getTemperatureC() {
     if(ut == 0) return NAN;
     int32_t x1 = ((ut - (int32_t)ac6) * (int32_t)ac5) >> 15;
     int32_t x2 = ((int32_t)mc << 11) / (x1 + md);
-    b5 = x1 + x2;
+    b5 = x1 + x2;	// Write back temperature coefficient
     return (float)((b5 + 8) >> 4) / 10.0f;
 }
 
+int16_t BMP085::getTemperatureC_x10() {
+    /*
+    Datasheet formula:
+        UT = raw temperature
+        X1 = (UT - AC6) * AC5 / 2^15
+        X2 = MC * 2^11 / (X1 + MD)
+        B5 = X1 + X2
+        T = (B5 + 8) / 2^4
+    */
+    int32_t ut = getRawTemperature();
+    if(ut == 0) 
+		return INT16_MIN;
+    int32_t x1 = ((ut - (int32_t)ac6) * (int32_t)ac5) >> 15;
+    int32_t x2 = ((int32_t)mc << 11) / (x1 + md);
+    b5 = x1 + x2;  // Write back temperature coefficient
+    return (b5 + 8) >> 4;
+}
 float BMP085::getTemperatureF() {
     return getTemperatureC() * 9.0f / 5.0f + 32;
 }
@@ -256,7 +273,7 @@ int32_t BMP085::getPressure() {
     if(up == 0) return INT32_MIN;
     uint8_t oss = (measureMode & 0xC0) >> 6;
     int32_t p;
-    int32_t b6 = b5 - 4000;
+    int32_t b6 = b5 - 4000;	// Use temperature coefficient
     int32_t x1 = ((int32_t)b2 * ((b6 * b6) >> 12)) >> 11;
     int32_t x2 = ((int32_t)ac2 * b6) >> 11;
     int32_t x3 = x1 + x2;

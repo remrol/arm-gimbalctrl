@@ -38,6 +38,13 @@ void sensorsInit()
 		g_sensorsState.magnY = INT16_MIN;
 		g_sensorsState.magnZ = INT16_MIN;
 
+		g_sensorsState.mpuEventTimeStamp = g_sensorsState.baroEventTimestamp;
+		g_sensorsState.mpuAccelX = INT16_MIN;
+		g_sensorsState.mpuAccelY = INT16_MIN;
+		g_sensorsState.mpuAccelZ = INT16_MIN;
+		g_sensorsState.mpuGyroX = INT16_MIN;
+		g_sensorsState.mpuGyroY = INT16_MIN;
+		g_sensorsState.mpuGyroZ = INT16_MIN;
 	}
 }
 
@@ -76,7 +83,7 @@ void sensorsRead()
 		}
 	}
 	
-	// Magnetometer ------------------------------------------------
+	// Magnetometer -----------------------------------------------
 	if( millis() >= g_sensorsState.magnEventTimestamp )
 	{
 		g_magn.getHeading( &g_sensorsState.magnX, &g_sensorsState.magnY, &g_sensorsState.magnZ );
@@ -85,8 +92,22 @@ void sensorsRead()
 		g_state.magnY = g_sensorsState.magnY;
 		g_state.magnZ = g_sensorsState.magnZ;
 		
-		g_sensorsState.magnEventTimestamp = millis() + 100;
+		g_sensorsState.magnEventTimestamp = millis() + 100;			// TODO: figure out more precise event time stamp
 	}
 	
+	// Mpu --------------------------------------------------------
+	if( millis() >= g_sensorsState.mpuEventTimeStamp )
+	{
+		g_mpu6050.getMotion6( &g_sensorsState.mpuAccelX, &g_sensorsState.mpuAccelY, &g_sensorsState.mpuAccelZ, &g_sensorsState.mpuGyroX, &g_sensorsState.mpuGyroY, &g_sensorsState.mpuGyroZ);
+		g_state.mpuEventTimeStamp = millis();
+		g_state.mpuAccelX = g_sensorsState.mpuAccelX;
+		g_state.mpuAccelY = g_sensorsState.mpuAccelY;
+		g_state.mpuAccelZ = g_sensorsState.mpuAccelZ;
+		g_state.mpuGyroX = g_sensorsState.mpuGyroX;
+		g_state.mpuGyroY = g_sensorsState.mpuGyroY;
+		g_state.mpuGyroZ = g_sensorsState.mpuGyroZ;
+			
+		g_sensorsState.mpuEventTimeStamp = millis() + 100;			// TODO: figure out more precise event time stamp
+	}
 	
 }

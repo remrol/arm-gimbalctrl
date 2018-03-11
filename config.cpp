@@ -91,6 +91,14 @@ void stateInit()
 	g_state.magnX = INT16_MIN;
 	g_state.magnY = INT16_MIN;
 	g_state.magnZ = INT16_MIN;
+	
+	g_state.mpuEventTimeStamp = 0;
+	g_state.mpuAccelX = INT16_MIN;
+	g_state.mpuAccelY = INT16_MIN;
+	g_state.mpuAccelZ = INT16_MIN;
+	g_state.mpuGyroX = INT16_MIN;
+	g_state.mpuGyroY = INT16_MIN;
+	g_state.mpuGyroZ = INT16_MIN;
 }
 
 void diagMinMax(int16_t value)

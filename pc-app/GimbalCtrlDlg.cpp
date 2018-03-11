@@ -278,12 +278,20 @@ void CGimbalCtrlDlg::OnTimer(UINT_PTR nIDEvent)
 
 void CGimbalCtrlDlg::readDiagnostics()
 {
-	double pTS, mTS;
-	int pT, pP, mX, mY, mZ;
-	if( m_device.getSensors( pTS, pT, pP, mTS, mX, mY, mZ ) )
+	double pTS, mTS, mpuTS;
+	int pT, pP, mX, mY, mZ, aX, aY, aZ, gX, gY, gZ;
+	if( m_device.getSensors( 
+		pTS, pT, pP, 
+		mTS, mX, mY, mZ,
+		mpuTS, aX, aY, aZ, gX, gY, gZ ) )
 	{
         std::stringstream ss;
-        ss << "P: " << pTS << " " << pT / 10.0 << " " << pP << " M: " << mTS << " " << mX << " " << mY << " " << mZ;
+        ss << 
+			"P: " << pTS << " " << pT / 10.0 << " " << pP << 
+			" M: " << mTS << " " << mX << " " << mY << " " << mZ <<
+			" A: " << aX << " " << aY << " " << aZ <<
+			" G: " << gX << " " << gY << " " << gZ;
+
 	    m_listDiagnostics.InsertString( 0, ss.str().c_str() );
 	}
 

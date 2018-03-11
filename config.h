@@ -51,6 +51,14 @@ struct State
 	int16_t  magnX;
 	int16_t  magnY;
 	int16_t  magnZ;
+	
+	uint32_t mpuEventTimeStamp;
+	int16_t  mpuAccelX;
+	int16_t  mpuAccelY;
+	int16_t  mpuAccelZ;
+	int16_t  mpuGyroX;
+	int16_t  mpuGyroY;
+	int16_t  mpuGyroZ;	
 };
 
 void stateInit();

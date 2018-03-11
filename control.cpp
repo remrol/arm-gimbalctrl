@@ -420,7 +420,11 @@ void sendSensors()
 {
 	sprintf_P(g_strbuf, PSTR("%ld,%d,%ld,"), g_state.baroTimeStamp, g_state.baroTempX10, g_state.baroPressure);
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR("%ld,%d,%d,%d\r\n"), g_state.magnTimeStamp, g_state.magnX, g_state.magnY, g_state.magnZ);
+	sprintf_P(g_strbuf, PSTR("%ld,%d,%d,%d,"), g_state.magnTimeStamp, g_state.magnX, g_state.magnY, g_state.magnZ);
+	uart_puts(g_strbuf);
+	sprintf_P(g_strbuf, PSTR("%ld,%d,%d,%d,"), g_state.mpuEventTimeStamp, g_state.mpuAccelX, g_state.mpuAccelY, g_state.mpuAccelZ);
+	uart_puts(g_strbuf);
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d\r\n"), g_state.mpuGyroX, g_state.mpuGyroY, g_state.mpuGyroZ);
 	uart_puts(g_strbuf);
 }
 

@@ -530,22 +530,32 @@ bool Device::setTimeouts( int _mot_stop_nopulse_timeout_ms, int _mot_disable_sto
 
 bool Device::getSensors( 
 	double& _baroTimeStampSec, int& _baroTemperature, int& _baroPressure,
-	double& _magnTimeStamp, int& _magnX, int& _magnY, int& _magnZ )
+	double& _magnTimeStamp, int& _magnX, int& _magnY, int& _magnZ,
+	double& _mpuTimeStamp, int& _accelX, int& _accelY, int& _accelZ, int& _gyroX, int& _gyroY, int& _gyroZ )
 {
     if( !checkConnected( __FUNCTION__ ) )
         return false;
     std::string msg = sendReceive( buildMessage( 'e' ) );
 	std::vector< std::string > tokens = tokenize( msg );
-    if( !checkExpectedTokensCount( tokens, 7, __FUNCTION__ ) )
+    if( !checkExpectedTokensCount( tokens, 14, __FUNCTION__ ) )
         return false;
 
     _baroTimeStampSec = atoi( tokens[0].c_str()) / 1000.0;
     _baroTemperature = atoi( tokens[1].c_str());
     _baroPressure = atoi( tokens[2].c_str());
+
 	_magnTimeStamp = atoi( tokens[3].c_str()) / 1000.0;
 	_magnX = atoi( tokens[4].c_str());
 	_magnY = atoi( tokens[5].c_str());
 	_magnZ = atoi( tokens[6].c_str());
+
+	_mpuTimeStamp = atoi( tokens[7].c_str()) / 1000.0;
+	_accelX = atoi( tokens[8].c_str());
+	_accelY = atoi( tokens[9].c_str());
+	_accelZ = atoi( tokens[10].c_str());
+	_gyroX = atoi( tokens[11].c_str());
+	_gyroY = atoi( tokens[12].c_str());
+	_gyroZ = atoi( tokens[13].c_str());
 
     return true;
 }

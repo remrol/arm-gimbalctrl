@@ -418,7 +418,9 @@ void sendDiagnostics()
 
 void sendSensors()
 {
-	sprintf_P(g_strbuf, PSTR("%ld,%d,%ld\r\n"), g_state.baroTimeStamp, g_state.baroTempX10, g_state.baroPressure);
+	sprintf_P(g_strbuf, PSTR("%ld,%d,%ld,"), g_state.baroTimeStamp, g_state.baroTempX10, g_state.baroPressure);
+	uart_puts(g_strbuf);
+	sprintf_P(g_strbuf, PSTR("%ld,%d,%d,%d\r\n"), g_state.magnTimeStamp, g_state.magnX, g_state.magnY, g_state.magnZ);
 	uart_puts(g_strbuf);
 }
 

@@ -46,6 +46,11 @@ struct State
 	uint32_t baroTimeStamp;
 	int32_t  baroPressure;
 	int16_t  baroTempX10;
+	
+	uint32_t magnTimeStamp;
+	int16_t  magnX;
+	int16_t  magnY;
+	int16_t  magnZ;
 };
 
 void stateInit();

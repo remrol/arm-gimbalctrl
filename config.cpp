@@ -86,6 +86,11 @@ void stateInit()
 	g_state.baroTimeStamp = 0;
 	g_state.baroPressure = INT32_MIN;
 	g_state.baroTempX10 = INT16_MIN;
+	
+	g_state.magnTimeStamp = 0;
+	g_state.magnX = INT16_MIN;
+	g_state.magnY = INT16_MIN;
+	g_state.magnZ = INT16_MIN;
 }
 
 void diagMinMax(int16_t value)

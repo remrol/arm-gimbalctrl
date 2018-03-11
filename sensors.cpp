@@ -32,6 +32,12 @@ void sensorsInit()
 		g_sensorsState.baroEventType = BARO_EVENT_TEMP_TRIGGER;
 		g_sensorsState.baroTemperature = INT16_MIN;
 		g_sensorsState.baroPressure = INT32_MIN;
+		
+		g_sensorsState.magnEventTimestamp = g_sensorsState.baroEventTimestamp;
+		g_sensorsState.magnX = INT16_MIN;
+		g_sensorsState.magnY = INT16_MIN;
+		g_sensorsState.magnZ = INT16_MIN;
+
 	}
 }
 
@@ -39,7 +45,8 @@ void sensorsRead()
 {
 	if( !g_sensorsState.initialized)
 		return;
-		
+	
+	// barometer --------------------------------------------------	
 	if( millis() >= g_sensorsState.baroEventTimestamp )
 	{
 		switch( g_sensorsState.baroEventType)
@@ -69,16 +76,17 @@ void sensorsRead()
 		}
 	}
 	
+	// Magnetometer ------------------------------------------------
+	if( millis() >= g_sensorsState.magnEventTimestamp )
+	{
+		g_magn.getHeading( &g_sensorsState.magnX, &g_sensorsState.magnY, &g_sensorsState.magnZ );
+		g_state.magnTimeStamp = millis();
+		g_state.magnX = g_sensorsState.magnX;
+		g_state.magnY = g_sensorsState.magnY;
+		g_state.magnZ = g_sensorsState.magnZ;
 		
-		//---------------------------
-		/*
-		bpm.setControl(BMP085_MODE_TEMPERATURE);
-		while (micros() - lastMicros < bpm.getMeasureDelayMicroseconds());
-		g_state.diag0 = bpm.getTemperatureC() * 100;
-		bpm.setControl(BMP085_MODE_PRESSURE_3);
-		while (micros() - lastMicros < bpm.getMeasureDelayMicroseconds());
-		g_state.diag1 = 10 * bpm.getAltitude(bpm.getPressure());
-		*/
-		//---------------------------
+		g_sensorsState.magnEventTimestamp = millis() + 100;
+	}
+	
 	
 }

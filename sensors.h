@@ -20,6 +20,11 @@ struct SensorsState
 	uint8_t  baroEventType;
 	int16_t  baroTemperature;
 	int32_t  baroPressure;
+	
+	uint32_t magnEventTimestamp;
+	int16_t  magnX;
+	int16_t  magnY;
+	int16_t  magnZ;
 };
 
 extern SensorsState g_sensorsState;

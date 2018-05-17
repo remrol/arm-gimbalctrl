@@ -58,19 +58,21 @@ std::string Config::toDisplayableString() const
 bool State::fromString( const std::string& _data )
 {
 	std::vector< std::string > tokens = tokenize( _data );
-	if( tokens.size() != 8 )
+	if( tokens.size() != 10 )
 	{
 		return false;
 	}
 
 	timeStampSec        = atoi( tokens[0].c_str() ) / 1000.0;
 	motorPosition       = atoi( tokens[1].c_str() );
-	lastPulseTimeSec    = atoi( tokens[2].c_str() ) / 1000.0;
-	pulseDuration       = atoi( tokens[3].c_str() );
-	motorDirection      = atoi( tokens[4].c_str() );
-	motorSpeed          = atoi( tokens[5].c_str() );
-	speed               = atoi( tokens[6].c_str() );
-	ocr0                = atoi( tokens[7].c_str() );
+	lastPulse1TimeSec   = atoi( tokens[2].c_str() ) / 1000.0;
+	lastPulse3TimeSec   = atoi( tokens[3].c_str() ) / 1000.0;
+	pulse1Duration      = atoi( tokens[4].c_str() );
+	pulse3Duration      = atoi( tokens[5].c_str() );
+	motorDirection      = atoi( tokens[6].c_str() );
+	motorSpeed          = atoi( tokens[7].c_str() );
+	speed               = atoi( tokens[8].c_str() );
+	ocr0                = atoi( tokens[9].c_str() );
 
 	return true;
 }
@@ -83,8 +85,8 @@ std::string State::toDisplayableString() const
 		"Motor pos " << motorPosition << "\r\n" <<	
 		"Motor direction " << motorDirection << "\r\n" <<	
 		"Motor speed " << motorSpeed << "\r\n" <<	
-		"Pulse duration " << pulseDuration << "\r\n" <<	
-		"Pulse timestamp " << lastPulseTimeSec << "\r\n" <<	
+		"Pulse1 duration, timestamp " << pulse1Duration << "," << lastPulse1TimeSec << "\r\n" <<	
+		"Pulse3 duration, timestamp " << pulse3Duration << "," << lastPulse3TimeSec  << "\r\n" <<	
 		"Speed " << speed << "\r\n" <<	
 		"OCR0 " << ocr0;
 

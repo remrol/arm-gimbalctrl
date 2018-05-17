@@ -24,8 +24,10 @@ struct State
 {
 	double timeStampSec;
 	int motorPosition;	// Motor position
-	double lastPulseTimeSec;	// Timestamp of last measured pulse
-	int pulseDuration;	// Last measured pulse duration in ms/2, 0 if not available.	
+	double lastPulse1TimeSec;	// Timestamp of last measured pulse
+	double lastPulse3TimeSec;	// Timestamp of last measured pulse
+	int pulse1Duration;	// Last measured pulse duration in ms/2, 0 if not available.	
+	int pulse3Duration;	// Last measured pulse duration in ms/2, 0 if not available.	
 	int	motorDirection;
 	int motorSpeed;
 	int speed;

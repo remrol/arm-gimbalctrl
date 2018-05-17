@@ -36,6 +36,15 @@ ISR(TIMER1_OVF_vect)
 	g_state.vT1OverflowCount += 0x10000;					
 }	
 
+ISR(TIMER3_OVF_vect)
+{
+	// Clear overflow flag.
+	ETIFR &= 0xff ^ _BV(TOV3);
+
+	// Increment overflows count.
+	g_state.vT3OverflowCount += 0x10000;
+}
+
 ISR(TIMER1_CAPT_vect)
 {
 	static uint32_t risingEdgeTimeStamp = 0;// Rising edge time stamp, 0 means non-valid.
@@ -62,9 +71,46 @@ ISR(TIMER1_CAPT_vect)
 		// Validate measured pulse duration. Accept only 500 - 2500 us range.	
 		if( pulseDuration >= 500 && pulseDuration <= 2500 )
 		{
-			g_state.vPulseDurationSum += pulseDuration;
-			g_state.vPulseDurationSumCount += 1;
-			g_state.vPulseTimeStamp = millis();		// Store pulse time stamp.
+			g_state.vPulse1DurationSum += pulseDuration;
+			g_state.vPulse1DurationSumCount += 1;
+			g_state.vPulse1TimeStamp = millis();		// Store pulse time stamp.
+		}
+	}
+	else
+	{
+		// Should not happen, we have falling edge but no rising edge time stamp captured.
+	}
+}
+
+ISR(TIMER3_CAPT_vect)
+{
+	static uint32_t risingEdgeTimeStamp = 0;// Rising edge time stamp, 0 means non-valid.
+	
+	// Critical operations.
+	uint8_t risingEdge = TCCR3B & _BV( ICES3 );		// Read which edge has been captured.
+	TCCR3B ^= _BV( ICES3 );					// Switch edge capture.
+	
+	uint32_t timeStamp = g_state.vT3OverflowCount;	// Compute precise 32 bit time stamp.
+	timeStamp |= ICR3;
+	
+	if( risingEdge ) // Read which edge has been captured.
+	{
+		// If rising edge then remember its time stamp.
+		risingEdgeTimeStamp = timeStamp;
+	}
+	else if( risingEdgeTimeStamp != 0 )
+	{
+		// Compute pulse duration.
+		uint32_t pulseDuration = ( timeStamp - risingEdgeTimeStamp ) / ( F_CPU / 8000000 );
+		// Clear rising edge.
+		risingEdgeTimeStamp = 0;
+		
+		// Validate measured pulse duration. Accept only 500 - 2500 us range.
+		if( pulseDuration >= 500 && pulseDuration <= 2500 )
+		{
+			g_state.vPulse3DurationSum += pulseDuration;
+			g_state.vPulse3DurationSumCount += 1;
+			g_state.vPulse3TimeStamp = millis();		// Store pulse time stamp.
 		}
 	}
 	else
@@ -231,7 +277,7 @@ void handleSpeedSmooth()
 }
 
 
-uint16_t getPulseTime()
+uint16_t getPulse1Time()
 {
 	uint32_t pulseDurationSum;
 	uint16_t pulseDurationSumCount;
@@ -239,10 +285,10 @@ uint16_t getPulseTime()
 	// Rewrite volatile vars with interrupts off.
 	uint8_t oldSREG = SREG;
 	cli();
-	pulseDurationSum = g_state.vPulseDurationSum;
-	pulseDurationSumCount = g_state.vPulseDurationSumCount;
-	g_state.vPulseDurationSum = 0;
-	g_state.vPulseDurationSumCount = 0;
+	pulseDurationSum = g_state.vPulse1DurationSum;
+	pulseDurationSumCount = g_state.vPulse1DurationSumCount;
+	g_state.vPulse1DurationSum = 0;
+	g_state.vPulse1DurationSumCount = 0;
 	SREG = oldSREG;
 
 	// Calc avg pulse time
@@ -252,18 +298,37 @@ uint16_t getPulseTime()
 	return pulseDurationSum / pulseDurationSumCount;
 }
 
-uint32_t getPulseTimeStamp()
+uint32_t getPulse1TimeStamp()
 {
 	uint32_t pulseTimeStamp;
 	uint8_t oldSREG = SREG;
 	cli();
-	pulseTimeStamp = g_state.vPulseTimeStamp;
+	pulseTimeStamp = g_state.vPulse1TimeStamp;
 	SREG = oldSREG;
 
 	return pulseTimeStamp;
 }
 
+uint16_t getPulse3Time()
+{
+	uint32_t pulseDurationSum;
+	uint16_t pulseDurationSumCount;
 
+	// Rewrite volatile vars with interrupts off.
+	uint8_t oldSREG = SREG;
+	cli();
+	pulseDurationSum = g_state.vPulse3DurationSum;
+	pulseDurationSumCount = g_state.vPulse3DurationSumCount;
+	g_state.vPulse3DurationSum = 0;
+	g_state.vPulse3DurationSumCount = 0;
+	SREG = oldSREG;
+
+	// Calc avg pulse time
+	if( pulseDurationSumCount == 0 )
+		return 0;
+
+	return pulseDurationSum / pulseDurationSumCount;
+}
 	
 int main(void)
 {
@@ -288,14 +353,20 @@ int main(void)
 			_BV( COM00 );								// Set OC0 on compare match when up-counting. Clear OC0 on compare match when down counting
 	
 	// Input -----------------------------------------------------------------
-	// Capture source = ICP1 = PD4	
+	// Capture source ICP1 = PD4
 	// Whole D as input
 	DDRD = 0x00;
-	
 	TCCR1B = _BV( ICNC1 ) |	// Allow noise canceler
 			 _BV( CS11 )  |	// Clock / 8
 			 _BV( ICES1 );	// A rising edge is capture event.
 			 
+			 
+	// Capture source ICP3 = PE7
+	// Whole E as input
+	DDRE = 0x00;
+	TCCR3B = _BV(ICNC3 ) |	// Allow noise canceler
+			 _BV(CS31)	 |  // Clock/8
+			 _BV(ICES3);	// A rising edge is capture event.
 
 	// Timer millis()
 	initTime();
@@ -305,6 +376,8 @@ int main(void)
 	    	_BV( TOIE1 )  |	// Enable interrupt by timer1 overflow
 			_BV( TICIE1 ) | // Enable interrupt by timer1 capture event
 			_BV( OCIE0 );  	// Enable interrupt by timer0 output compare match
+	ETIMSK = _BV(TOIE3) |	// Enable interrupt by timer3 overflow
+			 _BV(TICIE3);	// Enable interrupt by timer3 capture event.
 	
 	TIFR = 0;				// Clear flags
 	
@@ -332,15 +405,17 @@ int main(void)
 		// Periodically pulse duration -> speed handler
 		if( now >= handlePulseTimeout )
 		{
-			g_state.pulseDuration = getPulseTime();
-			if( g_state.pulseDuration > 0 )
+			g_state.pulse1Duration = getPulse1Time();
+			g_state.pulse3Duration = getPulse3Time();
+			
+			if( g_state.pulse1Duration > 0 )
 			{
-				pulseDurationToSpeed(g_state.pulseDuration);
+				pulseDurationToSpeed(g_state.pulse1Duration);
 			}
-			else if( now > getPulseTimeStamp() + g_config.mot_stop_nopulse_timeout_ms)
+			else if( now > getPulse1TimeStamp() + g_config.mot_stop_nopulse_timeout_ms)
 			{
 				//  If no response for timeout then set speed 0.
-				pulseDurationToSpeed(g_state.pulseDuration);
+				pulseDurationToSpeed(g_state.pulse1Duration);
 			}
 			
 			handlePulseTimeout += g_config.process_pulse_interval_ms;

@@ -2,6 +2,6 @@
 #include "uart.h"
 #include <math.h>
 #include <stdlib.h>
-#include <stdint.h>
 
+Storm32LiveData g_storm32LiveData;
 

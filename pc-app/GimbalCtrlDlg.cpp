@@ -74,6 +74,7 @@ BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
     ON_BN_CLICKED(IDC_BUTTON_PROCESSINGINTERVALS_SET, &CGimbalCtrlDlg::OnBnClickedButtonProcessingintervalsSet)
     ON_BN_CLICKED(IDC_BUTTON_MOTORTIMEOUTS_GET, &CGimbalCtrlDlg::readMotorTimeouts)
     ON_BN_CLICKED(IDC_BUTTON_MOTORTIMEOUTS_SET, &CGimbalCtrlDlg::OnBnClickedButtonMotortimeoutsSet)
+	ON_BN_CLICKED(IDC_BUTTON_STORM32_GETDATA, &CGimbalCtrlDlg::OnBnClickedButtonStorm32Getdata)
 END_MESSAGE_MAP()
 
 
@@ -378,4 +379,10 @@ void CGimbalCtrlDlg::OnBnClickedButtonMotortimeoutsSet()
 	{
 		readMotorTimeouts();
 	}
+}
+
+
+void CGimbalCtrlDlg::OnBnClickedButtonStorm32Getdata()
+{
+	m_device.getStorm32data();
 }

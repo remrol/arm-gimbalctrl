@@ -354,8 +354,8 @@ int main(void)
 	
 	// Input -----------------------------------------------------------------
 	// Capture source ICP1 = PD4
-	// Whole D as input
-	DDRD = 0x00;
+	// PD2 output, rest input
+	DDRD = _BV(2);
 	TCCR1B = _BV( ICNC1 ) |	// Allow noise canceler
 			 _BV( CS11 )  |	// Clock / 8
 			 _BV( ICES1 );	// A rising edge is capture event.
@@ -390,6 +390,9 @@ int main(void)
 	DDRE = 0x01; // PE0 = RxD = input, PE1 = TxD = output
 
 	uart_init(UART_BAUD_SELECT(19200, F_CPU));
+	
+	uart1_init(UART_BAUD_SELECT(19200, F_CPU));
+
 	//---------------------
 	
 //	HMC5883L_init();

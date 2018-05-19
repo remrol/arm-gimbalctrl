@@ -241,6 +241,12 @@
     <Compile Include="sensors.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="storm32.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="storm32.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="time.c">
       <SubType>compile</SubType>
     </Compile>

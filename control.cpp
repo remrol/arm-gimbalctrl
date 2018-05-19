@@ -1,6 +1,7 @@
 #define __STDC_LIMIT_MACROS
 #include "control.h"
 #include "config.h"
+#include "storm32.h"
 #include <math.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -428,6 +429,58 @@ void sendSensors()
 	uart_puts(g_strbuf);
 }
 
+void sendStorm32()
+{
+	uart1_putc('t');
+	
+	uint32_t timeout = millis() + 100;
+	uint8_t error = 0;
+	uint8_t ch = 0;
+		
+	while(true)
+	{
+		uint16_t c = uart1_getc();
+		
+		// No data, check for timeout
+		if( c & UART_NO_DATA)
+		{
+			// Detect timeout
+			if( millis() > timeout )
+			{
+				error = 1;
+				break;
+			}
+			
+			continue;
+		}
+
+		// Error, return with error
+		if( c & 0xff00 )
+		{
+			error = 2;
+			break;
+		}		
+		
+		ch = c;
+		break;		
+	}
+	
+	if( error == 1 )
+	{
+		uart_puts_p( PSTR("E 1\r\n"));
+	}
+	else if( error ==2 )
+	{
+		uart_puts_p( PSTR("E 2\r\n"));
+	}
+	else
+	{
+		sprintf_P(g_strbuf, PSTR("OK %d\r\n"), (int) ch);
+		uart_puts(g_strbuf);
+	}
+	
+}
+
 void control()
 {
 	// Timeout is 20 ms
@@ -489,6 +542,9 @@ void control()
 			
 		case 'e':
 			sendSensors(); break;
+			
+		case 'f':
+			sendStorm32(); break;
 		}
 	}
 	while( timeout > millis() );	

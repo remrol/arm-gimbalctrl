@@ -66,4 +66,5 @@ public:
     int			m_timeoutMotorStopIfNoPulse;
     int			m_timeoutMotorShutdownIfNoPulse;
     int			m_speedSmoothRatio;
+	afx_msg void OnBnClickedButtonStorm32Getdata();
 };

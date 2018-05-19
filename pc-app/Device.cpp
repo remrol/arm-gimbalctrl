@@ -559,3 +559,15 @@ bool Device::getSensors(
 
     return true;
 }
+
+
+bool Device::getStorm32data()
+{
+    if( !checkConnected( __FUNCTION__ ) )
+        return false;
+
+	std::string msg = sendReceive( buildMessage( 'f' ) );
+	L_ << msg;
+
+	return true;
+}

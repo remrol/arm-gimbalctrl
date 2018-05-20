@@ -561,7 +561,7 @@ bool Device::getSensors(
 }
 
 
-bool Device::getStorm32data()
+bool Device::readStorm32LiveData()
 {
     if( !checkConnected( __FUNCTION__ ) )
         return false;

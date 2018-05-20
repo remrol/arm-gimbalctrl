@@ -38,7 +38,7 @@ public:
 		double& _magnTimeStamp, int& _magnX, int& _magnY, int& _magnZ,
 		double& _mpuTimeStamp, int& _accelX, int& _accelY, int& _accelZ, int& _gyroX, int& _gyroY, int& _gyroZ );
 
-	bool getStorm32data();
+	bool readStorm32LiveData();
 
 private:
 

@@ -384,5 +384,5 @@ void CGimbalCtrlDlg::OnBnClickedButtonMotortimeoutsSet()
 
 void CGimbalCtrlDlg::OnBnClickedButtonStorm32Getdata()
 {
-	m_device.getStorm32data();
+	m_device.readStorm32LiveData();
 }

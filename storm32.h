@@ -41,6 +41,7 @@ struct Storm32LiveData
 	uint8_t endChar;						// o
 };
 
+#define STORM32_FIELDSCOUNT 32
 
 typedef uint8_t Storm32Status;
 static const Storm32Status ST32_UPDATE_OK = 0;

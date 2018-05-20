@@ -446,6 +446,26 @@ void updateStorm32LiveData()
 	}
 }
 
+
+void readStorm32LiveData()
+{
+	// Timeout is 100 ms
+	uint32_t timeout = millis() + 100;
+
+	// Receive
+	int16_t dataOffset = receiveInt16(timeout);
+	if( dataOffset == INT16_MIN || dataOffset < 0 || dataOffset > STORM32_FIELDSCOUNT - 2 )
+	{
+		sprintf_P(g_strbuf, PSTR("ERR0 %d %d\r\n"), g_lastErr, dataOffset);
+		uart_puts( g_strbuf );
+		return;
+	}
+	
+	int16_t* data = ( (int16_t*) ( &g_storm32LiveData) ) + dataOffset;
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d\r\n"), data[0], data[1],  data[2] );
+	uart_puts(g_strbuf);	
+}
+
 void control()
 {
 	// Timeout is 20 ms
@@ -510,6 +530,9 @@ void control()
 			
 		case 'f':
 			updateStorm32LiveData(); break;
+			
+		case 'g':
+			readStorm32LiveData(); break;
 		}
 	}
 	while( timeout > millis() );	

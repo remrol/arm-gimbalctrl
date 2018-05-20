@@ -436,7 +436,7 @@ void updateStorm32LiveData()
 	
 	if( status != ST32_UPDATE_OK )
 	{
-		sprintf_P(g_strbuf, PSTR("ERR %d\r\n"));
+		sprintf_P(g_strbuf, PSTR("ERR %d\r\n"), (int) status);
 		uart_puts(g_strbuf);
 	}
 	else

@@ -6,16 +6,22 @@ extern "C"
 #include "time.h"
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 
 uint32_t        g_storm32LiveDataTimeStamp = 0;
 Storm32LiveData g_storm32LiveData;
 
+void storm32_Init()
+{
+	g_storm32LiveDataTimeStamp = 0;
+	memset(&g_storm32LiveData, 0, sizeof(Storm32LiveData));
+}
 
 Storm32Status storm32_UpdateStatus()
 {
-	g_storm32LiveDataTimeStamp = millis();
-	uint32_t timeout = g_storm32LiveDataTimeStamp + 100;
-	uint8_t* stormData = (uint8_t*) & g_storm32LiveData;
+	uint32_t timeStamp = millis();
+	uint32_t timeout = timeStamp + 100;
+	uint8_t stormData[sizeof(Storm32LiveData)];
 	
 	uart1_putc('d');
 	
@@ -46,6 +52,12 @@ Storm32Status storm32_UpdateStatus()
 		}
 	}
 	
+	Storm32LiveData* st32Data = (Storm32LiveData*) stormData;
+	if( st32Data->endChar != 'o' )
+		return ST32_UPDATE_CRCERROR;
+	
+	g_storm32LiveDataTimeStamp = timeStamp;
+	memcpy(&g_storm32LiveData, st32Data, sizeof(Storm32LiveData));
 	return ST32_UPDATE_OK;	
 }
 

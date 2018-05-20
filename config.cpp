@@ -36,6 +36,8 @@ void configLoadDefaults()
 	g_config.mot_stop_nopulse_timeout_ms = 2*1000;
 	g_config.mot_disable_stopped_timeout_ms = 10*1000;
 	
+	g_config.storm32_update_inteval_ms = 500;
+	
 	// Update crc
 	g_config.crc = configComputeCrc();	
 }

@@ -12,6 +12,7 @@
 #include "config.h"
 #include "control.h"
 #include "sensors.h"
+#include "storm32.h"
 
 extern "C"
 {
@@ -383,6 +384,7 @@ int main(void)
 	
 	// I2C and sensors --------------------------------------------------------
 	sensorsInit();
+	storm32_Init();
 
 	// Main loop --------------------------------------------------------------
 	sei();
@@ -397,8 +399,9 @@ int main(void)
 	
 //	HMC5883L_init();
 	
-	uint32_t handleSpeedSmoothTimeout, handlePulseTimeout;
-	handleSpeedSmoothTimeout = handlePulseTimeout = millis();
+	uint32_t handleSpeedSmoothTimeout, handlePulseTimeout, handleStorm32UpdateTimeout;
+	handleStorm32UpdateTimeout = handleSpeedSmoothTimeout = handlePulseTimeout = millis();
+	handleStorm32UpdateTimeout += 5*1000; // Delay storm32 update 5 seconds
 	
 
     while(1)
@@ -431,6 +434,12 @@ int main(void)
 			handleSpeedSmoothTimeout += g_config.process_speedsmooth_interval_ms;
 		}
 
+		// Periodically update storm32 data
+		if( now >= handleStorm32UpdateTimeout )
+		{
+			storm32_UpdateStatus();
+			handleStorm32UpdateTimeout += g_config.storm32_update_inteval_ms;
+		}
 		// Read sensors
 		sensorsRead();
 

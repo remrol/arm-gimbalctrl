@@ -21,6 +21,7 @@ struct Config
 	uint16_t mot_stop_nopulse_timeout_ms;
 	uint16_t mot_disable_stopped_timeout_ms;
 	
+	uint16_t storm32_update_inteval_ms;
 	// crc
 	uint8_t crc;	
 };

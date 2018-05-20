@@ -47,8 +47,10 @@ typedef uint8_t Storm32Status;
 static const Storm32Status ST32_UPDATE_OK = 0;
 static const Storm32Status ST32_UPDATE_TIMEOUT = 1;
 static const Storm32Status ST32_UPDATE_UARTERROR = 2;
+static const Storm32Status ST32_UPDATE_CRCERROR = 3;
 
 
+void storm32_Init();
 Storm32Status storm32_UpdateStatus();
 
 

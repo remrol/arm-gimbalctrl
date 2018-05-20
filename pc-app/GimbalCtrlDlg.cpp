@@ -385,9 +385,11 @@ void CGimbalCtrlDlg::OnBnClickedButtonMotortimeoutsSet()
 void CGimbalCtrlDlg::OnBnClickedButtonStorm32Getdata()
 {
 	double timeStamp;
-	m_device.readStorm32LiveData(timeStamp);
+//	m_device.readStorm32LiveData(timeStamp);
 
 	int a0, a1, a2;
 
 	m_device.getStorm32LiveData( Device::ST32DO_InputSrcPitch, a0, a1, a2 );
+
+	L_ << a0 << " " << a1 << " " << a2;
 }

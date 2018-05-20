@@ -561,13 +561,32 @@ bool Device::getSensors(
 }
 
 
-bool Device::readStorm32LiveData()
+bool Device::readStorm32LiveData(double& _timeStamp)
 {
     if( !checkConnected( __FUNCTION__ ) )
         return false;
 
-	std::string msg = sendReceive( buildMessage( 'f' ) );
-	L_ << msg;
+	std::vector< std::string > tokens = tokenize( sendReceive( buildMessage( 'f') ) );
+    if( !checkExpectedTokensCount( tokens, 1, __FUNCTION__ ) )
+        return false;
+
+	_timeStamp = (double) atoi( tokens[0].c_str() ) / 1000.0;
+	return true;
+}
+
+
+bool Device::getStorm32LiveData( int _offset, int& _data0, int& _data1, int& _data2 )
+{
+    if( !checkConnected( __FUNCTION__ ) )
+        return false;
+
+	std::vector< std::string > tokens = tokenize( sendReceive( buildMessage( 'g', _offset ) ) );
+    if( !checkExpectedTokensCount( tokens, 3, __FUNCTION__ ) )
+        return false;
+
+	_data0 = atoi( tokens[0].c_str() );
+	_data1 = atoi( tokens[1].c_str() );
+	_data2 = atoi( tokens[2].c_str() );
 
 	return true;
 }

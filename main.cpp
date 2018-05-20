@@ -391,7 +391,7 @@ int main(void)
 
 	uart_init(UART_BAUD_SELECT(19200, F_CPU));
 	
-	uart1_init(UART_BAUD_SELECT(19200, F_CPU));
+	uart1_init(UART_BAUD_SELECT(38400, F_CPU));
 
 	//---------------------
 	

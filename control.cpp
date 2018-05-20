@@ -429,49 +429,21 @@ void sendSensors()
 	uart_puts(g_strbuf);
 }
 
-void sendStorm32()
+// InputSrcPitch
+void updateStorm32LiveData()
 {
-	uart1_putc('d');
+	Storm32Status status = storm32_UpdateStatus();
 	
-	uint32_t timeout = millis() + 100;
-	uint8_t error = 0;
-	uint8_t* stormData = (uint8_t*) & g_storm32LiveData;
-		
-	for( uint8_t i = 0; i < 67; ++i )
+	if( status != ST32_UPDATE_OK )
 	{
-		uint16_t c;
-		
-		while( true)
-		{
-			c = uart1_getc();
-		
-			// No data, check for timeout
-			if( c & UART_NO_DATA)
-			{
-				// Detect timeout
-				if( millis() > timeout )
-				{
-					error = 1;
-					break;
-				}
-			
-				continue;
-			}
-
-			// Error, return with error
-			if( c & 0xff00 )
-			{
-				error = 2;
-				break;
-			}
-
-			stormData[i] = (uint8_t) c;
-			break;			
-		}
+		sprintf_P(g_strbuf, PSTR("ERR %d\r\n"));
+		uart_puts(g_strbuf);
 	}
-	
-	sprintf_P(g_strbuf, PSTR("OK %d %d %d %d\r\n"), (int) error, (int) g_storm32LiveData.InputSrcPitch, (int) g_storm32LiveData.InputSrcRoll, (int) g_storm32LiveData.InputSrcYaw);
-	uart_puts(g_strbuf);	
+	else
+	{
+		sprintf_P(g_strbuf, PSTR("%ld\r\n"), g_storm32LiveDataTimeStamp);
+		uart_puts(g_strbuf);	
+	}
 }
 
 void control()
@@ -537,7 +509,7 @@ void control()
 			sendSensors(); break;
 			
 		case 'f':
-			sendStorm32(); break;
+			updateStorm32LiveData(); break;
 		}
 	}
 	while( timeout > millis() );	

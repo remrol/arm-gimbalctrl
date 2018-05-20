@@ -41,7 +41,19 @@ struct Storm32LiveData
 	uint8_t endChar;						// o
 };
 
+
+typedef uint8_t Storm32Status;
+static const Storm32Status ST32_UPDATE_OK = 0;
+static const Storm32Status ST32_UPDATE_TIMEOUT = 1;
+static const Storm32Status ST32_UPDATE_UARTERROR = 2;
+
+
+Storm32Status storm32_UpdateStatus();
+
+
+extern uint32_t        g_storm32LiveDataTimeStamp;
 extern Storm32LiveData g_storm32LiveData;
+
 
 #endif // STORM32_H
 

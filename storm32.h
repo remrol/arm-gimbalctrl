@@ -48,6 +48,7 @@ static const Storm32Status ST32_UPDATE_OK = 0;
 static const Storm32Status ST32_UPDATE_TIMEOUT = 1;
 static const Storm32Status ST32_UPDATE_UARTERROR = 2;
 static const Storm32Status ST32_UPDATE_CRCERROR = 3;
+static const Storm32Status ST32_UPDATE_ENDCHARERROR = 4;
 
 
 void storm32_Init();

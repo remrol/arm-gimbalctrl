@@ -590,3 +590,18 @@ bool Device::getStorm32LiveData( int _offset, int& _data0, int& _data1, int& _da
 
 	return true;
 }
+
+	
+bool Device::getStorm32(
+	int& _imuErrors, int& _lipoVoltage, int& _loopTimeMillis,
+	int& _InputSrcPitch, int& _InputSrcRoll, int& _InputSrcYaw)
+{
+    if( !checkConnected( __FUNCTION__ ) )
+        return false;
+
+	if( !getStorm32LiveData( ST32DO_InputSrcPitch, _InputSrcPitch, _InputSrcRoll, _InputSrcYaw ) ||
+		!getStorm32LiveData( ST32DO_imuErrorsCount, _imuErrors, _lipoVoltage, _loopTimeMillis) )
+		return false;
+
+	return true;
+}

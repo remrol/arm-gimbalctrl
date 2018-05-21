@@ -76,6 +76,10 @@ public:
 		double& _magnTimeStamp, int& _magnX, int& _magnY, int& _magnZ,
 		double& _mpuTimeStamp, int& _accelX, int& _accelY, int& _accelZ, int& _gyroX, int& _gyroY, int& _gyroZ );
 
+	bool getStorm32( 
+		int& _imuErrors, int& _lipoVoltage, int& _loopTimeMillis,
+		int& _InputSrcPitch, int& _InputSrcRoll, int& _InputSrcYaw );
+
 	bool readStorm32LiveData( double& _timeStamp );
 
 	bool getStorm32LiveData( int _offset, int& _data0, int& _data1, int& _data2 );

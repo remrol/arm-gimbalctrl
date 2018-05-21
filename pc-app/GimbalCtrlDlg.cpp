@@ -279,23 +279,42 @@ void CGimbalCtrlDlg::OnTimer(UINT_PTR nIDEvent)
 
 void CGimbalCtrlDlg::readDiagnostics()
 {
-	double pTS, mTS, mpuTS;
-	int pT, pP, mX, mY, mZ, aX, aY, aZ, gX, gY, gZ;
-	if( m_device.getSensors( 
-		pTS, pT, pP, 
-		mTS, mX, mY, mZ,
-		mpuTS, aX, aY, aZ, gX, gY, gZ ) )
+	if( false )
 	{
-        std::stringstream ss;
-        ss << 
-			"P: " << pTS << " " << pT / 10.0 << " " << pP << 
-			" M: " << mTS << " " << mX << " " << mY << " " << mZ <<
-			" A: " << aX << " " << aY << " " << aZ <<
-			" G: " << gX << " " << gY << " " << gZ;
+		double pTS, mTS, mpuTS;
+		int pT, pP, mX, mY, mZ, aX, aY, aZ, gX, gY, gZ;
+		if( m_device.getSensors( 
+			pTS, pT, pP, 
+			mTS, mX, mY, mZ,
+			mpuTS, aX, aY, aZ, gX, gY, gZ ) )
+		{
+			std::stringstream ss;
+			ss << 
+				"P: " << pTS << " " << pT / 10.0 << " " << pP << 
+				" M: " << mTS << " " << mX << " " << mY << " " << mZ <<
+				" A: " << aX << " " << aY << " " << aZ <<
+				" G: " << gX << " " << gY << " " << gZ;
 
-	    m_listDiagnostics.InsertString( 0, ss.str().c_str() );
+			m_listDiagnostics.InsertString( 0, ss.str().c_str() );
+		}
+
 	}
+	else if( true )
+	{
+		int imuErrors, lipoVoltage, loopTimeMillis;
+		int InputSrcPitch, InputSrcRoll, InputSrcYaw;
 
+		if( m_device.getStorm32( imuErrors, lipoVoltage, loopTimeMillis, InputSrcPitch, InputSrcRoll, InputSrcYaw ) )
+		{
+			std::stringstream ss;
+			ss << 
+				"Err: " << imuErrors << " Volt: " << lipoVoltage << " LoopMs: " << loopTimeMillis <<
+				 " Input: " << InputSrcPitch << " " << InputSrcRoll << " " << InputSrcYaw;
+
+			m_listDiagnostics.InsertString( 0, ss.str().c_str() );
+		}
+
+	}
 
 /*
     int diag0, diag1;

@@ -71,7 +71,9 @@ Storm32Status storm32_UpdateStatus()
 			if( c & 0xff00 )
 				return ST32_UPDATE_UARTERROR;
 
-			crc_accumulate((uint8_t) c, &crc);
+			if( i < sizeof(Storm32LiveData) - 3 )
+				crc_accumulate((uint8_t) c, &crc);
+				
 			stormData[i] = (uint8_t) c;
 			break;
 		}
@@ -79,8 +81,8 @@ Storm32Status storm32_UpdateStatus()
 	
 	Storm32LiveData* st32Data = (Storm32LiveData*) stormData;
 	
-//	if(st32Data->crc != crc)
-//		return ST32_UPDATE_CRCERROR;
+	if(st32Data->crc != crc)
+		return ST32_UPDATE_CRCERROR;
 	
 	if( st32Data->endChar != 'o' )
 		return ST32_UPDATE_ENDCHARERROR;

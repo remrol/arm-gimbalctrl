@@ -108,6 +108,7 @@ void stateInit()
 	g_state.mpuGyroZ = INT16_MIN;
 	
 	g_state.rotateOffset = 0;
+	g_state.stabilizeMode = 0;
 }
 
 void diagMinMax(int16_t value)

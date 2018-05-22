@@ -68,6 +68,7 @@ struct State
 	int16_t  mpuGyroZ;	
 	
 	int16_t  rotateOffset;
+	uint8_t  stabilizeMode;
 };
 
 void stateInit();

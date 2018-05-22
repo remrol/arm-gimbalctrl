@@ -261,6 +261,17 @@ void handleSpeedSmooth()
 	// Rewrite to get rid of overwrites
 	int16_t speed = g_state.speed;
 	
+	if( g_state.stabilizeMode)
+	{
+		int16_t error = g_storm32LiveData.aImu1AnglePitch / 4;
+		if( error < -128 )
+			error = -128;
+		else if( error > 128 )
+			error = 128;
+			
+		speed = error;
+	}
+	
 	if( speed == g_state.motorSpeed )
 	{
 		setMotorSpeed( g_state.motorSpeed );	

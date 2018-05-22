@@ -302,14 +302,25 @@ void CGimbalCtrlDlg::readDiagnostics()
 	else if( true )
 	{
 		int imuErrors, lipoVoltage, loopTimeMillis;
+		int imu1AnglePitch, imu1AngleRoll, imu1AngleYaw;
+		int imu1AHRS_x, imu1AHRS_y, imu1AHRS_z;
+		int imu1AngleMPIDPitch, imu1AngleMPIDRoll, imu1AngleMPIDYaw;
 		int InputSrcPitch, InputSrcRoll, InputSrcYaw;
 
-		if( m_device.getStorm32( imuErrors, lipoVoltage, loopTimeMillis, InputSrcPitch, InputSrcRoll, InputSrcYaw ) )
+		if( m_device.getStorm32( 
+			imuErrors, lipoVoltage, loopTimeMillis, 
+			imu1AnglePitch, imu1AngleRoll, imu1AngleYaw, 
+			imu1AHRS_x, imu1AHRS_y, imu1AHRS_z, 
+			imu1AngleMPIDPitch, imu1AngleMPIDRoll, imu1AngleMPIDYaw, 
+			InputSrcPitch, InputSrcRoll, InputSrcYaw ) )
 		{
 			std::stringstream ss;
 			ss << 
-				"Err: " << imuErrors << " Volt: " << lipoVoltage << " LoopMs: " << loopTimeMillis <<
-				 " Input: " << InputSrcPitch << " " << InputSrcRoll << " " << InputSrcYaw;
+				"Err " << imuErrors << 
+				" Angle " << imu1AnglePitch << " " << imu1AngleRoll << " " << imu1AngleYaw << 
+				" AHRS " << imu1AHRS_x << " " << imu1AHRS_y << " " << imu1AHRS_z << 
+				" Angle-PID " << imu1AngleMPIDPitch << " " << imu1AngleMPIDRoll << " " <<  imu1AngleMPIDYaw << 
+				" In " << InputSrcPitch << " " << InputSrcRoll << " " << InputSrcYaw;
 
 			m_listDiagnostics.InsertString( 0, ss.str().c_str() );
 		}
@@ -403,7 +414,7 @@ void CGimbalCtrlDlg::OnBnClickedButtonMotortimeoutsSet()
 
 void CGimbalCtrlDlg::OnBnClickedButtonStorm32Getdata()
 {
-	double timeStamp;
+//	double timeStamp;
 //	m_device.readStorm32LiveData(timeStamp);
 
 	int a0, a1, a2;

@@ -66,6 +66,8 @@ struct State
 	int16_t  mpuGyroX;
 	int16_t  mpuGyroY;
 	int16_t  mpuGyroZ;	
+	
+	int16_t  rotateOffset;
 };
 
 void stateInit();

@@ -260,16 +260,18 @@ void handleSpeedSmooth()
 	int16_t dstSpd;
 	// Rewrite to get rid of overwrites
 	int16_t speed = g_state.speed;
+	int8_t speedSmoothFactor = g_config.speed_smooth_factor;
 	
 	if( g_state.stabilizeMode)
 	{
-		int16_t error = g_storm32LiveData.aImu1AngleYaw / 4;
+		int16_t error = -g_storm32LiveData.param21 / 16;
 		if( error < -128 )
 			error = -128;
 		else if( error > 128 )
 			error = 128;
 			
 		speed = error;
+		speedSmoothFactor = 64;
 	}
 	
 	if( speed == g_state.motorSpeed )
@@ -278,12 +280,12 @@ void handleSpeedSmooth()
 	}
 	else if( speed < g_state.motorSpeed )
 	{
-		dstSpd = g_state.motorSpeed - g_config.speed_smooth_factor;
+		dstSpd = g_state.motorSpeed - speedSmoothFactor;
 		setMotorSpeed( dstSpd > speed ? dstSpd : speed );
 	}
 	else
 	{
-		dstSpd = g_state.motorSpeed + g_config.speed_smooth_factor;
+		dstSpd = g_state.motorSpeed + speedSmoothFactor;
 		setMotorSpeed( dstSpd < speed ? dstSpd : speed );	
 	}
 }
@@ -425,6 +427,11 @@ int main(void)
 			g_state.pulse1Duration = getPulse1Time();
 			g_state.pulse3Duration = getPulse3Time();
 			
+			if( g_state.pulse3Duration > 1500 )
+				g_state.stabilizeMode = 1;
+			else
+				g_state.stabilizeMode = 0;
+				
 			if( g_state.pulse1Duration > 0 )
 			{
 				pulseDurationToSpeed(g_state.pulse1Duration);

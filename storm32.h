@@ -3,8 +3,54 @@
 
 #include <stdint.h>
 
+
+enum Storm32STATE
+{
+	ST32_strtMOTOR = 0,
+	ST32_SETTLE = 1,
+	ST32_CALIBRATE = 2,
+	ST32_LEVEL = 3,
+	ST32_AUTODIR = 4,
+	ST32_RELEVEL = 5,
+	ST32_NORMAL	 = 6
+};
+
 struct Storm32LiveData
 {
+	int16_t STATE;
+	int16_t param1;
+	int16_t param2;
+	int16_t imuErrorsCount;
+	int16_t lipoVoltage;
+	int16_t param5;
+	int16_t param6;
+	int16_t param7;
+	int16_t param8;
+	int16_t param9;
+	int16_t param10;
+	int16_t param11;
+	int16_t param12;
+	int16_t param13;
+	int16_t param14;
+	int16_t param15;
+	int16_t param16;
+	int16_t param17;
+	int16_t param18;
+	int16_t param19;
+	int16_t param20;
+	int16_t param21;
+	int16_t param22;
+	int16_t param23;
+	int16_t param24;
+	int16_t param25;
+	int16_t param26;
+	int16_t param27;
+	int16_t param28;
+	int16_t param29;
+	int16_t param30;
+	int16_t param31;
+
+/*	
 	uint16_t STATE;							// state
 	uint16_t status;						// status
 	uint16_t status2;						// status2
@@ -37,6 +83,7 @@ struct Storm32LiveData
 	int16_t Imu1AHRS_acc_mag;				// (s16)(10000*Imu1AHRS._acc_mag);
 	int16_t Imu1AHRS_acc_confidence;		// (s16)(10000*Imu1AHRS._acc_confidence);
 	uint16_t functionInputPulsePacked;		// pack_functioninputvalues(&FunctionInputPulse);  //Function input values
+*/	
 	uint16_t crc;
 	uint8_t endChar;						// o
 };

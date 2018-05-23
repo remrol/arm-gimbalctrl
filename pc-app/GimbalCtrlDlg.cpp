@@ -307,8 +307,8 @@ void CGimbalCtrlDlg::readDiagnostics()
 		{
 			std::stringstream ss;
 
-			for( int i = 0; i < values.size(); ++i )
-				ss << values[i] << " ";
+			for( int i = 7; i < values.size() - 2; i += 3 )
+				ss << "  " << i << ":" << values[i] << " " << values[i+1] << " " << values[i+2];
 
 			m_listDiagnostics.InsertString( 0, ss.str().c_str() );
 		}

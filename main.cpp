@@ -263,7 +263,7 @@ void handleSpeedSmooth()
 	
 	if( g_state.stabilizeMode)
 	{
-		int16_t error = g_storm32LiveData.aImu1AnglePitch / 4;
+		int16_t error = g_storm32LiveData.aImu1AngleYaw / 4;
 		if( error < -128 )
 			error = -128;
 		else if( error > 128 )

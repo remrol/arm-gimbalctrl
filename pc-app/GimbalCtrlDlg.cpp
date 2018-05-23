@@ -301,26 +301,14 @@ void CGimbalCtrlDlg::readDiagnostics()
 	}
 	else if( true )
 	{
-		int imuErrors, lipoVoltage, loopTimeMillis;
-		int imu1AnglePitch, imu1AngleRoll, imu1AngleYaw;
-		int imu1AHRS_x, imu1AHRS_y, imu1AHRS_z;
-		int imu1AngleMPIDPitch, imu1AngleMPIDRoll, imu1AngleMPIDYaw;
-		int InputSrcPitch, InputSrcRoll, InputSrcYaw;
+		std::vector< int > values;
 
-		if( m_device.getStorm32( 
-			imuErrors, lipoVoltage, loopTimeMillis, 
-			imu1AnglePitch, imu1AngleRoll, imu1AngleYaw, 
-			imu1AHRS_x, imu1AHRS_y, imu1AHRS_z, 
-			imu1AngleMPIDPitch, imu1AngleMPIDRoll, imu1AngleMPIDYaw, 
-			InputSrcPitch, InputSrcRoll, InputSrcYaw ) )
+		if( m_device.getStorm32( values ) )
 		{
 			std::stringstream ss;
-			ss << 
-				"Err " << imuErrors << 
-				" Angle " << imu1AnglePitch << " " << imu1AngleRoll << " " << imu1AngleYaw << 
-				" AHRS " << imu1AHRS_x << " " << imu1AHRS_y << " " << imu1AHRS_z << 
-				" Angle-PID " << imu1AngleMPIDPitch << " " << imu1AngleMPIDRoll << " " <<  imu1AngleMPIDYaw << 
-				" In " << InputSrcPitch << " " << InputSrcRoll << " " << InputSrcYaw;
+
+			for( int i = 0; i < values.size(); ++i )
+				ss << values[i] << " ";
 
 			m_listDiagnostics.InsertString( 0, ss.str().c_str() );
 		}

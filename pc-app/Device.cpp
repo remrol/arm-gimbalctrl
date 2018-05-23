@@ -592,21 +592,34 @@ bool Device::getStorm32LiveData( int _offset, int& _data0, int& _data1, int& _da
 }
 
 	
-bool Device::getStorm32(
-	int& _imuErrors, int& _lipoVoltage, int& _loopTimeMillis,
-	int& _imu1AnglePitch, int& _imu1AngleRoll, int& _imu1AngleYaw, 
-	int& _imu1AHRS_x, int& _imu1AHRS_y, int& _imu1AHRS_z, 
-	int& _imu1AngleMPIDPitch, int& _imu1AngleMPIDRoll, int& _imu1AngleMPIDYaw,
-	int& _InputSrcPitch, int& _InputSrcRoll, int& _InputSrcYaw)
+bool Device::getStorm32( std::vector< int>& _values )
 {
     if( !checkConnected( __FUNCTION__ ) )
         return false;
 
-	if( !getStorm32LiveData( ST32DO_InputSrcPitch, _InputSrcPitch, _InputSrcRoll, _InputSrcYaw ) ||
-		!getStorm32LiveData( ST32DO_aImu1AnglePitch, _imu1AnglePitch, _imu1AngleRoll, _imu1AngleYaw ) ||
-		!getStorm32LiveData( ST32DO_Imu1AHRS_R_x, _imu1AHRS_x, _imu1AHRS_y, _imu1AHRS_z ) ||
-		!getStorm32LiveData( ST32DO_aImu1AnglePitch_minus_PID, _imu1AngleMPIDPitch, _imu1AngleMPIDRoll, _imu1AngleMPIDYaw ) ||
-		!getStorm32LiveData( ST32DO_imuErrorsCount, _imuErrors, _lipoVoltage, _loopTimeMillis) )
+	_values.resize(32);
+
+	if( !getStorm32LiveData( 0, _values[0], _values[1], _values[2]) )
+		return false;
+	if( !getStorm32LiveData( 3, _values[3], _values[4], _values[5]) )
+		return false;
+	if( !getStorm32LiveData( 6, _values[6], _values[7], _values[8]) )
+		return false;
+	if( !getStorm32LiveData( 9, _values[9], _values[10], _values[11]) )
+		return false;
+	if( !getStorm32LiveData( 12, _values[12], _values[13], _values[14]) )
+		return false;
+	if( !getStorm32LiveData( 15, _values[15], _values[16], _values[17]) )
+		return false;
+	if( !getStorm32LiveData( 18, _values[18], _values[19], _values[20]) )
+		return false;
+	if( !getStorm32LiveData( 21, _values[21], _values[22], _values[23]) )
+		return false;
+	if( !getStorm32LiveData( 24, _values[24], _values[25], _values[26]) )
+		return false;
+	if( !getStorm32LiveData( 27, _values[27], _values[28], _values[29]) )
+		return false;
+	if( !getStorm32LiveData( 29, _values[29], _values[30], _values[31]) )
 		return false;
 
 	return true;

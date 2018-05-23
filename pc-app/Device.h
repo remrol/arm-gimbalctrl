@@ -76,12 +76,7 @@ public:
 		double& _magnTimeStamp, int& _magnX, int& _magnY, int& _magnZ,
 		double& _mpuTimeStamp, int& _accelX, int& _accelY, int& _accelZ, int& _gyroX, int& _gyroY, int& _gyroZ );
 
-	bool getStorm32( 
-		int& _imuErrors, int& _lipoVoltage, int& _loopTimeMillis,
-		int& _imu1AnglePitch, int& _imu1AngleRoll, int& _imu1AngleYaw, 
-		int& _imu1AHRS_x, int& _imu1AHRS_y, int& _imu1AHRS_z, 
-		int& _imu1AngleMPIDPitch, int& _imu1AngleMPIDRoll, int& _imu1AngleMPIDYaw,
-		int& _InputSrcPitch, int& _InputSrcRoll, int& _InputSrcYaw );
+	bool getStorm32( std::vector< int>& _values );
 
 	bool readStorm32LiveData( double& _timeStamp );
 

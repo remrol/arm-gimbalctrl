@@ -78,7 +78,7 @@ void sensorsRead()
 			g_state.baroPressure = g_sensorsState.baroPressure;
 			
 			g_sensorsState.baroEventType = BARO_EVENT_TEMP_TRIGGER;
-			g_sensorsState.baroEventTimestamp = millis() + 100;			// TODO: figure out more precise event time stamp
+			g_sensorsState.baroEventTimestamp = millis() + 1000;			// TODO: figure out more precise event time stamp
 			break;			
 		}
 	}
@@ -92,7 +92,7 @@ void sensorsRead()
 		g_state.magnY = g_sensorsState.magnY;
 		g_state.magnZ = g_sensorsState.magnZ;
 		
-		g_sensorsState.magnEventTimestamp = millis() + 100;			// TODO: figure out more precise event time stamp
+		g_sensorsState.magnEventTimestamp = millis() + 1000;			// TODO: figure out more precise event time stamp
 	}
 	
 	// Mpu --------------------------------------------------------
@@ -107,7 +107,7 @@ void sensorsRead()
 		g_state.mpuGyroY = g_sensorsState.mpuGyroY;
 		g_state.mpuGyroZ = g_sensorsState.mpuGyroZ;
 			
-		g_sensorsState.mpuEventTimeStamp = millis() + 100;			// TODO: figure out more precise event time stamp
+		g_sensorsState.mpuEventTimeStamp = millis() + 1000;			// TODO: figure out more precise event time stamp
 	}
 	
 }

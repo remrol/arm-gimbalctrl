@@ -264,7 +264,7 @@ void handleSpeedSmooth()
 	
 	if( g_state.stabilizeMode)
 	{
-		int16_t error = -g_storm32LiveData.param21 / 16;
+		int16_t error =  ( g_state.rotateOffset - g_storm32LiveData.param21 ) / 16;
 		if( error < -128 )
 			error = -128;
 		else if( error > 128 )
@@ -427,10 +427,21 @@ int main(void)
 			g_state.pulse1Duration = getPulse1Time();
 			g_state.pulse3Duration = getPulse3Time();
 			
-			if( g_state.pulse3Duration > 1500 )
+			// Check stabilize mode
+			if( g_state.pulse3Duration > 1500 && g_storm32LiveData.STATE == ST32_NORMAL)
+			{
+				// If entering stabilize mode then read current position as reference position
+				if( g_state.stabilizeMode == 0 )
+				{
+					g_state.rotateOffset = g_storm32LiveData.param21;
+				}
+				
 				g_state.stabilizeMode = 1;
+			}
 			else
+			{
 				g_state.stabilizeMode = 0;
+			}
 				
 			if( g_state.pulse1Duration > 0 )
 			{

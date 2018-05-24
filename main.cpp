@@ -452,8 +452,16 @@ int main(void)
 				}
 				else
 				{
-					// Apply rotation on each iteration
-					g_state.rotateOffset += ( g_state.speed  );			
+					// Apply rotation on each iteration, wrap-around at -18000 and  18000
+					g_state.rotateOffset += g_state.speed;
+					if( g_state.rotateOffset < -18000 )
+					{
+						g_state.rotateOffset = 18000 + ( g_state.rotateOffset + 18000 );
+					}
+					else if( g_state.rotateOffset > 18000 )
+					{
+						g_state.rotateOffset =  -18000 + ( g_state.rotateOffset - 18000);
+					}
 				}			
 			}
 			else

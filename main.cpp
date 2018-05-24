@@ -442,7 +442,7 @@ int main(void)
 			
 			// Handle stabilize mode --------------------------------------------------------
 			
-			if( g_state.pulse3Duration > 1500 && g_storm32LiveData.STATE == ST32_NORMAL)
+			if( g_state.pulse3Duration > 1500 && g_state.pulse3Duration < 2300 && g_storm32LiveData.STATE == ST32_NORMAL)
 			{
 				// If entering stabilize mode then read current position as reference position
 				if( g_state.stabilizeMode == 0 )
@@ -453,7 +453,7 @@ int main(void)
 				else
 				{
 					// Apply rotation on each iteration
-					g_state.rotateOffset += ( g_state.speed / 64 );			
+					g_state.rotateOffset += ( g_state.speed  );			
 				}			
 			}
 			else

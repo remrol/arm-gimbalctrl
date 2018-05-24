@@ -67,7 +67,8 @@ struct State
 	int16_t  mpuGyroY;
 	int16_t  mpuGyroZ;	
 	
-	int16_t  rotateOffset;
+	int16_t  yawOffset;
+	int16_t  yawError;
 	uint8_t  stabilizeMode;
 };
 

@@ -107,7 +107,8 @@ void stateInit()
 	g_state.mpuGyroY = INT16_MIN;
 	g_state.mpuGyroZ = INT16_MIN;
 	
-	g_state.rotateOffset = 0;
+	g_state.yawOffset = 0;
+	g_state.yawError = 0;
 	g_state.stabilizeMode = 0;
 }
 

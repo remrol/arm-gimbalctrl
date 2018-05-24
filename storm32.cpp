@@ -4,6 +4,7 @@ extern "C"
 	#include "uart.h"
 };
 #include "time.h"
+#include "config.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -89,6 +90,11 @@ Storm32Status storm32_UpdateStatus()
 	
 	g_storm32LiveDataTimeStamp = timeStamp;
 	memcpy(&g_storm32LiveData, st32Data, sizeof(Storm32LiveData));
+	
+	// TODO: debugging only
+	g_storm32LiveData.param22 = g_state.yawOffset;
+	g_storm32LiveData.param23 = g_state.yawError;
+	
 	return ST32_UPDATE_OK;	
 }
 

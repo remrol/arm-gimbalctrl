@@ -254,6 +254,24 @@ void setMotorSpeed( int16_t speed )
 	g_state.motorSpeed = speed;
 }
 
+int16_t calcYawError()
+{
+	if( g_state.yawOffset < -10000 && g_storm32LiveData.param21 > 10000 )
+	{
+		g_state.yawError = ( (int16_t)18000 + g_state.yawOffset ) + ( (int16_t)18000 - g_storm32LiveData.param21 );
+	}
+	else if( g_state.yawOffset > 10000 && g_storm32LiveData.param21 < -10000 )
+	{
+		g_state.yawError = ( (int16_t)18000 - g_state.yawOffset ) + ( (int16_t)18000 + g_storm32LiveData.param21 );	
+		g_state.yawError = -g_state.yawError;
+	}
+	else
+	{
+		g_state.yawError = g_state.yawOffset - g_storm32LiveData.param21;
+	}
+	
+	return g_state.yawError / 16;
+}
 
 void handleSpeedSmooth()
 {
@@ -264,7 +282,7 @@ void handleSpeedSmooth()
 	
 	if( g_state.stabilizeMode)
 	{
-		int16_t error =  ( g_state.rotateOffset - g_storm32LiveData.param21 ) / 16;
+		int16_t error =  calcYawError();
 		if( error < -128 )
 			error = -128;
 		else if( error > 128 )
@@ -448,19 +466,19 @@ int main(void)
 				if( g_state.stabilizeMode == 0 )
 				{
 					g_state.stabilizeMode = 1;
-					g_state.rotateOffset = g_storm32LiveData.param21;
+					g_state.yawOffset = g_storm32LiveData.param21;
 				}
 				else
 				{
 					// Apply rotation on each iteration, wrap-around at -18000 and  18000
-					g_state.rotateOffset += g_state.speed;
-					if( g_state.rotateOffset < -18000 )
+					g_state.yawOffset += g_state.speed;
+					if( g_state.yawOffset < -18000 )
 					{
-						g_state.rotateOffset = 18000 + ( g_state.rotateOffset + 18000 );
+						g_state.yawOffset = 18000 + ( g_state.yawOffset + 18000 );
 					}
-					else if( g_state.rotateOffset > 18000 )
+					else if( g_state.yawOffset > 18000 )
 					{
-						g_state.rotateOffset =  -18000 + ( g_state.rotateOffset - 18000);
+						g_state.yawOffset =  -18000 + ( g_state.yawOffset - 18000);
 					}
 				}			
 			}

@@ -307,6 +307,7 @@ void CGimbalCtrlDlg::readDiagnostics()
 		{
 			std::stringstream ss;
 
+//			ss << values[21] << " " << values[22] << " " << values[23];
 			for( int i = 7; i < values.size() - 2; i += 3 )
 				ss << "  " << i << ":" << values[i] << " " << values[i+1] << " " << values[i+2];
 

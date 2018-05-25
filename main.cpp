@@ -265,14 +265,14 @@ void handleSpeedSmooth()
 	// if yaw stabilize then assign speed from yaw error and increase smooth factor
 	if( g_state.yawStabilizeMode)
 	{
-		int16_t error =  g_state.yawError / 16;
+		int16_t error =  g_state.yawError / 12;
 		if( error < -256 )
 			error = -256;
 		else if( error > 256 )
 			error = 256;
 			
 		speed = error;
-		speedSmoothFactor = 64;
+		speedSmoothFactor = 8;
 	}
 	
 	if( speed == g_state.motorSpeed )

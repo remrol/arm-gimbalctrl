@@ -33,16 +33,16 @@ struct Storm32LiveData
 	int16_t param13;
 	int16_t param14;
 	int16_t param15;
-	int16_t param16;
+	int16_t param16; // imu1 
 	int16_t param17;
 	int16_t param18;
-	int16_t param19;
+	int16_t param19; // imu2
 	int16_t param20;
 	int16_t param21;
 	int16_t param22;
 	int16_t param23;
 	int16_t param24;
-	int16_t param25;
+	int16_t param25; // angles 
 	int16_t param26;
 	int16_t param27;
 	int16_t param28;

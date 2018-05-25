@@ -72,6 +72,7 @@ Storm32Status storm32_UpdateStatus()
 			if( c & 0xff00 )
 				return ST32_UPDATE_UARTERROR;
 
+			// Accumulate crc for all bytes except of last three (crc and 'o' character)
 			if( i < sizeof(Storm32LiveData) - 3 )
 				crc_accumulate((uint8_t) c, &crc);
 				
@@ -96,6 +97,11 @@ Storm32Status storm32_UpdateStatus()
 	g_storm32LiveData.param23 = g_state.yawError;
 	
 	return ST32_UPDATE_OK;	
+}
+
+int16_t storm32_getYawAngle()
+{
+	return g_storm32LiveData.param21;
 }
 
 

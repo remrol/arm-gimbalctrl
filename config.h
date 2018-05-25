@@ -69,7 +69,7 @@ struct State
 	
 	int16_t  yawOffset;
 	int16_t  yawError;
-	uint8_t  stabilizeMode;
+	uint8_t  yawStabilizeMode;
 };
 
 void stateInit();

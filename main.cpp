@@ -256,18 +256,20 @@ void setMotorSpeed( int16_t speed )
 
 int16_t calcYawError()
 {
-	if( g_state.yawOffset < -10000 && g_storm32LiveData.param21 > 10000 )
+	int16_t yawAngle = storm32_getYawAngle();
+	
+	if( g_state.yawOffset < -10000 && yawAngle > 10000 )
 	{
-		g_state.yawError = ( (int16_t)18000 + g_state.yawOffset ) + ( (int16_t)18000 - g_storm32LiveData.param21 );
+		g_state.yawError = ( (int16_t)18000 + g_state.yawOffset ) + ( (int16_t)18000 - yawAngle );
 	}
-	else if( g_state.yawOffset > 10000 && g_storm32LiveData.param21 < -10000 )
+	else if( g_state.yawOffset > 10000 && yawAngle < -10000 )
 	{
-		g_state.yawError = ( (int16_t)18000 - g_state.yawOffset ) + ( (int16_t)18000 + g_storm32LiveData.param21 );	
+		g_state.yawError = ( (int16_t)18000 - g_state.yawOffset ) + ( (int16_t)18000 + yawAngle );	
 		g_state.yawError = -g_state.yawError;
 	}
 	else
 	{
-		g_state.yawError = g_state.yawOffset - g_storm32LiveData.param21;
+		g_state.yawError = g_state.yawOffset - yawAngle;
 	}
 	
 	return g_state.yawError / 16;
@@ -280,13 +282,13 @@ void handleSpeedSmooth()
 	int16_t speed = g_state.speed;
 	int8_t speedSmoothFactor = g_config.speed_smooth_factor;
 	
-	if( g_state.stabilizeMode)
+	if( g_state.yawStabilizeMode)
 	{
 		int16_t error =  calcYawError();
-		if( error < -128 )
-			error = -128;
-		else if( error > 128 )
-			error = 128;
+		if( error < -256 )
+			error = -256;
+		else if( error > 256 )
+			error = 256;
 			
 		speed = error;
 		speedSmoothFactor = 64;
@@ -428,8 +430,6 @@ int main(void)
 
 	//---------------------
 	
-//	HMC5883L_init();
-	
 	uint32_t handleSpeedSmoothTimeout, handlePulseTimeout, handleStorm32UpdateTimeout;
 	handleStorm32UpdateTimeout = handleSpeedSmoothTimeout = handlePulseTimeout = millis();
 	handleStorm32UpdateTimeout += 5*1000; // Delay storm32 update 5 seconds
@@ -463,10 +463,11 @@ int main(void)
 			if( g_state.pulse3Duration > 1500 && g_state.pulse3Duration < 2300 && g_storm32LiveData.STATE == ST32_NORMAL)
 			{
 				// If entering stabilize mode then read current position as reference position
-				if( g_state.stabilizeMode == 0 )
+				if( g_state.yawStabilizeMode == 0 )
 				{
-					g_state.stabilizeMode = 1;
-					g_state.yawOffset = g_storm32LiveData.param21;
+					g_state.yawStabilizeMode = 1;
+					g_state.yawOffset = storm32_getYawAngle();
+					g_state.yawError = 0;
 				}
 				else
 				{
@@ -484,7 +485,7 @@ int main(void)
 			}
 			else
 			{
-				g_state.stabilizeMode = 0;
+				g_state.yawStabilizeMode = 0;
 			}
 		}
 

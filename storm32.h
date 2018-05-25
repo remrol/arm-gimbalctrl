@@ -100,6 +100,7 @@ static const Storm32Status ST32_UPDATE_ENDCHARERROR = 4;
 
 void storm32_Init();
 Storm32Status storm32_UpdateStatus();
+int16_t storm32_getYawAngle();
 
 
 extern uint32_t        g_storm32LiveDataTimeStamp;

@@ -350,11 +350,11 @@ void calcYawError()
 {
 	int16_t yawAngle = storm32_getYawAngle();
 	
-	if( g_state.yawOffset < -10000 && yawAngle > 10000 )
+	if( g_state.yawOffset < -9000 && yawAngle > 9000 )
 	{
 		g_state.yawError = ( (int16_t)18000 + g_state.yawOffset ) + ( (int16_t)18000 - yawAngle );
 	}
-	else if( g_state.yawOffset > 10000 && yawAngle < -10000 )
+	else if( g_state.yawOffset > 9000 && yawAngle < -9000 )
 	{
 		g_state.yawError = ( (int16_t)18000 - g_state.yawOffset ) + ( (int16_t)18000 + yawAngle );
 		g_state.yawError = -g_state.yawError;
@@ -382,11 +382,11 @@ void handleYawStabilizeMode()
 			g_state.yawOffset += g_state.yawCtrlSpeed;
 			if( g_state.yawOffset < -18000 )
 			{
-				g_state.yawOffset = 18000 + ( g_state.yawOffset + 18000 );
+				g_state.yawOffset = ( g_state.yawOffset + 18000 ) + 18000;
 			}
 			else if( g_state.yawOffset > 18000 )
 			{
-				g_state.yawOffset =  -18000 + ( g_state.yawOffset - 18000);
+				g_state.yawOffset = ( g_state.yawOffset - 18000 ) - 18000;
 			}
 		}
 	}
@@ -476,7 +476,7 @@ int main(void)
 			g_state.pulse1Duration = getPulse1Time();
 			g_state.pulse3Duration = getPulse3Time();
 					
-			//  Update yaw ctrl speed if pulse value available or timeout exceeeded
+			//  Update yaw ctrl speed if pulse value available or timeout exceeded
 			if( g_state.pulse1Duration != 0 || ( now > getPulse1TimeStamp() + g_config.mot_stop_nopulse_timeout_ms) )
 			{
 				calcYawCtrSpeed(g_state.pulse1Duration);

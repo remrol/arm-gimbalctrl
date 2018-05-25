@@ -25,7 +25,7 @@ extern "C"
 //--------------------------------------------------------------------------------
 void setMotorSpeed( int16_t speed );	
 void handleSpeedSmooth();
-void pulseDurationToSpeed( uint16_t pulseMs );
+void calcYawCtrSpeed( uint16_t pulseMs );
 
 
 ISR(TIMER1_OVF_vect)
@@ -131,7 +131,7 @@ ISR(TIMER0_COMP_vect)
 
 //-------------------------------------------------------------------------------------
 
-void pulseDurationToSpeed( uint16_t pulseMs )
+void calcYawCtrSpeed( uint16_t pulseMs )
 {
 	static uint16_t lastPulseMs = 0;
 	uint16_t diff;
@@ -365,7 +365,7 @@ void calcYawError()
 	}
 }
 
-void handleStabilizeMode()
+void handleYawStabilizeMode()
 {
 	if( g_state.pulse3Duration > 1500 && g_state.pulse3Duration < 2300 && g_storm32LiveData.STATE == ST32_NORMAL)
 	{
@@ -476,17 +476,13 @@ int main(void)
 			g_state.pulse1Duration = getPulse1Time();
 			g_state.pulse3Duration = getPulse3Time();
 					
-			if( g_state.pulse1Duration > 0 )
+			//  Update yaw ctrl speed if pulse value available or timeout exceeeded
+			if( g_state.pulse1Duration != 0 || ( now > getPulse1TimeStamp() + g_config.mot_stop_nopulse_timeout_ms) )
 			{
-				pulseDurationToSpeed(g_state.pulse1Duration);
-			}
-			else if( now > getPulse1TimeStamp() + g_config.mot_stop_nopulse_timeout_ms)
-			{
-				//  If no response for timeout then set speed 0.
-				pulseDurationToSpeed(g_state.pulse1Duration);
+				calcYawCtrSpeed(g_state.pulse1Duration);
 			}
 			
-			handleStabilizeMode();
+			handleYawStabilizeMode();
 								
 			handlePulseTimeout += g_config.process_pulse_interval_ms;
 		}
@@ -510,7 +506,6 @@ int main(void)
 		}
 		// Read sensors
 		sensorsRead();
-
 
 		// IO control
 		control();

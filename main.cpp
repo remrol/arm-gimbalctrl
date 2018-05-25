@@ -145,7 +145,7 @@ void pulseDurationToSpeed( uint16_t pulseMs )
 	if( pulseMs == 0 )
 	{
 		// Stop motor if out of range.
-		g_state.speed = 0;
+		g_state.yawCtrlSpeed = 0;
 	}
 	else
 	{
@@ -158,7 +158,7 @@ void pulseDurationToSpeed( uint16_t pulseMs )
 			//	diff = ( pulseMs - g_config.pulse_dband_hi * g_config.power;  diff /= ( g_config.pulse_max - g_config.pulse_dband_hi );
 			diff = exponent(pulseMs - g_config.pulse_dband_hi, g_config.pulse_max - g_config.pulse_dband_hi, g_config.expo_percent );
 			diff = diff * g_config.power / ( g_config.pulse_max - g_config.pulse_dband_hi );
-			g_state.speed = diff;
+			g_state.yawCtrlSpeed = diff;
 		}
 		else if( pulseMs <= g_config.pulse_dband_lo )
 		{
@@ -169,12 +169,12 @@ void pulseDurationToSpeed( uint16_t pulseMs )
 			//			diff = ( g_config.pulse_dband_lo - pulseMs ) * g_config.power;	diff /= g_config.pulse_dband_lo - g_config.pulse_min;
 			diff = exponent( g_config.pulse_dband_lo - pulseMs, g_config.pulse_dband_lo - g_config.pulse_min, g_config.expo_percent );
 			diff = diff * g_config.power / ( g_config.pulse_dband_lo - g_config.pulse_min );
-			g_state.speed = -diff;
+			g_state.yawCtrlSpeed = -diff;
 		}
 		else
 		{
 			// In dead band, stop the motor.
-			g_state.speed = 0;
+			g_state.yawCtrlSpeed = 0;
 		}
 	}
 }
@@ -254,37 +254,18 @@ void setMotorSpeed( int16_t speed )
 	g_state.motorSpeed = speed;
 }
 
-int16_t calcYawError()
-{
-	int16_t yawAngle = storm32_getYawAngle();
-	
-	if( g_state.yawOffset < -10000 && yawAngle > 10000 )
-	{
-		g_state.yawError = ( (int16_t)18000 + g_state.yawOffset ) + ( (int16_t)18000 - yawAngle );
-	}
-	else if( g_state.yawOffset > 10000 && yawAngle < -10000 )
-	{
-		g_state.yawError = ( (int16_t)18000 - g_state.yawOffset ) + ( (int16_t)18000 + yawAngle );	
-		g_state.yawError = -g_state.yawError;
-	}
-	else
-	{
-		g_state.yawError = g_state.yawOffset - yawAngle;
-	}
-	
-	return g_state.yawError / 16;
-}
-
 void handleSpeedSmooth()
 {
 	int16_t dstSpd;
+	
 	// Rewrite to get rid of overwrites
-	int16_t speed = g_state.speed;
+	int16_t speed = g_state.yawCtrlSpeed;
 	int8_t speedSmoothFactor = g_config.speed_smooth_factor;
 	
+	// if yaw stabilize then assign speed from yaw error and increase smooth factor
 	if( g_state.yawStabilizeMode)
 	{
-		int16_t error =  calcYawError();
+		int16_t error =  g_state.yawError / 16;
 		if( error < -256 )
 			error = -256;
 		else if( error > 256 )
@@ -364,6 +345,57 @@ uint16_t getPulse3Time()
 	return pulseDurationSum / pulseDurationSumCount;
 }
 	
+	
+void calcYawError()
+{
+	int16_t yawAngle = storm32_getYawAngle();
+	
+	if( g_state.yawOffset < -10000 && yawAngle > 10000 )
+	{
+		g_state.yawError = ( (int16_t)18000 + g_state.yawOffset ) + ( (int16_t)18000 - yawAngle );
+	}
+	else if( g_state.yawOffset > 10000 && yawAngle < -10000 )
+	{
+		g_state.yawError = ( (int16_t)18000 - g_state.yawOffset ) + ( (int16_t)18000 + yawAngle );
+		g_state.yawError = -g_state.yawError;
+	}
+	else
+	{
+		g_state.yawError = g_state.yawOffset - yawAngle;
+	}
+}
+
+void handleStabilizeMode()
+{
+	if( g_state.pulse3Duration > 1500 && g_state.pulse3Duration < 2300 && g_storm32LiveData.STATE == ST32_NORMAL)
+	{
+		// If entering stabilize mode then read current position as reference position
+		if( g_state.yawStabilizeMode == 0 )
+		{
+			g_state.yawStabilizeMode = 1;
+			g_state.yawOffset = storm32_getYawAngle();
+			g_state.yawError = 0;
+		}
+		else
+		{
+			// Update yaw offset by rotation speed, wrap-around at -18000 and  18000 (-180 deg, 180 deg)
+			g_state.yawOffset += g_state.yawCtrlSpeed;
+			if( g_state.yawOffset < -18000 )
+			{
+				g_state.yawOffset = 18000 + ( g_state.yawOffset + 18000 );
+			}
+			else if( g_state.yawOffset > 18000 )
+			{
+				g_state.yawOffset =  -18000 + ( g_state.yawOffset - 18000);
+			}
+		}
+	}
+	else
+	{
+		g_state.yawStabilizeMode = 0;
+	}
+}
+	
 int main(void)
 {
 	configEepromLoad();
@@ -434,7 +466,6 @@ int main(void)
 	handleStorm32UpdateTimeout = handleSpeedSmoothTimeout = handlePulseTimeout = millis();
 	handleStorm32UpdateTimeout += 5*1000; // Delay storm32 update 5 seconds
 	
-
     while(1)
     {
 		uint32_t now = millis();
@@ -444,8 +475,7 @@ int main(void)
 		{
 			g_state.pulse1Duration = getPulse1Time();
 			g_state.pulse3Duration = getPulse3Time();
-			
-				
+					
 			if( g_state.pulse1Duration > 0 )
 			{
 				pulseDurationToSpeed(g_state.pulse1Duration);
@@ -456,37 +486,9 @@ int main(void)
 				pulseDurationToSpeed(g_state.pulse1Duration);
 			}
 			
+			handleStabilizeMode();
+								
 			handlePulseTimeout += g_config.process_pulse_interval_ms;
-			
-			// Handle stabilize mode --------------------------------------------------------
-			
-			if( g_state.pulse3Duration > 1500 && g_state.pulse3Duration < 2300 && g_storm32LiveData.STATE == ST32_NORMAL)
-			{
-				// If entering stabilize mode then read current position as reference position
-				if( g_state.yawStabilizeMode == 0 )
-				{
-					g_state.yawStabilizeMode = 1;
-					g_state.yawOffset = storm32_getYawAngle();
-					g_state.yawError = 0;
-				}
-				else
-				{
-					// Apply rotation on each iteration, wrap-around at -18000 and  18000
-					g_state.yawOffset += g_state.speed;
-					if( g_state.yawOffset < -18000 )
-					{
-						g_state.yawOffset = 18000 + ( g_state.yawOffset + 18000 );
-					}
-					else if( g_state.yawOffset > 18000 )
-					{
-						g_state.yawOffset =  -18000 + ( g_state.yawOffset - 18000);
-					}
-				}			
-			}
-			else
-			{
-				g_state.yawStabilizeMode = 0;
-			}
 		}
 
 		// Periodically handle speed smoother 
@@ -499,7 +501,11 @@ int main(void)
 		// Periodically update storm32 data
 		if( now >= handleStorm32UpdateTimeout )
 		{
+			// Get fresh data from storm32
 			storm32_UpdateStatus();
+			// Calc yaw error now as new storm32 data has arrived
+			calcYawError();
+			
 			handleStorm32UpdateTimeout += g_config.storm32_update_inteval_ms;
 		}
 		// Read sensors

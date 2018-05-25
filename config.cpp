@@ -81,7 +81,7 @@ void stateInit()
 	g_state.vPulse3DurationSum = 0;
 	g_state.vPulse3DurationSumCount = 0;
 	g_state.vPulse3TimeStamp = 0;
-	g_state.speed = 0;
+	g_state.yawCtrlSpeed = 0;
 	g_state.motorDirection = 0;
 	g_state.motorSpeed = 0;
 	g_state.vT1OverflowCount = 0;

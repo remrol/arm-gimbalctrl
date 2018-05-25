@@ -42,7 +42,7 @@ struct State
 
 	uint16_t pulse1Duration;	// Last measured pulse duration in ms, 0 if not available.
 	uint16_t pulse3Duration;	// Last measured pulse duration in ms, 0 if not available.
-	int16_t  speed;
+	int16_t  yawCtrlSpeed;		// yaw user-control speed
 	int8_t	 motorDirection;
 	int16_t  motorSpeed;
 	uint8_t  ocr0;

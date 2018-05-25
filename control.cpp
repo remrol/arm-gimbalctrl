@@ -199,7 +199,7 @@ void sendState()
 	uart_puts(g_strbuf);
 	sprintf_P(g_strbuf, PSTR("%d,%d,%d,%d,"), g_state.pulse1Duration, g_state.pulse3Duration, g_state.motorDirection, g_state.motorSpeed );
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_state.speed, g_state.ocr0);
+	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_state.yawCtrlSpeed, g_state.ocr0);
 	uart_puts(g_strbuf);
 }
 

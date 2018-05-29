@@ -192,7 +192,9 @@ void storm32_getAngles()
 	else
 	{
 	}
-	  
 	
+	g_storm32LiveData.param5 = LOW_BYTE(status);
+	g_storm32LiveData.param6 = cmdBuffer[0];
+	g_storm32LiveData.param7 = cmdBuffer[1];
 }
 

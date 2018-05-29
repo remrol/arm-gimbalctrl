@@ -499,6 +499,8 @@ int main(void)
 		{
 			// Get fresh data from storm32
 			storm32_UpdateStatus();
+//			storm32_getAngles();
+
 			// Calc yaw error now as new storm32 data has arrived
 			calcYawError();
 			

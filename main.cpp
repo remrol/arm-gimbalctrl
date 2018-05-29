@@ -267,10 +267,10 @@ void handleSpeedSmooth()
 	if( g_state.yawStabilizeMode)
 	{
 		int16_t error =  g_state.yawError / 12;
-		if( error < -256 )
-			error = -256;
-		else if( error > 256 )
-			error = 256;
+		if( error < -192 )
+			error = -192;
+		else if( error > 192 )
+			error = 192;
 			
 		speed = error;
 		speedSmoothFactor = 8;
@@ -505,9 +505,9 @@ int main(void)
 			// Calc yaw error now as new storm32 data has arrived
 			calcYawError();
 			
-			g_debug.data0 += 1;
-			g_debug.data1 = g_state.yawError;
-			g_debug.data2 = storm32_getYawAngle();
+//			g_debug.data0 += 1;
+//			g_debug.data1 = g_state.yawError;
+//			g_debug.data2 = storm32_getYawAngle();
 			
 			handleStorm32UpdateTimeout += g_config.storm32_update_inteval_ms;
 		}

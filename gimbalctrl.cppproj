@@ -240,6 +240,12 @@
     <Compile Include="main.cpp">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="PID_v1.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="PID_v1.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="sensors.cpp">
       <SubType>compile</SubType>
     </Compile>

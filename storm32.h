@@ -95,13 +95,18 @@ static const Storm32Status ST32_UPDATE_OK = 0;
 static const Storm32Status ST32_UPDATE_TIMEOUT = 1;
 static const Storm32Status ST32_UPDATE_UARTERROR = 2;
 static const Storm32Status ST32_UPDATE_CRCERROR = 3;
-static const Storm32Status ST32_UPDATE_ENDCHARERROR = 4;
+static const Storm32Status ST32_UPDATE_DATAERROR = 4;
+static const Storm32Status ST32_UPDATE_DATAEMPTY = 5;
 
 
 void storm32_Init();
 Storm32Status storm32_UpdateStatus();
+
+bool    storm32_yawAvailable();
 int16_t storm32_getYawAngle();
-void storm32_getAngles();
+
+
+Storm32Status storm32_getAngles();
 
 
 

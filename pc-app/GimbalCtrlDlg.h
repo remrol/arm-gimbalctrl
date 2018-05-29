@@ -21,7 +21,7 @@ public:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 
 	static const int WORK_TIMER_ID = 1;
-	static const int WORK_TIMER_INTERVAL_MS = 1000;
+	static const int WORK_TIMER_INTERVAL_MS = 200; //1000;
 
 // Implementation
 protected:

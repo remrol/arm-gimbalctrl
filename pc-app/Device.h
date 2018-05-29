@@ -82,6 +82,8 @@ public:
 
 	bool getStorm32LiveData( int _offset, int& _data0, int& _data1, int& _data2 );
 
+	bool getDebug( int _offset, int& _data );
+
 private:
 
     bool checkConnected( const std::string& _signature );

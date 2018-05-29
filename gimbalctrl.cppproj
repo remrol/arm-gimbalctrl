@@ -195,6 +195,12 @@
     <Compile Include="control.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="debug.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="debug.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="fcpu.h">
       <SubType>compile</SubType>
     </Compile>

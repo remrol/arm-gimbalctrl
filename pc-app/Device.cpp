@@ -591,6 +591,20 @@ bool Device::getStorm32LiveData( int _offset, int& _data0, int& _data1, int& _da
 	return true;
 }
 
+bool Device::getDebug( int _offset, int& _data )
+{
+    if( !checkConnected( __FUNCTION__ ) )
+        return false;
+
+	std::vector< std::string > tokens = tokenize( sendReceive( buildMessage( 'h', _offset ) ) );
+    if( !checkExpectedTokensCount( tokens, 1, __FUNCTION__ ) )
+        return false;
+
+	_data = atoi( tokens[0].c_str() );
+
+	return true;
+}
+
 	
 bool Device::getStorm32( std::vector< int>& _values )
 {
@@ -624,3 +638,5 @@ bool Device::getStorm32( std::vector< int>& _values )
 
 	return true;
 }
+
+

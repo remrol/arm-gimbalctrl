@@ -13,6 +13,7 @@
 #include "control.h"
 #include "sensors.h"
 #include "storm32.h"
+#include "debug.h"
 
 extern "C"
 {
@@ -367,7 +368,7 @@ void calcYawError()
 
 void handleYawStabilizeMode()
 {
-	if( g_state.pulse3Duration > 1500 && g_state.pulse3Duration < 2300 && g_storm32LiveData.STATE == ST32_NORMAL)
+	if( g_state.pulse3Duration > 1500 && g_state.pulse3Duration < 2300 && storm32_yawAvailable() )
 	{
 		// If entering stabilize mode then read current position as reference position
 		if( g_state.yawStabilizeMode == 0 )
@@ -398,6 +399,7 @@ void handleYawStabilizeMode()
 	
 int main(void)
 {
+	debug_init();
 	configEepromLoad();
 	stateInit();
 	
@@ -498,11 +500,14 @@ int main(void)
 		if( now >= handleStorm32UpdateTimeout )
 		{
 			// Get fresh data from storm32
-			storm32_UpdateStatus();
-//			storm32_getAngles();
+			storm32_getAngles();
 
 			// Calc yaw error now as new storm32 data has arrived
 			calcYawError();
+			
+			g_debug.data0 += 1;
+			g_debug.data1 = g_state.yawError;
+			g_debug.data2 = storm32_getYawAngle();
 			
 			handleStorm32UpdateTimeout += g_config.storm32_update_inteval_ms;
 		}

@@ -2,6 +2,7 @@
 #include "control.h"
 #include "config.h"
 #include "storm32.h"
+#include "debug.h"
 #include <math.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -466,6 +467,26 @@ void readStorm32LiveData()
 	uart_puts(g_strbuf);	
 }
 
+void readDebug()
+{
+	// Timeout is 100 ms
+	uint32_t timeout = millis() + 100;
+
+	// Receive
+	int16_t dataOffset = receiveInt16(timeout);
+	if( dataOffset == INT16_MIN || dataOffset < 0 || dataOffset > (int16_t) ( sizeof(g_debug) / 2 ) )
+	{
+		sprintf_P(g_strbuf, PSTR("ERR0 %d %d\r\n"), g_lastErr, dataOffset);
+		uart_puts( g_strbuf );
+		return;
+	}
+
+	int16_t* data = (int16_t*) &g_debug ;
+	sprintf_P(g_strbuf, PSTR("%d\r\n"), data[dataOffset] );
+	uart_puts(g_strbuf);
+}
+
+
 void control()
 {
 	// Timeout is 20 ms
@@ -533,6 +554,9 @@ void control()
 			
 		case 'g':
 			readStorm32LiveData(); break;
+			
+		case 'h':
+			readDebug(); break;
 		}
 	}
 	while( timeout > millis() );	

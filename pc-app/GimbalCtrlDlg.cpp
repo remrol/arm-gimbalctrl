@@ -260,7 +260,7 @@ void CGimbalCtrlDlg::OnTimer(UINT_PTR nIDEvent)
 	{
 		if( m_device.isOpened() )
 		{
-			readState();
+//			readState();
 			readDiagnostics();
 
 /*
@@ -299,7 +299,7 @@ void CGimbalCtrlDlg::readDiagnostics()
 		}
 
 	}
-	else if( true )
+	else if( false )
 	{
 		std::vector< int > values;
 
@@ -314,6 +314,21 @@ void CGimbalCtrlDlg::readDiagnostics()
 			m_listDiagnostics.InsertString( 0, ss.str().c_str() );
 		}
 
+	}
+	else if(true)
+	{
+		std::stringstream ss;
+
+		std::vector< int > values;
+		values.resize(3);
+
+		for( size_t i = 0; i < values.size(); ++i )
+		{
+			m_device.getDebug(i, values[i] );
+			ss << i << ":" << values[i] << "   ";
+		}
+
+		m_listDiagnostics.InsertString( 0, ss.str().c_str() );		
 	}
 
 /*

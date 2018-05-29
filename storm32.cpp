@@ -5,13 +5,15 @@ extern "C"
 };
 #include "time.h"
 #include "config.h"
+#include "debug.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
-uint32_t        g_storm32LiveDataTimeStamp = 0;
+Storm32Status	g_storm32_yawStatus;
+int16_t			g_storm32_yaw;
+uint32_t        g_storm32LiveDataTimeStamp;
 Storm32LiveData g_storm32LiveData;
-
 
 //please use LIVEDATA_STATUS_V2, may deprecate in future
 #define ST32_LIVEDATA_STATUS_V1			0x0001
@@ -55,6 +57,8 @@ void storm32_Init()
 {
 	g_storm32LiveDataTimeStamp = 0;
 	memset(&g_storm32LiveData, 0, sizeof(Storm32LiveData));
+	g_storm32_yaw = 0;
+	g_storm32_yawStatus = ST32_UPDATE_DATAEMPTY;
 }
 
 uint16_t uart1_recv_until( uint8_t* _buffer, uint8_t _sizeLimit, uint32_t _timeout )
@@ -135,27 +139,31 @@ Storm32Status storm32_UpdateStatus()
 		return ST32_UPDATE_CRCERROR;
 	
 	if( st32Data->endChar != 'o' )
-		return ST32_UPDATE_ENDCHARERROR;
+		return ST32_UPDATE_DATAERROR;
 	
 	g_storm32LiveDataTimeStamp = timeStamp;
 	memcpy(&g_storm32LiveData, st32Data, sizeof(Storm32LiveData));
 	
-	// TODO: debugging only
-	g_storm32LiveData.param22 = g_state.yawOffset;
-	g_storm32LiveData.param23 = g_state.yawError;
-	
 	return ST32_UPDATE_OK;	
 }
 
+
+
 int16_t storm32_getYawAngle()
 {
-	return g_storm32LiveData.param21;
+	return g_storm32_yaw; // g_storm32LiveData.param21;
 }
+
+bool storm32_yawAvailable()
+{
+	return g_storm32_yawStatus == ST32_UPDATE_OK;
+}
+
 
 #define LOW_BYTE(x)   ((x) & 0xFF)
 #define HIGH_BYTE(x)   (((x)>>8) & 0xFF)
 
-void storm32_getAngles()
+Storm32Status storm32_getAngles()
 {
 	uint8_t cmdBuffer[32];
 	uint16_t crc;
@@ -179,22 +187,22 @@ void storm32_getAngles()
 		uart1_putc(cmdBuffer[i]);
 	
 	// Receive data back
+	uint16_t status = uart1_recv_until( cmdBuffer, 0x0d, millis() + 100 );
 	
-	uint16_t status = uart1_recv_until( cmdBuffer, sizeof(cmdBuffer), millis() + 100 );
+	// Check receive error
 	if( status & 0x0100 )
-	{
-		// Timeout
-	}
-	else if( status & 0x200)
-	{
-		// Other error
-	}
-	else
-	{
-	}
+		return ST32_UPDATE_TIMEOUT;
+	if( status & 0x200)
+		return ST32_UPDATE_UARTERROR;
 	
-	g_storm32LiveData.param5 = LOW_BYTE(status);
-	g_storm32LiveData.param6 = cmdBuffer[0];
-	g_storm32LiveData.param7 = cmdBuffer[1];
+	// Check syntax
+	// 0xFB LEN 0x06 datamask16 roll16 pitch16 yaw16 crc-low-byte crc-high-byte
+	if(cmdBuffer[0] != 0xfb || cmdBuffer[1] != 0x08 )
+		return ST32_UPDATE_DATAERROR;
+
+	g_storm32_yaw = -*( ( int16_t* ) ( cmdBuffer + 9 ) );
+	g_storm32_yawStatus = ST32_UPDATE_OK;
+
+	return ST32_UPDATE_OK;
 }
 

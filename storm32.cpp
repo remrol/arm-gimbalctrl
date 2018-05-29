@@ -13,6 +13,25 @@ uint32_t        g_storm32LiveDataTimeStamp = 0;
 Storm32LiveData g_storm32LiveData;
 
 
+//please use LIVEDATA_STATUS_V2, may deprecate in future
+#define ST32_LIVEDATA_STATUS_V1			0x0001
+#define ST32_LIVEDATA_TIMES				0x0002
+#define ST32_LIVEDATA_IMU1GYRO			0x0004
+#define ST32_LIVEDATA_IMU1ACC			0x0008
+#define ST32_LIVEDATA_IMU1R				0x0010
+#define ST32_LIVEDATA_IMU1ANGLES		0x0020
+#define ST32_LIVEDATA_PIDCNTRL			0x0040
+#define ST32_LIVEDATA_INPUTS			0x0080
+#define ST32_LIVEDATA_IMU2ANGLES		0x0100
+#define ST32_LIVEDATA_MAGANGLES			0x0200
+#define ST32_LIVEDATA_STORM32LINK		0x0400
+#define ST32_LIVEDATA_IMUACCCONFIDENCE	0x0800
+#define ST32_LIVEDATA_ATTITUDE_RELATIVE	0x1000
+#define ST32_LIVEDATA_STATUS_V2			0x2000
+#define ST32_LIVEDATA_ENCODERANGLES		0x4000
+#define ST32_LIVEDATA_IMUACCABS			0x8000
+
+
 #define X25_INIT_CRC 0xffff
 #define X25_VALIDATE_CRC 0xf0b8
  
@@ -32,11 +51,40 @@ static inline void crc_init(uint16_t* crcAccum)
     *crcAccum = X25_INIT_CRC;
 }
 
-
 void storm32_Init()
 {
 	g_storm32LiveDataTimeStamp = 0;
 	memset(&g_storm32LiveData, 0, sizeof(Storm32LiveData));
+}
+
+uint16_t uart1_recv_until( uint8_t* _buffer, uint8_t _sizeLimit, uint32_t _timeout )
+{
+	for( uint8_t i = 0; i < _sizeLimit; ++i)
+	{
+		while( true)
+		{
+			uint16_t c = uart1_getc();
+			
+			// No data, check for timeout
+			if( c & UART_NO_DATA)
+			{
+				// Detect timeout
+				if( millis() > _timeout )
+					return 0x0100 + i;	// Signal timeout error
+				
+				continue;
+			}
+
+			// Error, return with error
+			if( c & 0xff00 )
+				return 0x0200 + i;	// Signal general error
+
+			_buffer[i] = (uint8_t) c;
+			break;
+		}
+	}
+	
+	return _sizeLimit;
 }
 
 Storm32Status storm32_UpdateStatus()
@@ -104,4 +152,47 @@ int16_t storm32_getYawAngle()
 	return g_storm32LiveData.param21;
 }
 
+#define LOW_BYTE(x)   ((x) & 0xFF)
+#define HIGH_BYTE(x)   (((x)>>8) & 0xFF)
+
+void storm32_getAngles()
+{
+	uint8_t cmdBuffer[32];
+	uint16_t crc;
+	
+	// Prepare input buffer.
+	crc_init(&crc);
+	cmdBuffer[0] = 0xFA;
+	cmdBuffer[1] = 0x02;
+	crc_accumulate(cmdBuffer[1], &crc);
+	cmdBuffer[2] = 0x06;
+	crc_accumulate(cmdBuffer[2], &crc);
+	cmdBuffer[3] = LOW_BYTE(ST32_LIVEDATA_IMU1ANGLES);
+	crc_accumulate(cmdBuffer[3], &crc);
+	cmdBuffer[4] = HIGH_BYTE(ST32_LIVEDATA_IMU1ANGLES);
+	crc_accumulate(cmdBuffer[4], &crc);
+	cmdBuffer[5] = LOW_BYTE(crc);
+	cmdBuffer[6] = HIGH_BYTE(crc);
+	
+	// Send data.
+	for( uint8_t i = 0; i < 7; ++i )
+		uart1_putc(cmdBuffer[i]);
+	
+	// Receive data back
+	
+	uint16_t status = uart1_recv_until( cmdBuffer, sizeof(cmdBuffer), millis() + 100 );
+	if( status & 0x0100 )
+	{
+		// Timeout
+	}
+	else if( status & 0x200)
+	{
+		// Other error
+	}
+	else
+	{
+	}
+	  
+	
+}
 

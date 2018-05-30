@@ -3,10 +3,8 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
-#include <avr/eeprom.h>
 #include <stdio.h>
 
-//#include "simple_uart.h"
 #include "i2c_master.h"
 #include "calculations.h"
 #include "config.h"
@@ -261,19 +259,18 @@ void handleSpeedSmooth()
 	
 	// Rewrite to get rid of overwrites
 	int16_t speed = g_state.yawCtrlSpeed;
-	int8_t speedSmoothFactor = g_config.speed_smooth_factor;
+	int8_t speedSmoothFactor = g_config.speed_normal_smooth_factor;
 	
 	// if yaw stabilize then assign speed from yaw error and increase smooth factor
 	if( g_state.yawStabilizeMode)
 	{
-		int16_t error =  g_state.yawError / 12;
-		if( error < -192 )
-			error = -192;
-		else if( error > 192 )
-			error = 192;
+		speed =  g_state.yawPIDspeed;
+		if( speed < -g_config.yawMaxSpeed )
+			speed = -g_config.yawMaxSpeed;
+		else if( speed > g_config.yawMaxSpeed )
+			speed = g_config.yawMaxSpeed;
 			
-		speed = error;
-		speedSmoothFactor = 16;
+		speedSmoothFactor = g_config.speed_yawstabilize_smooth_factor;
 	}
 	
 	if( speed == g_state.motorSpeed )
@@ -395,17 +392,15 @@ void handleYawStabilizeMode()
 		{
 			g_state.yawStabilizeMode = 1;
 			g_state.yawOffset = g_state.storm32YawAngle;
-			g_state.yawError = 0;
+			g_state.yawPIDspeed = 0;
 			
 			// PID.
 			g_state.yawPIDInput = g_state.storm32YawAngle;
 			g_state.yawPIDSetPoint = g_state.storm32YawAngle;
 			
-			PID_PID2( 
-				&g_state.yawPIDInput,  &g_state.yawPIDOutput, &g_state.yawPIDSetPoint,
-				1, 1.0, 0.01,
-				PID_DIRECT, millis(), 10, &g_state.yawPID );
-				
+			PID_PID2( &g_state.yawPIDInput,  &g_state.yawPIDOutput, &g_state.yawPIDSetPoint,
+				g_config.yawPID_p, g_config.yawPID_i, g_config.yawPID_d, PID_DIRECT, millis(), 10, &g_state.yawPID );
+					
 			PID_SetMode( PID_AUTOMATIC, &g_state.yawPID );
 		}
 		else
@@ -528,18 +523,17 @@ int main(void)
 			g_state.yawPIDInput = g_state.storm32YawAngle;
 			g_state.yawPIDSetPoint = g_state.yawOffset;
 			PID_Compute( &g_state.yawPID, millis());		
-			g_state.yawError = g_state.yawPIDOutput;
+			g_state.yawPIDspeed = g_state.yawPIDOutput;
 			
 			g_debug.data0 = g_state.yawPIDOutput;
 			g_debug.data1 = subtractAngles( g_state.yawOffset, g_state.storm32YawAngle );
 			g_debug.data2 = g_state.storm32YawAngle;
-
-			
-			
+	
 			handleStorm32UpdateTimeout += g_config.storm32_update_inteval_ms;
 		}
+		
 		// Read sensors
-		sensorsRead();
+//		sensorsRead();
 
 		// IO control
 		control();

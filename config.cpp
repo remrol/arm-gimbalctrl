@@ -26,7 +26,8 @@ void configLoadDefaults()
 	g_config.pulse_dband_lo = ( ( g_config.pulse_min + g_config.pulse_max ) / 2 ) - 300 / 2;
 	g_config.pulse_dband_hi = ( ( g_config.pulse_min + g_config.pulse_max ) / 2 ) + 300 / 2;
 	g_config.pwm_scale_factor = 1200;
-	g_config.speed_smooth_factor = 5;
+	g_config.speed_normal_smooth_factor = 5;
+	g_config.speed_yawstabilize_smooth_factor = 16;
 	g_config.power = 128;
 	g_config.expo_percent = 40;
 	
@@ -38,6 +39,11 @@ void configLoadDefaults()
 	
 	g_config.storm32_update_inteval_ms = 100;
 	
+	g_config.yawPID_p = 0.1;
+	g_config.yawPID_i = 0.1;
+	g_config.yawPID_d = 0.01;
+	g_config.yawMaxSpeed = 192;
+
 	// Update crc
 	g_config.crc = configComputeCrc();	
 }
@@ -108,7 +114,7 @@ void stateInit()
 	g_state.mpuGyroZ = INT16_MIN;
 	
 	g_state.yawOffset = 0;
-	g_state.yawError = 0;
+	g_state.yawPIDspeed = 0;
 	g_state.yawStabilizeMode = 0;
 	g_state.yawPIDInput = 0;
 	g_state.yawPIDSetPoint = 0;

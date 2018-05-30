@@ -15,7 +15,8 @@ struct Config
 	uint16_t pulse_dband_hi;
 	
 	uint16_t pwm_scale_factor;
-	int8_t   speed_smooth_factor;
+	int8_t   speed_normal_smooth_factor;
+	int8_t   speed_yawstabilize_smooth_factor;
 	uint8_t  power; // 1..128
 	uint8_t  expo_percent;
 	
@@ -26,6 +27,11 @@ struct Config
 	uint16_t mot_disable_stopped_timeout_ms;
 	
 	uint16_t storm32_update_inteval_ms;
+	float    yawPID_p;
+	float    yawPID_i;
+	float    yawPID_d;
+	int16_t  yawMaxSpeed;
+	
 	// crc
 	uint8_t crc;	
 };
@@ -72,7 +78,7 @@ struct State
 	int16_t  mpuGyroZ;	
 	
 	int16_t  yawOffset;
-	int16_t  yawError;
+	int16_t  yawPIDspeed;
 	uint8_t  yawStabilizeMode;
 	float	 yawPIDInput;
 	float    yawPIDSetPoint;
@@ -81,7 +87,6 @@ struct State
 	
 	int16_t  storm32YawAngle;
 	uint32_t storm32YawTimeStamp;
-	
 };
 
 void stateInit();

@@ -186,7 +186,7 @@ void sendConfig()
 	uart_puts(g_strbuf);
 	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_config.pulse_dband_lo, g_config.pulse_dband_hi, g_config.pwm_scale_factor);
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_config.speed_smooth_factor, g_config.power, g_config.expo_percent);
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_config.speed_normal_smooth_factor, g_config.power, g_config.expo_percent);
 	uart_puts(g_strbuf);	
 	sprintf_P(g_strbuf, PSTR("%d,%d,"), g_config.process_pulse_interval_ms, g_config.process_speedsmooth_interval_ms);
 	uart_puts(g_strbuf);
@@ -335,7 +335,7 @@ void receiveMotorParams()
 
 void sendProcessing()
 {
-	sprintf_P(g_strbuf, PSTR("%d,%d,%d\r\n"), g_config.process_pulse_interval_ms, g_config.process_speedsmooth_interval_ms, g_config.speed_smooth_factor);
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d\r\n"), g_config.process_pulse_interval_ms, g_config.process_speedsmooth_interval_ms, g_config.speed_normal_smooth_factor);
 	uart_puts(g_strbuf);
 }
 
@@ -372,7 +372,7 @@ void receiveProcessing()
 	// Write to config
 	g_config.process_pulse_interval_ms = pulseInterval;
 	g_config.process_speedsmooth_interval_ms = speedSmoothInterval;
-	g_config.speed_smooth_factor = speedSmoothFactor;
+	g_config.speed_normal_smooth_factor = speedSmoothFactor;
 	
 	// Send back received values
 	sendProcessing();

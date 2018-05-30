@@ -532,10 +532,10 @@ int main(void)
 			PID_Compute( &g_state.yawPID, millis());
 			
 			g_debug.data0 = g_state.yawPIDOutput;
+			g_debug.data1 = g_state.yawError;
+			g_debug.data2 = g_state.storm32YawAngle;
 			
 //			g_debug.data0 += 1;
-//			g_debug.data1 = g_state.yawError;
-//			g_debug.data2 = g_state.storm32YawAngle;
 			
 			handleStorm32UpdateTimeout += g_config.storm32_update_inteval_ms;
 		}

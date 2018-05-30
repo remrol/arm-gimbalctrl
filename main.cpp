@@ -349,7 +349,7 @@ uint16_t getPulse3Time()
 	
 void calcYawError()
 {
-	int16_t yawAngle = storm32_getYawAngle();
+	int16_t yawAngle = g_state.storm32YawAngle;
 	
 	if( g_state.yawOffset < -9000 && yawAngle > 9000 )
 	{
@@ -374,7 +374,7 @@ void handleYawStabilizeMode()
 		if( g_state.yawStabilizeMode == 0 )
 		{
 			g_state.yawStabilizeMode = 1;
-			g_state.yawOffset = storm32_getYawAngle();
+			g_state.yawOffset = g_state.storm32YawAngle;
 			g_state.yawError = 0;
 		}
 		else
@@ -500,14 +500,14 @@ int main(void)
 		if( now >= handleStorm32UpdateTimeout )
 		{
 			// Get fresh data from storm32
-			storm32_getAngles();
+			storm32UpdateAngles();
 
 			// Calc yaw error now as new storm32 data has arrived
 			calcYawError();
 			
 //			g_debug.data0 += 1;
 //			g_debug.data1 = g_state.yawError;
-//			g_debug.data2 = storm32_getYawAngle();
+//			g_debug.data2 = g_state.storm32YawAngle;
 			
 			handleStorm32UpdateTimeout += g_config.storm32_update_inteval_ms;
 		}

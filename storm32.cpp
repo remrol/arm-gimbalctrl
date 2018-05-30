@@ -10,8 +10,6 @@ extern "C"
 #include <stdlib.h>
 #include <string.h>
 
-Storm32Status	g_storm32_yawStatus;
-int16_t			g_storm32_yaw;
 uint32_t        g_storm32LiveDataTimeStamp;
 Storm32LiveData g_storm32LiveData;
 
@@ -34,9 +32,6 @@ Storm32LiveData g_storm32LiveData;
 #define ST32_LIVEDATA_IMUACCABS			0x8000
 
 
-#define X25_INIT_CRC 0xffff
-#define X25_VALIDATE_CRC 0xf0b8
- 
 static inline void crc_accumulate(uint8_t data, uint16_t *crcAccum)
 {
 	/*Accumulate one byte of data into the CRC*/
@@ -46,10 +41,10 @@ static inline void crc_accumulate(uint8_t data, uint16_t *crcAccum)
     tmp^= (tmp<<4);
     *crcAccum = (*crcAccum>>8) ^ (tmp<<8) ^ (tmp <<3) ^ (tmp>>4);
 }
- 
 
 static inline void crc_init(uint16_t* crcAccum)
 {
+#define X25_INIT_CRC 0xffff
     *crcAccum = X25_INIT_CRC;
 }
 
@@ -57,8 +52,6 @@ void storm32_Init()
 {
 	g_storm32LiveDataTimeStamp = 0;
 	memset(&g_storm32LiveData, 0, sizeof(Storm32LiveData));
-	g_storm32_yaw = 0;
-	g_storm32_yawStatus = ST32_UPDATE_DATAEMPTY;
 }
 
 uint16_t uart1_recv_until( uint8_t* _buffer, uint8_t _sizeLimit, uint32_t _timeout )
@@ -147,23 +140,17 @@ Storm32Status storm32_UpdateStatus()
 	return ST32_UPDATE_OK;	
 }
 
-
-
-int16_t storm32_getYawAngle()
-{
-	return g_storm32_yaw; // g_storm32LiveData.param21;
-}
-
 bool storm32_yawAvailable()
 {
-	return g_storm32_yawStatus == ST32_UPDATE_OK;
+	// Timestamp is valid and not older than 1 sec
+	return g_state.storm32YawTimeStamp != 0 && g_state.storm32YawTimeStamp + 1000 > millis();
 }
 
 
 #define LOW_BYTE(x)   ((x) & 0xFF)
 #define HIGH_BYTE(x)   (((x)>>8) & 0xFF)
 
-Storm32Status storm32_getAngles()
+Storm32Status storm32UpdateAngles()
 {
 	uint8_t cmdBuffer[32];
 	uint16_t crc;
@@ -182,12 +169,14 @@ Storm32Status storm32_getAngles()
 	cmdBuffer[5] = LOW_BYTE(crc);
 	cmdBuffer[6] = HIGH_BYTE(crc);
 	
+	uint32_t timeNow = millis();
+	
 	// Send data.
 	for( uint8_t i = 0; i < 7; ++i )
 		uart1_putc(cmdBuffer[i]);
 	
 	// Receive data back
-	uint16_t status = uart1_recv_until( cmdBuffer, 0x0d, millis() + 100 );
+	uint16_t status = uart1_recv_until( cmdBuffer, 0x0d, timeNow + 100 );
 	
 	// Check receive error
 	if( status & 0x0100 )
@@ -200,9 +189,10 @@ Storm32Status storm32_getAngles()
 	if(cmdBuffer[0] != 0xfb || cmdBuffer[1] != 0x08 )
 		return ST32_UPDATE_DATAERROR;
 
-	g_storm32_yaw = -*( ( int16_t* ) ( cmdBuffer + 9 ) );
-	g_storm32_yawStatus = ST32_UPDATE_OK;
-
+	g_state.storm32YawAngle = -*( ( int16_t* ) ( cmdBuffer + 9 ) );
+	g_state.storm32YawTimeStamp = timeNow;
+	
 	return ST32_UPDATE_OK;
 }
 
+//	g_state.storm32YawTimeStamp = 0;

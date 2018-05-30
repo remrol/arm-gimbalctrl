@@ -70,6 +70,9 @@ struct State
 	int16_t  yawOffset;
 	int16_t  yawError;
 	uint8_t  yawStabilizeMode;
+	
+	int16_t  storm32YawAngle;
+	uint32_t  storm32YawTimeStamp;
 };
 
 void stateInit();

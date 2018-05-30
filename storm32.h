@@ -103,10 +103,9 @@ void storm32_Init();
 Storm32Status storm32_UpdateStatus();
 
 bool    storm32_yawAvailable();
-int16_t storm32_getYawAngle();
 
 
-Storm32Status storm32_getAngles();
+Storm32Status storm32UpdateAngles();
 
 
 

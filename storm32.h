@@ -99,12 +99,8 @@ static const Storm32Status ST32_UPDATE_DATAERROR = 4;
 static const Storm32Status ST32_UPDATE_DATAEMPTY = 5;
 
 
-void storm32_Init();
-Storm32Status storm32_UpdateStatus();
-
-bool    storm32_yawAvailable();
-
-
+void storm32Init();
+Storm32Status storm32UpdateStatus();
 Storm32Status storm32UpdateAngles();
 
 

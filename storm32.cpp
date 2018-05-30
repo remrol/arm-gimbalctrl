@@ -48,7 +48,7 @@ static inline void crc_init(uint16_t* crcAccum)
     *crcAccum = X25_INIT_CRC;
 }
 
-void storm32_Init()
+void storm32Init()
 {
 	g_storm32LiveDataTimeStamp = 0;
 	memset(&g_storm32LiveData, 0, sizeof(Storm32LiveData));
@@ -84,7 +84,7 @@ uint16_t uart1_recv_until( uint8_t* _buffer, uint8_t _sizeLimit, uint32_t _timeo
 	return _sizeLimit;
 }
 
-Storm32Status storm32_UpdateStatus()
+Storm32Status storm32UpdateStatus()
 {
 	uint32_t timeStamp = millis();
 	uint32_t timeout = timeStamp + 100;
@@ -140,11 +140,7 @@ Storm32Status storm32_UpdateStatus()
 	return ST32_UPDATE_OK;	
 }
 
-bool storm32_yawAvailable()
-{
-	// Timestamp is valid and not older than 1 sec
-	return g_state.storm32YawTimeStamp != 0 && g_state.storm32YawTimeStamp + 1000 > millis();
-}
+
 
 
 #define LOW_BYTE(x)   ((x) & 0xFF)

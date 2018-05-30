@@ -346,29 +346,49 @@ uint16_t getPulse3Time()
 	return pulseDurationSum / pulseDurationSumCount;
 }
 	
-	
-void calcYawError()
+
+int16_t subtractAngles( int16_t _angle1, int16_t _angle2 )
 {
-	int16_t yawAngle = g_state.storm32YawAngle;
-	
-	if( g_state.yawOffset < -9000 && yawAngle > 9000 )
+	if( _angle1 < -9000 && _angle2 > 9000 )
 	{
-		g_state.yawError = ( (int16_t)18000 + g_state.yawOffset ) + ( (int16_t)18000 - yawAngle );
+		return ( (int16_t)18000 + _angle1 ) + ( (int16_t)18000 - _angle2 );
 	}
-	else if( g_state.yawOffset > 9000 && yawAngle < -9000 )
+	else if( _angle1 > 9000 && _angle2 < -9000 )
 	{
-		g_state.yawError = ( (int16_t)18000 - g_state.yawOffset ) + ( (int16_t)18000 + yawAngle );
-		g_state.yawError = -g_state.yawError;
+		return -( ( (int16_t)18000 - _angle1 ) + ( (int16_t)18000 + _angle2 ) );
 	}
 	else
 	{
-		g_state.yawError = g_state.yawOffset - yawAngle;
+		return _angle1 - _angle2;
 	}
+}
+	
+int16_t addAngles( int16_t _angle1, int16_t _angle2 )
+{
+	int16_t angle = _angle1 + _angle2;
+	
+	// wrap-around at -18000 and  18000 (-180 deg, 180 deg)
+	if( angle < -18000 )
+	{
+		angle = ( angle + 18000 ) + 18000;
+	}
+	else if( angle > 18000 )
+	{
+		angle = ( angle - 18000 ) - 18000;
+	}
+	
+	return angle;
+}
+	
+bool yawAvailable()
+{
+	// Timestamp is valid and not older than 1 sec
+	return g_state.storm32YawTimeStamp != 0 && g_state.storm32YawTimeStamp + 1000 > millis();
 }
 
 void handleYawStabilizeMode()
 {
-	if( g_state.pulse3Duration > 1500 && g_state.pulse3Duration < 2300 && storm32_yawAvailable() )
+	if( g_state.pulse3Duration > 1500 && g_state.pulse3Duration < 2300 && yawAvailable() )
 	{
 		// If entering stabilize mode then read current position as reference position
 		if( g_state.yawStabilizeMode == 0 )
@@ -379,16 +399,8 @@ void handleYawStabilizeMode()
 		}
 		else
 		{
-			// Update yaw offset by rotation speed, wrap-around at -18000 and  18000 (-180 deg, 180 deg)
-			g_state.yawOffset += g_state.yawCtrlSpeed;
-			if( g_state.yawOffset < -18000 )
-			{
-				g_state.yawOffset = ( g_state.yawOffset + 18000 ) + 18000;
-			}
-			else if( g_state.yawOffset > 18000 )
-			{
-				g_state.yawOffset = ( g_state.yawOffset - 18000 ) - 18000;
-			}
+			// Update yaw offset by rotation speed
+			g_state.yawOffset = addAngles( g_state.yawOffset, g_state.yawCtrlSpeed );
 		}
 	}
 	else
@@ -430,8 +442,8 @@ int main(void)
 			 
 			 
 	// Capture source ICP3 = PE7
-	// Whole E as input
-	DDRE = 0x00;
+	DDRE = 0x01; // PE0 = RxD = input, PE1 = TxD = output
+	
 	TCCR3B = _BV(ICNC3 ) |	// Allow noise canceler
 			 _BV(CS31)	 |  // Clock/8
 			 _BV(ICES3);	// A rising edge is capture event.
@@ -451,15 +463,14 @@ int main(void)
 	
 	// I2C and sensors --------------------------------------------------------
 	sensorsInit();
-	storm32_Init();
+	storm32Init();
 
 	// Main loop --------------------------------------------------------------
 	sei();
 	
-	DDRE = 0x01; // PE0 = RxD = input, PE1 = TxD = output
-
+	// Main uart
 	uart_init(UART_BAUD_SELECT(19200, F_CPU));
-	
+	// storm32 uart
 	uart1_init(UART_BAUD_SELECT(38400, F_CPU));
 
 	//---------------------
@@ -503,7 +514,7 @@ int main(void)
 			storm32UpdateAngles();
 
 			// Calc yaw error now as new storm32 data has arrived
-			calcYawError();
+			g_state.yawError = subtractAngles( g_state.yawOffset, g_state.storm32YawAngle );
 			
 //			g_debug.data0 += 1;
 //			g_debug.data1 = g_state.yawError;

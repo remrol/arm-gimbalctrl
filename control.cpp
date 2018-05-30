@@ -433,7 +433,7 @@ void sendSensors()
 // InputSrcPitch
 void updateStorm32LiveData()
 {
-	Storm32Status status = storm32_UpdateStatus();
+	Storm32Status status = storm32UpdateStatus();
 	
 	if( status != ST32_UPDATE_OK )
 	{

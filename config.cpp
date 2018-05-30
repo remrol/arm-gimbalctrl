@@ -110,6 +110,10 @@ void stateInit()
 	g_state.yawOffset = 0;
 	g_state.yawError = 0;
 	g_state.yawStabilizeMode = 0;
+	g_state.yawPIDInput = 0;
+	g_state.yawPIDSetPoint = 0;
+	g_state.yawPIDOutput = 0;
+	
 	g_state.storm32YawAngle = 0;
 	g_state.storm32YawTimeStamp = 0;
 

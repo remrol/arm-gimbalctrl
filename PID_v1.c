@@ -8,6 +8,41 @@
 #include "PID_v1.h"
 #include <string.h>
 
+
+float PID_inputSubtract( float _angle1, float _angle2 )
+{
+	if( _angle1 < -9000 && _angle2 > 9000 )
+	{
+		return ( (int16_t)18000 + _angle1 ) + ( (int16_t)18000 - _angle2 );
+	}
+	else if( _angle1 > 9000 && _angle2 < -9000 )
+	{
+		return -( ( (int16_t)18000 - _angle1 ) + ( (int16_t)18000 + _angle2 ) );
+	}
+	else
+	{
+		return _angle1 - _angle2;
+	}
+}
+
+float PID_inputAdd( float _angle1, float _angle2 )
+{
+	float angle = _angle1 + _angle2;
+	
+	// wrap-around at -18000 and  18000 (-180 deg, 180 deg)
+	if( angle < -18000 )
+	{
+		angle = ( angle + 18000 ) + 18000;
+	}
+	else if( angle > 18000 )
+	{
+		angle = ( angle - 18000 ) - 18000;
+	}
+	
+	return angle;
+}
+
+
 /*Constructor (...)*********************************************************
  *    The parameters specified here are those for for which we can't set up
  *    reliable defaults, so we need to have the user set them.
@@ -76,8 +111,8 @@ int8_t PID_Compute( struct PID* pid, uint32_t _timeStampMs )
 	{
 		/*Compute all the working error variables*/
 		float input = *pid->m_pInput;
-		float error = *pid->m_pSetpoint - input;
-		float dInput = (input - pid->m_lastInput);
+		float error = PID_inputSubtract(*pid->m_pSetpoint, input); // *pid->m_pSetpoint - input;
+		float dInput = PID_inputSubtract(input, pid->m_lastInput); //( input - pid->m_lastInput);
 		pid->m_outputSum += (pid->m_ki * error);
 
 		/*Add Proportional on Measurement, if PID_P_ON_M is specified*/

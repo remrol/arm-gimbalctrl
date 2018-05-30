@@ -2,6 +2,10 @@
 #define CONFIG_H
 
 #include <stdio.h>
+extern "C"
+{
+#include "PID_v1.h"
+}
 
 struct Config
 {
@@ -70,9 +74,14 @@ struct State
 	int16_t  yawOffset;
 	int16_t  yawError;
 	uint8_t  yawStabilizeMode;
+	float	 yawPIDInput;
+	float    yawPIDSetPoint;
+	float    yawPIDOutput;
+	PID      yawPID;
 	
 	int16_t  storm32YawAngle;
-	uint32_t  storm32YawTimeStamp;
+	uint32_t storm32YawTimeStamp;
+	
 };
 
 void stateInit();

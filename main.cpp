@@ -396,6 +396,17 @@ void handleYawStabilizeMode()
 			g_state.yawStabilizeMode = 1;
 			g_state.yawOffset = g_state.storm32YawAngle;
 			g_state.yawError = 0;
+			
+			// PID.
+			g_state.yawPIDInput = g_state.storm32YawAngle;
+			g_state.yawPIDSetPoint = g_state.storm32YawAngle;
+			
+			PID_PID2( 
+				&g_state.yawPIDInput, &g_state.yawPIDSetPoint, &g_state.yawPIDOutput, 
+				0.1, 0.0, 0.0,
+				PID_DIRECT, millis(), 0, &g_state.yawPID );
+				
+			PID_SetMode( PID_AUTOMATIC, &g_state.yawPID );
 		}
 		else
 		{
@@ -515,6 +526,12 @@ int main(void)
 
 			// Calc yaw error now as new storm32 data has arrived
 			g_state.yawError = subtractAngles( g_state.yawOffset, g_state.storm32YawAngle );
+			
+			// PID
+			g_state.yawPIDInput = g_state.storm32YawAngle;
+			PID_Compute( &g_state.yawPID, millis());
+			
+			g_debug.data0 = g_state.yawPIDOutput;
 			
 //			g_debug.data0 += 1;
 //			g_debug.data1 = g_state.yawError;

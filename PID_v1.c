@@ -56,7 +56,7 @@ void PID_PID(float* _pInput, float* _pOutput, float* _pSetpoint, float _Kp, floa
     pid->m_inAuto = 0;
 //	pid->m_outputSum = 0;	// TODO added
 
-    PID_SetOutputLimits(-255, 255, pid);				//default output limit corresponds to the arduino pwm limits
+    PID_SetOutputLimits(-2550, 2550, pid);				//default output limit corresponds to the arduino pwm limits
 
     pid->m_sampleTimeMs = _sampleTimeMs;			//default Controller Sample Time is 0.1 seconds
 

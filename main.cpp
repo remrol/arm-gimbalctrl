@@ -273,7 +273,7 @@ void handleSpeedSmooth()
 			error = 192;
 			
 		speed = error;
-		speedSmoothFactor = 8;
+		speedSmoothFactor = 16;
 	}
 	
 	if( speed == g_state.motorSpeed )
@@ -402,9 +402,9 @@ void handleYawStabilizeMode()
 			g_state.yawPIDSetPoint = g_state.storm32YawAngle;
 			
 			PID_PID2( 
-				&g_state.yawPIDInput, &g_state.yawPIDSetPoint, &g_state.yawPIDOutput, 
-				0.1, 0.0, 0.0,
-				PID_DIRECT, millis(), 0, &g_state.yawPID );
+				&g_state.yawPIDInput,  &g_state.yawPIDOutput, &g_state.yawPIDSetPoint,
+				1, 1.0, 0.01,
+				PID_DIRECT, millis(), 10, &g_state.yawPID );
 				
 			PID_SetMode( PID_AUTOMATIC, &g_state.yawPID );
 		}
@@ -524,18 +524,17 @@ int main(void)
 			// Get fresh data from storm32
 			storm32UpdateAngles();
 
-			// Calc yaw error now as new storm32 data has arrived
-			g_state.yawError = subtractAngles( g_state.yawOffset, g_state.storm32YawAngle );
-			
 			// PID
 			g_state.yawPIDInput = g_state.storm32YawAngle;
-			PID_Compute( &g_state.yawPID, millis());
+			g_state.yawPIDSetPoint = g_state.yawOffset;
+			PID_Compute( &g_state.yawPID, millis());		
+			g_state.yawError = g_state.yawPIDOutput;
 			
 			g_debug.data0 = g_state.yawPIDOutput;
-			g_debug.data1 = g_state.yawError;
+			g_debug.data1 = subtractAngles( g_state.yawOffset, g_state.storm32YawAngle );
 			g_debug.data2 = g_state.storm32YawAngle;
+
 			
-//			g_debug.data0 += 1;
 			
 			handleStorm32UpdateTimeout += g_config.storm32_update_inteval_ms;
 		}

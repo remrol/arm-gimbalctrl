@@ -93,8 +93,6 @@ void stateInit()
 	g_state.vT1OverflowCount = 0;
 	g_state.vT3OverflowCount = 0;
 	g_state.ocr0 = 0;
-	g_state.diag0 = INT16_MIN;
-	g_state.diag1 = INT16_MIN;
 	
 	g_state.baroTimeStamp = 0;
 	g_state.baroPressure = INT32_MIN;
@@ -125,18 +123,4 @@ void stateInit()
 
 }
 
-void diagMinMax(int16_t value)
-{
-	if( g_state.diag0 == INT16_MIN || value < g_state.diag0)
-		g_state.diag0 = value;
-
-	if( g_state.diag1 == INT16_MIN || value > g_state.diag1)
-		g_state.diag1 = value;
-}
-
-void diagReset()
-{
-	g_state.diag0 = INT16_MIN;
-	g_state.diag1 = INT16_MIN;
-}
 

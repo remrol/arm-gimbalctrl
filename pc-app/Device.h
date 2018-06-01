@@ -60,8 +60,6 @@ public:
     bool getServoRange( int& _min, int& _dbandLo, int& _dbandHi, int& _max);
     bool setServoRange( int _min, int _dbandLo, int _dbandHi, int _max);
 
-    bool getDiagnostics( int& _diag0, int& _diag1 );
-
     bool getProcessing( int& _process_pulse_interval_ms, int& _process_speedsmooth_interval_ms, int& _speedSmoothRatio);
     bool setProcessing( int& _process_pulse_interval_ms, int& _process_speedsmooth_interval_ms, int _speedSmoothRatio);
 
@@ -84,6 +82,14 @@ public:
 
 	bool getDebug( int _offset, int& _data );
 
+	bool getYawConfig( 
+		double& _pidP, double& _pidI, double& _pidD,
+		int& _stabilizeSmoothFactor, int& _st32UpdateIntevalMs, int& _yawMaxSpeed );
+
+	bool setYawConfig( 
+		double _pidP, double _pidI, double _pidD,
+		int _stabilizeSmoothFactor, int _st32UpdateIntevalMs, int _yawMaxSpeed );
+
 private:
 
     bool checkConnected( const std::string& _signature );
@@ -93,12 +99,62 @@ private:
     bool checkStatus( const std::string& _status, int _v0, int _v1, const std::string& _signature );
     bool checkStatus( const std::string& _status, int _v0, int _v1, int _v2, const std::string& _signature );
     bool checkStatus( const std::string& _status, int _v0, int _v1, int _v2, int _v3, const std::string& _signature );
+    bool checkStatus( const std::string& _status, double _v0, double _v1, double _v2, int _v3, int _v4, int _v5, const std::string& _signature );
 
-    static std::string buildMessage( char cmd );
-    static std::string buildMessage( char cmd, int _arg0 );
-    static std::string buildMessage( char cmd, int _arg0, int _arg1 );
-    static std::string buildMessage( char cmd, int _arg0, int _arg1, int _arg2 );
-    static std::string buildMessage( char cmd, int _arg0, int _arg1, int _arg2, int _arg3 );
+	static std::string buildMessage( char cmd )
+	{
+		std::string msg;
+		msg += cmd;
+		return msg;
+	}
+
+	template< typename T0 >
+	static std::string buildMessage( char cmd, T0 _arg0 )
+	{
+		std::stringstream ss;
+		ss << cmd << " " << _arg0 << "\r\n";
+		return ss.str();
+	}
+
+	template< typename T0, typename T1 >
+	static std::string buildMessage( char cmd, T0 _arg0, T1 _arg1 )
+	{
+		std::stringstream ss;
+		ss << cmd << " " << _arg0 << " " << _arg1 << "\r\n";
+		return ss.str();
+	}
+
+	template< typename T0, typename T1, typename T2 >
+	static std::string buildMessage( char cmd, T0 _arg0, T1 _arg1, T2 _arg2 )
+	{
+		std::stringstream ss;
+		ss << cmd << " " << _arg0 << " " << _arg1 << " " << _arg2 << "\r\n";
+		return ss.str();
+	}
+
+	template< typename T0, typename T1, typename T2, typename T3 >
+	static std::string buildMessage( char cmd, T0 _arg0, T1 _arg1, T2 _arg2, T3 _arg3 )
+	{
+		std::stringstream ss;
+		ss << cmd << " " << _arg0 << " " << _arg1 << " " << _arg2 << " " << _arg3 << "\r\n";
+		return ss.str();
+	}
+
+	template< typename T0, typename T1, typename T2, typename T3, typename T4 >
+	static std::string buildMessage( char cmd, T0 _arg0, T1 _arg1, T2 _arg2, T3 _arg3, T4 _arg4 )
+	{
+		std::stringstream ss;
+		ss << cmd << " " << _arg0 << " " << _arg1 << " " << _arg2 << " " << _arg3 << " " << _arg4 << "\r\n";
+		return ss.str();
+	}
+
+	template< typename T0, typename T1, typename T2, typename T3, typename T4, typename T5 >
+	static std::string buildMessage( char cmd, T0 _arg0, T1 _arg1, T2 _arg2, T3 _arg3, T4 _arg4, T5 _arg5 )
+	{
+		std::stringstream ss;
+		ss << cmd << " " << _arg0 << " " << _arg1 << " " << _arg2 << " " << _arg3 << " " << _arg4 << " " << _arg5 << "\r\n";
+		return ss.str();
+	}
 
 	bool validateDevice(std::string& _status);
 	std::string sendReceive( const std::string& _msg);

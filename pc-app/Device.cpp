@@ -245,40 +245,67 @@ bool Device::checkStatus( const std::string& _status, int _v0, int _v1, int _v2,
     return true;
 }
 
-std::string Device::buildMessage( char cmd )
+
+bool  Device::checkStatus( const std::string& _status, double _v0, double _v1, double _v2, int _v3, int _v4, int _v5, const std::string& _signature )
 {
-    std::string msg;
-    msg += cmd;
-    return msg;
+   std::vector<std::string> tokens = tokenize(_status);
+    if( tokens.empty())
+    {
+        L_ << _signature << " empty status";
+        return false;
+    }
+
+    if( isError(tokens[0] ) )
+    {
+        L_ << _signature << " error: " << _status;
+        return false;
+    }
+
+    if( tokens.size() < 6 )
+    {
+        L_ << _signature << " not enough args " << _status;
+        return false;
+    }
+
+    if(atof(tokens[0].c_str()) != _v0)
+    {
+        L_ << _signature << " arg0 " << tokens[0] << " expected " << _v0 << " status: " << _status;
+        return false;
+    }
+
+    if(atof(tokens[1].c_str()) != _v1)
+    {
+        L_ << _signature << " arg1 " << tokens[1] << " expected " << _v1 << " status: " << _status;
+        return false;
+    }
+
+    if(atof(tokens[2].c_str()) != _v2)
+    {
+        L_ << _signature << " arg2 " << tokens[2] << " expected " << _v2 << " status: " << _status;
+        return false;
+    }
+
+    if(atoi(tokens[3].c_str()) != _v3)
+    {
+        L_ << _signature << " arg3 " << tokens[3] << " expected " << _v3 << " status: " << _status;
+        return false;
+    }
+
+    if(atoi(tokens[4].c_str()) != _v4)
+    {
+        L_ << _signature << " arg4 " << tokens[4] << " expected " << _v4 << " status: " << _status;
+        return false;
+    }
+
+    if(atoi(tokens[5].c_str()) != _v5)
+    {
+        L_ << _signature << " arg5 " << tokens[5] << " expected " << _v5 << " status: " << _status;
+        return false;
+    }
+
+    return true;
 }
 
-std::string Device::buildMessage( char cmd, int _arg0 )
-{
-    std::stringstream ss;
-    ss << cmd << " " << _arg0 << "\r\n";
-    return ss.str();
-}
-
-std::string Device::buildMessage( char cmd, int _arg0, int _arg1 )
-{
-    std::stringstream ss;
-    ss << cmd << " " << _arg0 << " " << _arg1 << "\r\n";
-    return ss.str();
-}
-
-std::string Device::buildMessage( char cmd, int _arg0, int _arg1, int _arg2 )
-{
-    std::stringstream ss;
-    ss << cmd << " " << _arg0 << " " << _arg1 << " " << _arg2 << "\r\n";
-    return ss.str();
-}
-
-std::string Device::buildMessage( char cmd, int _arg0, int _arg1, int _arg2, int _arg3 )
-{
-    std::stringstream ss;
-    ss << cmd << " " << _arg0 << " " << _arg1 << " " << _arg2 << " " << _arg3 << "\r\n";
-    return ss.str();
-}
 
 bool Device::validateDevice(std::string& _status)
 {
@@ -412,21 +439,6 @@ bool Device::configSaveToEeprom()
         return false;
 
 	return true;
-}
-
-bool Device::getDiagnostics( int& _diag0, int& _diag1 )
-{
-    if( !checkConnected( __FUNCTION__ ) )
-        return false;
-
-	std::vector< std::string > tokens = tokenize( sendReceive( buildMessage( 'b' ) ) );
-    if( !checkExpectedTokensCount( tokens, 2, __FUNCTION__ ) )
-        return false;
-
-	_diag0 = atoi( tokens[0].c_str() );
-	_diag1 = atoi( tokens[1].c_str() );
-
-    return true;
 }
 
 bool Device::configLoadDefaults()
@@ -603,6 +615,44 @@ bool Device::getDebug( int _offset, int& _data )
 	_data = atoi( tokens[0].c_str() );
 
 	return true;
+}
+
+bool Device::getYawConfig( 
+	double& _pidP, double& _pidI, double& _pidD,
+	int& _stabilizeSmoothFactor, int& _st32UpdateIntevalMs, int& _yawMaxSpeed )
+{
+    if( !checkConnected( __FUNCTION__ ) )
+        return false;
+
+    std::string msg = sendReceive( buildMessage( 'b' ) );
+	std::vector< std::string > tokens = tokenize( msg );
+    if( !checkExpectedTokensCount( tokens, 6, __FUNCTION__ ) )
+        return false;
+
+	_pidP = atof( tokens[0].c_str() );
+	_pidI = atof( tokens[1].c_str() );
+	_pidD = atof( tokens[2].c_str() );
+	_stabilizeSmoothFactor = atoi(tokens[3].c_str());
+	_st32UpdateIntevalMs = atoi(tokens[4].c_str());
+	_yawMaxSpeed = atoi(tokens[5].c_str());
+
+	return true;
+}
+
+bool Device::setYawConfig( 
+	double _pidP, double _pidI, double _pidD,
+	int _stabilizeSmoothFactor, int _st32UpdateIntevalMs, int _yawMaxSpeed )
+{
+    if( !checkConnected( __FUNCTION__ ) )
+        return false;
+
+    std::string msg = sendReceive( buildMessage( 'B', _pidP, _pidI, _pidD, _stabilizeSmoothFactor, _st32UpdateIntevalMs, _yawMaxSpeed ) );
+    if( !checkStatus( msg, _pidP, _pidI, _pidD, _stabilizeSmoothFactor, _st32UpdateIntevalMs, _yawMaxSpeed, __FUNCTION__ ) )
+        return false;
+
+    return true;
+
+	return false;
 }
 
 	

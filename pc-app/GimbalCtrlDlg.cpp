@@ -33,28 +33,40 @@ CGimbalCtrlDlg::CGimbalCtrlDlg(CWnd* pParent /*=NULL*/)
   , m_timeoutMotorStopIfNoPulse(0)
   , m_timeoutMotorShutdownIfNoPulse(0)
   , m_speedSmoothRatio(0)
+  , m_yawPID_P(0)
+  , m_yawPID_I(0)
+  , m_yawPID_D(0)
+  , m_yawSpeedSmoothFactor(0)
+  , m_st32UpdateIntervalMs(0)
+  , m_yawMaxSpeed(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
 void CGimbalCtrlDlg::DoDataExchange(CDataExchange* pDX)
 {
-    CDialogEx::DoDataExchange(pDX);
-    DDX_Control(pDX, IDC_COMBO_COMPORTS, m_comboComPorts);
-    DDX_Control(pDX, IDC_BUTTON_CONNECT, m_buttonConnect);
-    DDX_Text(pDX, IDC_EDIT_SERVO_MIN, m_servoMin);
-    DDX_Text(pDX, IDC_EDIT_SERVO_DBANDLO, m_servoDbandLo);
-    DDX_Text(pDX, IDC_EDIT_SERVO_DBANDHI, m_servoDbandHi);
-    DDX_Text(pDX, IDC_EDIT_SERVO_MAX, m_servoMax);
-    DDX_Control(pDX, IDC_LIST_DIAGNOSTICS, m_listDiagnostics);
-    DDX_Text(pDX, IDC_EDIT_MOTOR_POWER, m_motorPower);
-    DDX_Text(pDX, IDC_EDIT_PWMSCALE, m_pwmScaleFactor);
-    DDX_Text(pDX, IDC_EDIT_EXPO, m_expo);
-    DDX_Text(pDX, IDC_EDIT_INTERVAL_PROCESSPULSE, m_intervalProcessPulseMs);
-    DDX_Text(pDX, IDC_EDIT_INTERVAL_PROCESSPEEDSMOOTH, m_intervalProcessSpeedSmooth);
-    DDX_Text(pDX, IDC_EDIT_TIMEOUT_STOPNOPULSE, m_timeoutMotorStopIfNoPulse);
-    DDX_Text(pDX, IDC_EDIT_TIMEOUT_DISABLENOPULSE, m_timeoutMotorShutdownIfNoPulse);
-    DDX_Text(pDX, IDC_EDIT_PROCESSPEEDSMOOTH_RATIO, m_speedSmoothRatio);
+	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_COMBO_COMPORTS, m_comboComPorts);
+	DDX_Control(pDX, IDC_BUTTON_CONNECT, m_buttonConnect);
+	DDX_Text(pDX, IDC_EDIT_SERVO_MIN, m_servoMin);
+	DDX_Text(pDX, IDC_EDIT_SERVO_DBANDLO, m_servoDbandLo);
+	DDX_Text(pDX, IDC_EDIT_SERVO_DBANDHI, m_servoDbandHi);
+	DDX_Text(pDX, IDC_EDIT_SERVO_MAX, m_servoMax);
+	DDX_Control(pDX, IDC_LIST_DIAGNOSTICS, m_listDiagnostics);
+	DDX_Text(pDX, IDC_EDIT_MOTOR_POWER, m_motorPower);
+	DDX_Text(pDX, IDC_EDIT_PWMSCALE, m_pwmScaleFactor);
+	DDX_Text(pDX, IDC_EDIT_EXPO, m_expo);
+	DDX_Text(pDX, IDC_EDIT_INTERVAL_PROCESSPULSE, m_intervalProcessPulseMs);
+	DDX_Text(pDX, IDC_EDIT_INTERVAL_PROCESSPEEDSMOOTH, m_intervalProcessSpeedSmooth);
+	DDX_Text(pDX, IDC_EDIT_TIMEOUT_STOPNOPULSE, m_timeoutMotorStopIfNoPulse);
+	DDX_Text(pDX, IDC_EDIT_TIMEOUT_DISABLENOPULSE, m_timeoutMotorShutdownIfNoPulse);
+	DDX_Text(pDX, IDC_EDIT_PROCESSPEEDSMOOTH_RATIO, m_speedSmoothRatio);
+	DDX_Text(pDX, IDC_EDIT_YAWPID_P, m_yawPID_P);
+	DDX_Text(pDX, IDC_EDIT_YAWPID_I, m_yawPID_I);
+	DDX_Text(pDX, IDC_EDIT_YAWPID_D, m_yawPID_D);
+	DDX_Text(pDX, IDC_EDIT_YAWSTAB_SPDSMOOTH, m_yawSpeedSmoothFactor);
+	DDX_Text(pDX, IDC_EDIT_ST32UPDINTVL_MS, m_st32UpdateIntervalMs);
+	DDX_Text(pDX, IDC_EDIT_YAWMAXSPEED, m_yawMaxSpeed);
 }
 
 BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
@@ -75,6 +87,7 @@ BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
     ON_BN_CLICKED(IDC_BUTTON_MOTORTIMEOUTS_GET, &CGimbalCtrlDlg::readMotorTimeouts)
     ON_BN_CLICKED(IDC_BUTTON_MOTORTIMEOUTS_SET, &CGimbalCtrlDlg::OnBnClickedButtonMotortimeoutsSet)
 	ON_BN_CLICKED(IDC_BUTTON_STORM32_GETDATA, &CGimbalCtrlDlg::OnBnClickedButtonStorm32Getdata)
+	ON_BN_CLICKED(IDC_BUTTON_YAW_SET, &CGimbalCtrlDlg::OnBnClickedButtonYawSet)
 END_MESSAGE_MAP()
 
 
@@ -418,12 +431,16 @@ void CGimbalCtrlDlg::OnBnClickedButtonMotortimeoutsSet()
 
 void CGimbalCtrlDlg::OnBnClickedButtonStorm32Getdata()
 {
-//	double timeStamp;
-//	m_device.readStorm32LiveData(timeStamp);
+	m_device.getYawConfig( m_yawPID_P, m_yawPID_I, m_yawPID_D, m_yawSpeedSmoothFactor, m_st32UpdateIntervalMs, m_yawMaxSpeed );
+    UpdateData(FALSE);
 
-	int a0, a1, a2;
+}
 
-	m_device.getStorm32LiveData( Device::ST32DO_InputSrcPitch, a0, a1, a2 );
 
-	L_ << a0 << " " << a1 << " " << a2;
+void CGimbalCtrlDlg::OnBnClickedButtonYawSet()
+{
+	UpdateData(TRUE);
+	m_device.setYawConfig( m_yawPID_P, m_yawPID_I, m_yawPID_D, m_yawSpeedSmoothFactor, m_st32UpdateIntervalMs, m_yawMaxSpeed );
+
+
 }

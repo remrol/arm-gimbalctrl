@@ -67,4 +67,11 @@ public:
     int			m_timeoutMotorShutdownIfNoPulse;
     int			m_speedSmoothRatio;
 	afx_msg void OnBnClickedButtonStorm32Getdata();
+	double m_yawPID_P;
+	double m_yawPID_I;
+	double m_yawPID_D;
+	int m_yawSpeedSmoothFactor;
+	int m_st32UpdateIntervalMs;
+	int m_yawMaxSpeed;
+	afx_msg void OnBnClickedButtonYawSet();
 };

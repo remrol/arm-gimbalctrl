@@ -18,6 +18,13 @@ char g_strbuf[32];
 
 uint16_t g_lastErr = 0;
 
+
+void sendFloat( float f )
+{
+	dtostrf(f, 8, 6, g_strbuf);
+	uart_puts(g_strbuf);
+}
+
 // Receives float or NAN in case of timeout or an error
 float receiveFloat( uint32_t _timeout)
 {
@@ -412,11 +419,6 @@ void receiveTimeouts()
 	sendTimeouts();
 }
 
-void sendDiagnostics()
-{
-	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_state.diag0, g_state.diag1);
-	uart_puts(g_strbuf);
-}
 
 void sendSensors()
 {
@@ -467,7 +469,7 @@ void readStorm32LiveData()
 	uart_puts(g_strbuf);	
 }
 
-void readDebug()
+void sendDebug()
 {
 	// Timeout is 100 ms
 	uint32_t timeout = millis() + 100;
@@ -486,6 +488,84 @@ void readDebug()
 	uart_puts(g_strbuf);
 }
 
+void sendYaw()
+{
+	sendFloat(g_config.yawPID_p);
+	uart_puts_p( PSTR(","));
+	sendFloat(g_config.yawPID_i);
+	uart_puts_p( PSTR(","));
+	sendFloat(g_config.yawPID_d);
+	sprintf_P(g_strbuf, PSTR(",%d,%d,%d\r\n"), (int) g_config.speed_yawstabilize_smooth_factor, (int) g_config.storm32_update_inteval_ms, (int) g_config.yawMaxSpeed );
+	uart_puts(g_strbuf);
+}
+
+void receiveYaw()
+{
+	// Timeout is 100 ms
+	uint32_t timeout = millis() + 100;
+	
+	float p = receiveFloat(timeout);
+	if( isnan(p) || p <= 0)
+	{
+		sprintf_P(g_strbuf, PSTR("P ERR %d\r\n"), g_lastErr);
+		uart_puts( g_strbuf );
+		return;
+	}		
+	
+	float i = receiveFloat(timeout);
+	if( isnan(i) || i <= 0)
+	{
+		sprintf_P(g_strbuf, PSTR("I ERR %d\r\n"), g_lastErr);
+		uart_puts( g_strbuf );
+		return;
+	}	
+	
+	float d = receiveFloat(timeout);
+	if( isnan(d) || d <= 0)
+	{
+		sprintf_P(g_strbuf, PSTR("D ERR %d\r\n"), g_lastErr);
+		uart_puts( g_strbuf );
+		return;
+	}
+	
+	int16_t speed_yawstabilize_smooth_factor = receiveInt16(timeout);
+	if( speed_yawstabilize_smooth_factor == INT16_MIN || speed_yawstabilize_smooth_factor <= 0 || speed_yawstabilize_smooth_factor > 127 )
+	{
+		sprintf_P(g_strbuf, PSTR("ERR2 %d %d\r\n"), g_lastErr, speed_yawstabilize_smooth_factor);
+		uart_puts( g_strbuf );
+		return;
+	}	
+	
+	int16_t storm32_update_inteval_ms = receiveInt16(timeout);
+	if( storm32_update_inteval_ms == INT16_MIN || storm32_update_inteval_ms <= 0 || storm32_update_inteval_ms > 1000 )
+	{
+		sprintf_P(g_strbuf, PSTR("ERR3 %d %d\r\n"), g_lastErr, storm32_update_inteval_ms);
+		uart_puts( g_strbuf );
+		return;
+	}	
+	
+	int16_t yawMaxSpeed = receiveInt16(timeout);
+	if( yawMaxSpeed == INT16_MIN || yawMaxSpeed <= 0 || yawMaxSpeed > 1000 )
+	{
+		sprintf_P(g_strbuf, PSTR("ERR4 %d %d\r\n"), g_lastErr, yawMaxSpeed);
+		uart_puts( g_strbuf );
+		return;
+	}
+	
+	g_config.yawPID_p = p;
+	g_config.yawPID_i = i;
+	g_config.yawPID_d = d;
+	g_config.speed_yawstabilize_smooth_factor = speed_yawstabilize_smooth_factor;
+	g_config.storm32_update_inteval_ms = storm32_update_inteval_ms;
+	g_config.yawMaxSpeed = yawMaxSpeed;
+	
+	sendYaw();
+	
+	if( g_state.yawStabilizeMode )
+	{
+		PID_SetTunings( g_config.yawPID_p, g_config.yawPID_i, g_config.yawPID_d, &g_state.yawPID );		
+	}
+}
 
 void control()
 {
@@ -533,9 +613,6 @@ void control()
 		case 'A':
 			receiveProcessing(); break;
 
-		case 'b':
-			sendDiagnostics(); break;
-
 		case 'm':
 			sendMotorParams(); break;
 		case 'M':
@@ -556,7 +633,12 @@ void control()
 			readStorm32LiveData(); break;
 			
 		case 'h':
-			readDebug(); break;
+			sendDebug(); break;
+			
+		case 'b':
+			sendYaw(); break;
+		case 'B':
+			receiveYaw(); break;
 		}
 	}
 	while( timeout > millis() );	

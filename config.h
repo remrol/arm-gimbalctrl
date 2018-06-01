@@ -57,9 +57,6 @@ struct State
 	int16_t  motorSpeed;
 	uint8_t  ocr0;
 
-	int16_t  diag0;
-	int16_t  diag1;
-	
 	uint32_t baroTimeStamp;
 	int32_t  baroPressure;
 	int16_t  baroTempX10;
@@ -95,9 +92,6 @@ void configEepromLoad();
 void configEepromSave();
 
 void configLoadDefaults();
-
-void diagMinMax(int16_t value);
-void diagReset();
 
 extern Config g_config;
 extern State  g_state;

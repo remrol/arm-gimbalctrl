@@ -270,7 +270,7 @@ void handleSpeedSmooth()
 		else if( speed > g_config.yawMaxSpeed )
 			speed = g_config.yawMaxSpeed;
 			
-		speedSmoothFactor = g_config.speed_yawstabilize_smooth_factor;
+		speedSmoothFactor = g_config.yaw_speed_smooth_factor;
 	}
 	
 	if( speed == g_state.motorSpeed )

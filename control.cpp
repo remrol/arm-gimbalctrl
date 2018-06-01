@@ -199,6 +199,33 @@ void sendConfig()
 	uart_puts(g_strbuf);
 	sprintf_P(g_strbuf, PSTR("%d,%d,%d\r\n"), g_config.mot_stop_nopulse_timeout_ms, g_config.mot_disable_stopped_timeout_ms, g_config.crc);
 	uart_puts(g_strbuf);
+	/*
+	uint16_t pulse_min;
+	uint16_t pulse_max;
+	uint16_t pulse_dband_lo;
+	uint16_t pulse_dband_hi;
+	
+	uint16_t pwm_scale_factor;
+	int8_t   speed_normal_smooth_factor;
+	int8_t   yaw_speed_smooth_factor;
+	uint8_t  power; // 1..128
+	uint8_t  expo_percent;
+	
+	uint16_t process_pulse_interval_ms;
+	uint16_t process_speedsmooth_interval_ms;
+
+	uint16_t mot_stop_nopulse_timeout_ms;
+	uint16_t mot_disable_stopped_timeout_ms;
+	
+	uint16_t storm32_update_inteval_ms;
+	float    yawPID_p;
+	float    yawPID_i;
+	float    yawPID_d;
+	int16_t  yawMaxSpeed;
+	
+	// crc
+	uint8_t crc;
+	*/	
 }
 
 void sendState()
@@ -495,7 +522,7 @@ void sendYaw()
 	sendFloat(g_config.yawPID_i);
 	uart_puts_p( PSTR(","));
 	sendFloat(g_config.yawPID_d);
-	sprintf_P(g_strbuf, PSTR(",%d,%d,%d\r\n"), (int) g_config.speed_yawstabilize_smooth_factor, (int) g_config.storm32_update_inteval_ms, (int) g_config.yawMaxSpeed );
+	sprintf_P(g_strbuf, PSTR(",%d,%d,%d\r\n"), (int) g_config.yaw_speed_smooth_factor, (int) g_config.storm32_update_inteval_ms, (int) g_config.yawMaxSpeed );
 	uart_puts(g_strbuf);
 }
 
@@ -528,10 +555,10 @@ void receiveYaw()
 		return;
 	}
 	
-	int16_t speed_yawstabilize_smooth_factor = receiveInt16(timeout);
-	if( speed_yawstabilize_smooth_factor == INT16_MIN || speed_yawstabilize_smooth_factor <= 0 || speed_yawstabilize_smooth_factor > 127 )
+	int16_t yaw_speed_smooth_factor = receiveInt16(timeout);
+	if( yaw_speed_smooth_factor == INT16_MIN || yaw_speed_smooth_factor <= 0 || yaw_speed_smooth_factor > 127 )
 	{
-		sprintf_P(g_strbuf, PSTR("ERR2 %d %d\r\n"), g_lastErr, speed_yawstabilize_smooth_factor);
+		sprintf_P(g_strbuf, PSTR("ERR2 %d %d\r\n"), g_lastErr, yaw_speed_smooth_factor);
 		uart_puts( g_strbuf );
 		return;
 	}	
@@ -555,7 +582,7 @@ void receiveYaw()
 	g_config.yawPID_p = p;
 	g_config.yawPID_i = i;
 	g_config.yawPID_d = d;
-	g_config.speed_yawstabilize_smooth_factor = speed_yawstabilize_smooth_factor;
+	g_config.yaw_speed_smooth_factor = yaw_speed_smooth_factor;
 	g_config.storm32_update_inteval_ms = storm32_update_inteval_ms;
 	g_config.yawMaxSpeed = yawMaxSpeed;
 	

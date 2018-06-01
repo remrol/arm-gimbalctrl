@@ -9,6 +9,11 @@ extern "C"
 
 struct Config
 {
+	// Current version, change after config members change or defaults change, forces reading defaults if eeprom saved has changed.
+	static const uint8_t CurrentVersion = 0;
+
+	uint8_t  version;		///< Saved version.
+	
 	uint16_t pulse_min;
 	uint16_t pulse_max;
 	uint16_t pulse_dband_lo;
@@ -16,7 +21,7 @@ struct Config
 	
 	uint16_t pwm_scale_factor;
 	int8_t   speed_normal_smooth_factor;
-	int8_t   speed_yawstabilize_smooth_factor;
+	int8_t   yaw_speed_smooth_factor;
 	uint8_t  power; // 1..128
 	uint8_t  expo_percent;
 	

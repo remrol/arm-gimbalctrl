@@ -27,7 +27,7 @@ void configLoadDefaults()
 	g_config.pulse_dband_hi = ( ( g_config.pulse_min + g_config.pulse_max ) / 2 ) + 300 / 2;
 	g_config.pwm_scale_factor = 1200;
 	g_config.speed_normal_smooth_factor = 5;
-	g_config.speed_yawstabilize_smooth_factor = 16;
+	g_config.yaw_speed_smooth_factor = 16;
 	g_config.power = 128;
 	g_config.expo_percent = 40;
 	
@@ -37,7 +37,7 @@ void configLoadDefaults()
 	g_config.mot_stop_nopulse_timeout_ms = 2*1000;
 	g_config.mot_disable_stopped_timeout_ms = 10*1000;
 	
-	g_config.storm32_update_inteval_ms = 100;
+	g_config.storm32_update_inteval_ms = 40;
 	
 	g_config.yawPID_p = 0.1;
 	g_config.yawPID_i = 0.1;
@@ -54,8 +54,8 @@ void configEepromLoad()
 	// config block address is 1
 	eeprom_read_block( &g_config, (void*) 0, sizeof(struct Config));
 
-	// Compare with read crc, if match then return..
-	if(configComputeCrc() == g_config.crc)
+	// Compare with current version and crc, if both match then return..
+	if( g_config.version == Config::CurrentVersion && configComputeCrc() == g_config.crc)
 		return;
 
 	// .. otherwise fill with some default values.

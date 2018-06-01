@@ -140,16 +140,16 @@ Storm32Status storm32UpdateStatus()
 	return ST32_UPDATE_OK;	
 }
 
-
-
-
 #define LOW_BYTE(x)   ((x) & 0xFF)
 #define HIGH_BYTE(x)   (((x)>>8) & 0xFF)
 
+// 4..6 ms
 Storm32Status storm32UpdateAngles()
 {
 	uint8_t cmdBuffer[32];
 	uint16_t crc;
+
+	uint32_t timeNow = millis();
 	
 	// Prepare input buffer.
 	crc_init(&crc);
@@ -165,7 +165,6 @@ Storm32Status storm32UpdateAngles()
 	cmdBuffer[5] = LOW_BYTE(crc);
 	cmdBuffer[6] = HIGH_BYTE(crc);
 	
-	uint32_t timeNow = millis();
 	
 	// Send data.
 	for( uint8_t i = 0; i < 7; ++i )
@@ -187,7 +186,7 @@ Storm32Status storm32UpdateAngles()
 
 	g_state.storm32YawAngle = -*( ( int16_t* ) ( cmdBuffer + 9 ) );
 	g_state.storm32YawTimeStamp = timeNow;
-	
+
 	return ST32_UPDATE_OK;
 }
 

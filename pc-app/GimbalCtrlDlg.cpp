@@ -94,6 +94,7 @@ BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_YAW_SET, &CGimbalCtrlDlg::OnBnClickedButtonYawSet)
 	ON_BN_CLICKED(IDC_BUTTON_CONFIG_LOADDEFAULTS, &CGimbalCtrlDlg::OnBnClickedButtonConfigLoaddefaults)
 	ON_BN_CLICKED(IDC_BUTTON_LIST_CLEAR, &CGimbalCtrlDlg::OnBnClickedButtonListClear)
+	ON_BN_CLICKED(IDC_BUTTON_LIST_UPDTINTVL_SET, &CGimbalCtrlDlg::OnBnClickedButtonListUpdtintvlSet)
 END_MESSAGE_MAP()
 
 
@@ -455,4 +456,10 @@ void CGimbalCtrlDlg::OnBnClickedButtonConfigLoaddefaults()
 void CGimbalCtrlDlg::OnBnClickedButtonListClear()
 {
 	m_listDiagnostics.ResetContent();
+}
+
+
+void CGimbalCtrlDlg::OnBnClickedButtonListUpdtintvlSet()
+{
+	// TODO: Add your control notification handler code here
 }

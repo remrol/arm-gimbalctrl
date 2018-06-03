@@ -79,4 +79,5 @@ public:
 	int			m_listUpdateIntervalMs;
 	CComboBox	m_comboListDataSource;
 	double		m_listLastUpdateTime;
+	afx_msg void OnBnClickedButtonListUpdtintvlSet();
 };

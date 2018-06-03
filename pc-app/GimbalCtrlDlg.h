@@ -48,6 +48,10 @@ public:
     afx_msg void OnBnClickedButtonProcessingintervalsSet();
     afx_msg void readMotorTimeouts();
     afx_msg void OnBnClickedButtonMotortimeoutsSet();
+	afx_msg void OnBnClickedButtonListClear();
+	afx_msg void OnBnClickedButtonYawSet();
+	afx_msg void OnBnClickedButtonConfigLoaddefaults();
+	afx_msg void OnBnClickedButtonStorm32Getdata();
 
     Device		m_device;
     CComboBox	m_comboComPorts;
@@ -66,12 +70,13 @@ public:
     int			m_timeoutMotorStopIfNoPulse;
     int			m_timeoutMotorShutdownIfNoPulse;
     int			m_speedSmoothRatio;
-	afx_msg void OnBnClickedButtonStorm32Getdata();
-	double m_yawPID_P;
-	double m_yawPID_I;
-	double m_yawPID_D;
-	int m_yawSpeedSmoothFactor;
-	int m_st32UpdateIntervalMs;
-	int m_yawMaxSpeed;
-	afx_msg void OnBnClickedButtonYawSet();
+	double		m_yawPID_P;
+	double		m_yawPID_I;
+	double		m_yawPID_D;
+	int			m_yawSpeedSmoothFactor;
+	int			m_st32UpdateIntervalMs;
+	int			m_yawMaxSpeed;
+	int			m_listUpdateIntervalMs;
+	CComboBox	m_comboListDataSource;
+	double		m_listLastUpdateTime;
 };

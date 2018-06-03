@@ -39,6 +39,8 @@ CGimbalCtrlDlg::CGimbalCtrlDlg(CWnd* pParent /*=NULL*/)
   , m_yawSpeedSmoothFactor(0)
   , m_st32UpdateIntervalMs(0)
   , m_yawMaxSpeed(0)
+  , m_listUpdateIntervalMs(1000)
+  , m_listLastUpdateTime( TimeMeasure::now())
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -67,6 +69,8 @@ void CGimbalCtrlDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_YAWSTAB_SPDSMOOTH, m_yawSpeedSmoothFactor);
 	DDX_Text(pDX, IDC_EDIT_ST32UPDINTVL_MS, m_st32UpdateIntervalMs);
 	DDX_Text(pDX, IDC_EDIT_YAWMAXSPEED, m_yawMaxSpeed);
+	DDX_Text(pDX, IDC_EDIT_LIST_UPDATEINTERVAL, m_listUpdateIntervalMs);
+	DDX_Control(pDX, IDC_COMBO_LIST_DATASOURCE, m_comboListDataSource);
 }
 
 BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
@@ -88,6 +92,8 @@ BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
     ON_BN_CLICKED(IDC_BUTTON_MOTORTIMEOUTS_SET, &CGimbalCtrlDlg::OnBnClickedButtonMotortimeoutsSet)
 	ON_BN_CLICKED(IDC_BUTTON_STORM32_GETDATA, &CGimbalCtrlDlg::OnBnClickedButtonStorm32Getdata)
 	ON_BN_CLICKED(IDC_BUTTON_YAW_SET, &CGimbalCtrlDlg::OnBnClickedButtonYawSet)
+	ON_BN_CLICKED(IDC_BUTTON_CONFIG_LOADDEFAULTS, &CGimbalCtrlDlg::OnBnClickedButtonConfigLoaddefaults)
+	ON_BN_CLICKED(IDC_BUTTON_LIST_CLEAR, &CGimbalCtrlDlg::OnBnClickedButtonListClear)
 END_MESSAGE_MAP()
 
 
@@ -126,6 +132,13 @@ BOOL CGimbalCtrlDlg::OnInitDialog()
 
 	m_timer = SetTimer( WORK_TIMER_ID, WORK_TIMER_INTERVAL_MS, nullptr );
 	L_ << "Starting timer id " << WORK_TIMER_ID << " interval " << WORK_TIMER_INTERVAL_MS << " [ms] status " << m_timer;
+
+
+	m_comboListDataSource.AddString( "Debug data" );
+	m_comboListDataSource.AddString( "Storm32 live data" );
+	m_comboListDataSource.AddString( "Sensors data" );
+	m_comboListDataSource.AddString( "None" );
+	m_comboListDataSource.SetCurSel(0);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -292,7 +305,24 @@ void CGimbalCtrlDlg::OnTimer(UINT_PTR nIDEvent)
 
 void CGimbalCtrlDlg::readDiagnostics()
 {
-	if( false )
+	int selectedData = m_comboListDataSource.GetCurSel();
+
+	if( selectedData == 0 )
+	{
+		std::stringstream ss;
+
+		std::vector< int > values;
+		values.resize(8);
+
+		for( size_t i = 0; i < values.size(); ++i )
+		{
+			m_device.getDebug(i, values[i] );
+			ss << i << ":" << values[i] << "   ";
+		}
+
+		m_listDiagnostics.InsertString( 0, ss.str().c_str() );	
+	}
+	else if( selectedData == 1 )
 	{
 		double pTS, mTS, mpuTS;
 		int pT, pP, mX, mY, mZ, aX, aY, aZ, gX, gY, gZ;
@@ -310,9 +340,8 @@ void CGimbalCtrlDlg::readDiagnostics()
 
 			m_listDiagnostics.InsertString( 0, ss.str().c_str() );
 		}
-
 	}
-	else if( false )
+	else if( selectedData == 2 )
 	{
 		std::vector< int > values;
 
@@ -320,41 +349,12 @@ void CGimbalCtrlDlg::readDiagnostics()
 		{
 			std::stringstream ss;
 
-//			ss << values[21] << " " << values[22] << " " << values[23];
 			for( int i = 7; i < values.size() - 2; i += 3 )
 				ss << "  " << i << ":" << values[i] << " " << values[i+1] << " " << values[i+2];
 
 			m_listDiagnostics.InsertString( 0, ss.str().c_str() );
 		}
-
 	}
-	else if(true)
-	{
-		std::stringstream ss;
-
-		std::vector< int > values;
-		values.resize(3);
-
-		for( size_t i = 0; i < values.size(); ++i )
-		{
-			m_device.getDebug(i, values[i] );
-			ss << i << ":" << values[i] << "   ";
-		}
-
-		m_listDiagnostics.InsertString( 0, ss.str().c_str() );		
-	}
-
-/*
-    int diag0, diag1;
-
-    if( m_device.getDiagnostics( diag0, diag1 ) )
-    {
-        std::stringstream ss;
-        ss << diag0 << "," << diag1;
-	    m_listDiagnostics.InsertString( 0, ss.str().c_str() );
-    }
-
-*/
 }
 
 
@@ -443,4 +443,16 @@ void CGimbalCtrlDlg::OnBnClickedButtonYawSet()
 	m_device.setYawConfig( m_yawPID_P, m_yawPID_I, m_yawPID_D, m_yawSpeedSmoothFactor, m_st32UpdateIntervalMs, m_yawMaxSpeed );
 
 
+}
+
+
+void CGimbalCtrlDlg::OnBnClickedButtonConfigLoaddefaults()
+{
+	// TODO: Add your control notification handler code here
+}
+
+
+void CGimbalCtrlDlg::OnBnClickedButtonListClear()
+{
+	m_listDiagnostics.ResetContent();
 }

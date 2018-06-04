@@ -520,15 +520,18 @@ int main(void)
 			storm32UpdateAngles();
 
 			// PID
-			g_state.yawPIDInput = g_state.storm32YawAngle;
-			g_state.yawPIDSetPoint = g_state.yawOffset;
-			PID_Compute( &g_state.yawPID, millis());		
-			g_state.yawPIDspeed = g_state.yawPIDOutput;
+			if( g_state.yawStabilizeMode )
+			{
+				g_state.yawPIDInput = g_state.storm32YawAngle;
+				g_state.yawPIDSetPoint = g_state.yawOffset;
+				PID_Compute( &g_state.yawPID, millis());		
+				g_state.yawPIDspeed = g_state.yawPIDOutput;
 			
-			g_debug.data0 = g_state.yawPIDOutput;
-			g_debug.data1 = subtractAngles( g_state.yawOffset, g_state.storm32YawAngle );
-			g_debug.data2 = g_state.storm32YawAngle;
-	
+				g_debug.data0 = g_state.yawPIDOutput;
+				g_debug.data1 = subtractAngles( g_state.yawOffset, g_state.storm32YawAngle );
+				g_debug.data2 = g_state.storm32YawAngle;
+			}
+			
 			handleStorm32UpdateTimeout += g_config.storm32_update_inteval_ms;
 		}
 		

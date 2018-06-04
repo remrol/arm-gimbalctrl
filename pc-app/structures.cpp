@@ -12,7 +12,7 @@ std::vector<std::string> tokenize( const std::string& _str)
 bool Config::fromString( const std::string& _data )
 {
 	std::vector< std::string > tokens = tokenize( _data );
-	if( tokens.size() != 13 )
+	if( tokens.size() != 19 )
 	{
 		return false;
 	}
@@ -23,13 +23,19 @@ bool Config::fromString( const std::string& _data )
 	pulse_dband_hi					= atoi( tokens[3].c_str() );
 	pwm_scale_factor				= atoi( tokens[4].c_str() );
 	speed_smooth_factor				= atoi( tokens[5].c_str() );
-	power							= atoi( tokens[6].c_str() );
-	expo_percent					= atoi( tokens[7].c_str() );
-	process_pulse_interval_ms		= atoi( tokens[8].c_str() );
-	process_speedsmooth_interval_ms	= atoi( tokens[9].c_str() );
-	mot_stop_nopulse_timeout_ms		= atoi( tokens[10].c_str() );
-	mot_disable_stopped_timeout_ms	= atoi( tokens[11].c_str() );
-	crc								= atoi( tokens[12].c_str() );
+	yaw_speed_smooth_factor         = atoi( tokens[6].c_str() );
+	power							= atoi( tokens[7].c_str() );
+	expo_percent					= atoi( tokens[8].c_str() );
+	process_pulse_interval_ms		= atoi( tokens[9].c_str() );
+	process_speedsmooth_interval_ms	= atoi( tokens[10].c_str() );
+	mot_stop_nopulse_timeout_ms		= atoi( tokens[11].c_str() );
+	mot_disable_stopped_timeout_ms	= atoi( tokens[12].c_str() );
+	storm32_update_inteval_ms       = atoi( tokens[13].c_str() );
+	yawPID_p						= atof( tokens[14].c_str());
+	yawPID_i						= atof( tokens[15].c_str());
+	yawPID_d						= atof( tokens[16].c_str());
+	yawMaxSpeed						= atoi( tokens[17].c_str() );
+	crc								= atoi( tokens[18].c_str() );
 
 	return true;
 }
@@ -44,12 +50,16 @@ std::string Config::toDisplayableString() const
 		"Pulse dband hi " << pulse_dband_hi << "\r\n" <<	
 		"PWM scale factor " << pwm_scale_factor << "\r\n" <<
 		"Speed smooth factor " << speed_smooth_factor << "\r\n" <<
+		"Yaw speed smooth factor " << yaw_speed_smooth_factor << "\r\n" <<
 		"Power " << power << "\r\n" <<	
 		"Expo " << expo_percent << "\r\n" <<	
 		"Process pulse interval " << process_pulse_interval_ms << " [ms]\r\n" <<	
-		"Process speed smooth interval " << process_speedsmooth_interval_ms << " [ms]\r\n" <<	
-		"Motor stop if no pulse timeout " << mot_stop_nopulse_timeout_ms << " [ms]\r\n" <<	
-		"Motor disable if no pulse timeout " << mot_disable_stopped_timeout_ms << " [ms]\r\n" <<	
+		"Process speed smooth interval " << process_speedsmooth_interval_ms << " [ms]\r\n" << 
+		"Motor stop if no pulse timeout " << mot_stop_nopulse_timeout_ms << " [ms]\r\n" << 
+		"Motor disable if no pulse timeout " << mot_disable_stopped_timeout_ms << " [ms]\r\n" << 
+		"Storm32 update interval " << storm32_update_inteval_ms << " [ms]\r\n" << 
+		"yaw PID   P " << yawPID_p << "   I " << yawPID_i << "   D " << yawPID_p << "\r\n" << 
+		"yaw max speed " << yawMaxSpeed << "\r\n" <<
 		"CRC8 " << crc;	
 
   return ss.str();

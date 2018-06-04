@@ -193,39 +193,23 @@ void sendConfig()
 	uart_puts(g_strbuf);
 	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_config.pulse_dband_lo, g_config.pulse_dband_hi, g_config.pwm_scale_factor);
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_config.speed_normal_smooth_factor, g_config.power, g_config.expo_percent);
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d,%d,"), g_config.speed_normal_smooth_factor, g_config.yaw_speed_smooth_factor, g_config.power, g_config.expo_percent);
 	uart_puts(g_strbuf);	
 	sprintf_P(g_strbuf, PSTR("%d,%d,"), g_config.process_pulse_interval_ms, g_config.process_speedsmooth_interval_ms);
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR("%d,%d,%d\r\n"), g_config.mot_stop_nopulse_timeout_ms, g_config.mot_disable_stopped_timeout_ms, g_config.crc);
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d,"), g_config.mot_stop_nopulse_timeout_ms, g_config.mot_disable_stopped_timeout_ms, g_config.storm32_update_inteval_ms);
 	uart_puts(g_strbuf);
-	/*
-	uint16_t pulse_min;
-	uint16_t pulse_max;
-	uint16_t pulse_dband_lo;
-	uint16_t pulse_dband_hi;
-	
-	uint16_t pwm_scale_factor;
-	int8_t   speed_normal_smooth_factor;
-	int8_t   yaw_speed_smooth_factor;
-	uint8_t  power; // 1..128
-	uint8_t  expo_percent;
-	
-	uint16_t process_pulse_interval_ms;
-	uint16_t process_speedsmooth_interval_ms;
+	sendFloat(g_config.yawPID_p);
+	uart_puts_p( PSTR(","));
+	sendFloat(g_config.yawPID_i);
+	uart_puts_p( PSTR(","));
+	sendFloat(g_config.yawPID_d);
+	uart_puts_p( PSTR(","));
+	sprintf_P(g_strbuf, PSTR("%d,"), g_config.yawMaxSpeed);
+	uart_puts(g_strbuf);
+	sprintf_P(g_strbuf, PSTR("%d\r\n"), g_config.crc);
+	uart_puts(g_strbuf);
 
-	uint16_t mot_stop_nopulse_timeout_ms;
-	uint16_t mot_disable_stopped_timeout_ms;
-	
-	uint16_t storm32_update_inteval_ms;
-	float    yawPID_p;
-	float    yawPID_i;
-	float    yawPID_d;
-	int16_t  yawMaxSpeed;
-	
-	// crc
-	uint8_t crc;
-	*/	
 }
 
 void sendState()

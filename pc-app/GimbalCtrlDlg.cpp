@@ -44,6 +44,7 @@ CGimbalCtrlDlg::CGimbalCtrlDlg(CWnd* pParent /*=NULL*/)
   , m_listUpdateIntervalSec(1)
   , m_diagNextUpdateTime( TimeMeasure::now() + 0.5 )
   , m_diagUpdateIntervalSec(1)
+  , m_stateUpdateIntervalMs(1000)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -74,6 +75,7 @@ void CGimbalCtrlDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_YAWMAXSPEED, m_yawMaxSpeed);
 	DDX_Text(pDX, IDC_EDIT_LIST_UPDATEINTERVAL, m_listUpdateIntervalMs);
 	DDX_Control(pDX, IDC_COMBO_LIST_DATASOURCE, m_comboListDataSource);
+	DDX_Text(pDX, IDC_EDIT_UPDATE_INTERVALMS, m_stateUpdateIntervalMs);
 }
 
 BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
@@ -93,11 +95,12 @@ BEGIN_MESSAGE_MAP(CGimbalCtrlDlg, CDialogEx)
     ON_BN_CLICKED(IDC_BUTTON_PROCESSINGINTERVALS_SET, &CGimbalCtrlDlg::OnBnClickedButtonProcessingintervalsSet)
     ON_BN_CLICKED(IDC_BUTTON_MOTORTIMEOUTS_GET, &CGimbalCtrlDlg::readMotorTimeouts)
     ON_BN_CLICKED(IDC_BUTTON_MOTORTIMEOUTS_SET, &CGimbalCtrlDlg::OnBnClickedButtonMotortimeoutsSet)
-	ON_BN_CLICKED(IDC_BUTTON_STORM32_GETDATA, &CGimbalCtrlDlg::OnBnClickedButtonStorm32Getdata)
+	ON_BN_CLICKED(IDC_BUTTON_STORM32_GETDATA, &CGimbalCtrlDlg::readYawConfig)
 	ON_BN_CLICKED(IDC_BUTTON_YAW_SET, &CGimbalCtrlDlg::OnBnClickedButtonYawSet)
 	ON_BN_CLICKED(IDC_BUTTON_CONFIG_LOADDEFAULTS, &CGimbalCtrlDlg::OnBnClickedButtonConfigLoaddefaults)
 	ON_BN_CLICKED(IDC_BUTTON_LIST_CLEAR, &CGimbalCtrlDlg::OnBnClickedButtonListClear)
 	ON_BN_CLICKED(IDC_BUTTON_LIST_UPDTINTVL_SET, &CGimbalCtrlDlg::OnBnClickedButtonListUpdtintvlSet)
+	ON_BN_CLICKED(IDC_BUTTON_UPDATE_INTERVAL_SET, &CGimbalCtrlDlg::OnBnClickedButtonUpdateIntervalSet)
 END_MESSAGE_MAP()
 
 
@@ -215,6 +218,7 @@ void CGimbalCtrlDlg::OnBnClickedButtonConnect()
 			readMotorParams();
 			readProcessing();
 			readMotorTimeouts();
+			readYawConfig();
 		}
 		else
 		{
@@ -436,7 +440,7 @@ void CGimbalCtrlDlg::OnBnClickedButtonMotortimeoutsSet()
 }
 
 
-void CGimbalCtrlDlg::OnBnClickedButtonStorm32Getdata()
+void CGimbalCtrlDlg::readYawConfig()
 {
 	m_device.getYawConfig( m_yawPID_P, m_yawPID_I, m_yawPID_D, m_yawSpeedSmoothFactor, m_st32UpdateIntervalMs, m_yawMaxSpeed );
     UpdateData(FALSE);
@@ -469,4 +473,13 @@ void CGimbalCtrlDlg::OnBnClickedButtonListUpdtintvlSet()
 	m_listUpdateIntervalSec = m_listUpdateIntervalMs / 1000.0;
 	if (m_listUpdateIntervalSec <= 0)
 		m_listUpdateIntervalSec = 1;
+}
+
+
+void CGimbalCtrlDlg::OnBnClickedButtonUpdateIntervalSet()
+{
+	UpdateData(TRUE);
+	m_diagUpdateIntervalSec = m_stateUpdateIntervalMs / 1000.0;
+	if( m_diagUpdateIntervalSec <= 0 )
+		m_diagUpdateIntervalSec = 1;
 }

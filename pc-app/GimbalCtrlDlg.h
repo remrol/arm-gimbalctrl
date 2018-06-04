@@ -51,7 +51,9 @@ public:
 	afx_msg void OnBnClickedButtonListClear();
 	afx_msg void OnBnClickedButtonYawSet();
 	afx_msg void OnBnClickedButtonConfigLoaddefaults();
-	afx_msg void OnBnClickedButtonStorm32Getdata();
+	afx_msg void readYawConfig();
+	afx_msg void OnBnClickedButtonListUpdtintvlSet();
+	afx_msg void OnBnClickedButtonUpdateIntervalSet();
 
     Device		m_device;
     CComboBox	m_comboComPorts;
@@ -82,5 +84,5 @@ public:
 	double		m_listUpdateIntervalSec;
 	double		m_diagNextUpdateTime;
 	double      m_diagUpdateIntervalSec;
-	afx_msg void OnBnClickedButtonListUpdtintvlSet();
+	int			m_stateUpdateIntervalMs;
 };

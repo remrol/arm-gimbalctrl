@@ -8,12 +8,18 @@ struct Config
 	int pulse_dband_hi;
 	int pwm_scale_factor;
 	int speed_smooth_factor;
+	int yaw_speed_smooth_factor;
 	int power; // 1..128
 	int expo_percent;
 	int process_pulse_interval_ms;
 	int process_speedsmooth_interval_ms;
 	int mot_stop_nopulse_timeout_ms;
 	int mot_disable_stopped_timeout_ms;
+	int storm32_update_inteval_ms;
+	double yawPID_p;
+	double yawPID_i;
+	double yawPID_d;
+	int yawMaxSpeed;
 	int crc;	// crc
 
 	bool fromString( const std::string& _data );

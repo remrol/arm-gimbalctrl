@@ -537,7 +537,7 @@ int main(void)
 		}
 		
 		// Read sensors
-//		sensorsRead();
+		sensorsRead();
 
 		// IO control
 		control();

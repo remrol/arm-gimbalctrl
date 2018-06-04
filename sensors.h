@@ -17,6 +17,7 @@ struct SensorsState
 	uint8_t initialized;
 	
 	uint32_t baroEventTimestamp;
+	uint32_t baroEventWorkTimestamp;
 	uint8_t  baroEventType;
 	int16_t  baroTemperature;
 	int32_t  baroPressure;

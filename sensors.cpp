@@ -26,19 +26,20 @@ void sensorsInit()
 	
 	if( g_magn.testConnection() && g_baro.testConnection() && g_mpu6050.testConnection())
 	{
+		uint32_t timeStamp = millis() + 1000;
 		g_sensorsState.initialized = true;
 		
-		g_sensorsState.baroEventTimestamp = millis() + 100;
+		g_sensorsState.baroEventWorkTimestamp = g_sensorsState.baroEventTimestamp = timeStamp;
 		g_sensorsState.baroEventType = BARO_EVENT_TEMP_TRIGGER;
 		g_sensorsState.baroTemperature = INT16_MIN;
 		g_sensorsState.baroPressure = INT32_MIN;
 		
-		g_sensorsState.magnEventTimestamp = g_sensorsState.baroEventTimestamp;
+		g_sensorsState.magnEventTimestamp = timeStamp;
 		g_sensorsState.magnX = INT16_MIN;
 		g_sensorsState.magnY = INT16_MIN;
 		g_sensorsState.magnZ = INT16_MIN;
 
-		g_sensorsState.mpuEventTimeStamp = g_sensorsState.baroEventTimestamp;
+		g_sensorsState.mpuEventTimeStamp = timeStamp;
 		g_sensorsState.mpuAccelX = INT16_MIN;
 		g_sensorsState.mpuAccelY = INT16_MIN;
 		g_sensorsState.mpuAccelZ = INT16_MIN;
@@ -53,21 +54,24 @@ void sensorsRead()
 	if( !g_sensorsState.initialized)
 		return;
 	
+	if( g_config.sensors_update_interval_ms == 0)
+		return;
+		
 	// barometer --------------------------------------------------	
-	if( millis() >= g_sensorsState.baroEventTimestamp )
+	if( millis() >= g_sensorsState.baroEventWorkTimestamp )
 	{
 		switch( g_sensorsState.baroEventType)
 		{
 		case BARO_EVENT_TEMP_TRIGGER:
 			g_baro.setControl(BMP085_MODE_TEMPERATURE);
-			g_sensorsState.baroEventTimestamp = millis() + g_baro.getMeasureDelayMilliseconds();
+			g_sensorsState.baroEventWorkTimestamp = millis() + g_baro.getMeasureDelayMilliseconds();
 			g_sensorsState.baroEventType = BARO_EVENT_TEMP_WAIT;
 			break;
 			
 		case BARO_EVENT_TEMP_WAIT:
 			g_sensorsState.baroTemperature = g_baro.getTemperatureC_x10();
 			g_baro.setControl(BMP085_MODE_PRESSURE_3);
-			g_sensorsState.baroEventTimestamp = millis() + g_baro.getMeasureDelayMilliseconds();
+			g_sensorsState.baroEventWorkTimestamp = millis() + g_baro.getMeasureDelayMilliseconds();
 			g_sensorsState.baroEventType = BARO_EVENT_PRESSURE_WAIT;
 			break;
 			
@@ -78,7 +82,8 @@ void sensorsRead()
 			g_state.baroPressure = g_sensorsState.baroPressure;
 			
 			g_sensorsState.baroEventType = BARO_EVENT_TEMP_TRIGGER;
-			g_sensorsState.baroEventTimestamp = millis() + 1000;			// TODO: figure out more precise event time stamp
+			g_sensorsState.baroEventTimestamp += g_config.sensors_update_interval_ms;
+			g_sensorsState.baroEventWorkTimestamp = g_sensorsState.baroEventTimestamp;
 			break;			
 		}
 	}
@@ -92,7 +97,7 @@ void sensorsRead()
 		g_state.magnY = g_sensorsState.magnY;
 		g_state.magnZ = g_sensorsState.magnZ;
 		
-		g_sensorsState.magnEventTimestamp = millis() + 1000;			// TODO: figure out more precise event time stamp
+		g_sensorsState.magnEventTimestamp += g_config.sensors_update_interval_ms;
 	}
 	
 	// Mpu --------------------------------------------------------
@@ -107,7 +112,7 @@ void sensorsRead()
 		g_state.mpuGyroY = g_sensorsState.mpuGyroY;
 		g_state.mpuGyroZ = g_sensorsState.mpuGyroZ;
 			
-		g_sensorsState.mpuEventTimeStamp = millis() + 1000;			// TODO: figure out more precise event time stamp
+		g_sensorsState.mpuEventTimeStamp += g_config.sensors_update_interval_ms;
 	}
 	
 }

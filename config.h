@@ -10,7 +10,7 @@ extern "C"
 struct Config
 {
 	// Current version, change after config members change or defaults change, forces reading defaults if eeprom saved has changed.
-	static const uint8_t CurrentVersion = 0;
+	static const uint8_t CurrentVersion = 1;
 
 	uint8_t  version;		///< Saved version.
 	
@@ -36,6 +36,8 @@ struct Config
 	float    yawPID_i;
 	float    yawPID_d;
 	int16_t  yawMaxSpeed;
+	
+	uint16_t sensors_update_interval_ms;
 	
 	// crc
 	uint8_t crc;	

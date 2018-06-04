@@ -12,7 +12,7 @@ std::vector<std::string> tokenize( const std::string& _str)
 bool Config::fromString( const std::string& _data )
 {
 	std::vector< std::string > tokens = tokenize( _data );
-	if( tokens.size() != 19 )
+	if( tokens.size() != 20 )
 	{
 		return false;
 	}
@@ -35,7 +35,8 @@ bool Config::fromString( const std::string& _data )
 	yawPID_i						= atof( tokens[15].c_str());
 	yawPID_d						= atof( tokens[16].c_str());
 	yawMaxSpeed						= atoi( tokens[17].c_str() );
-	crc								= atoi( tokens[18].c_str() );
+	sensors_update_interval_ms      = atoi( tokens[18].c_str() );
+	crc								= atoi( tokens[19].c_str() );
 
 	return true;
 }
@@ -58,8 +59,9 @@ std::string Config::toDisplayableString() const
 		"Motor stop if no pulse timeout " << mot_stop_nopulse_timeout_ms << " [ms]\r\n" << 
 		"Motor disable if no pulse timeout " << mot_disable_stopped_timeout_ms << " [ms]\r\n" << 
 		"Storm32 update interval " << storm32_update_inteval_ms << " [ms]\r\n" << 
-		"yaw PID   P " << yawPID_p << "   I " << yawPID_i << "   D " << yawPID_p << "\r\n" << 
+		"yaw PID   P " << yawPID_p << "   I " << yawPID_i << "   D " << yawPID_d << "\r\n" << 
 		"yaw max speed " << yawMaxSpeed << "\r\n" <<
+		"Sensors update interval " << sensors_update_interval_ms << "\r\n" << 
 		"CRC8 " << crc;	
 
   return ss.str();

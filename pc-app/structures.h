@@ -20,6 +20,7 @@ struct Config
 	double yawPID_i;
 	double yawPID_d;
 	int yawMaxSpeed;
+	int sensors_update_interval_ms;
 	int crc;	// crc
 
 	bool fromString( const std::string& _data );

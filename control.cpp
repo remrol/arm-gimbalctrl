@@ -205,7 +205,7 @@ void sendConfig()
 	uart_puts_p( PSTR(","));
 	sendFloat(g_config.yawPID_d);
 	uart_puts_p( PSTR(","));
-	sprintf_P(g_strbuf, PSTR("%d,"), g_config.yawMaxSpeed);
+	sprintf_P(g_strbuf, PSTR("%d,%d,"), g_config.yawMaxSpeed, g_config.sensors_update_interval_ms);
 	uart_puts(g_strbuf);
 	sprintf_P(g_strbuf, PSTR("%d\r\n"), g_config.crc);
 	uart_puts(g_strbuf);

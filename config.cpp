@@ -44,6 +44,7 @@ void configLoadDefaults()
 	g_config.yawPID_d = 0.002;
 	g_config.yawMaxSpeed = 192;
 
+	g_config.sensors_update_interval_ms = 0;
 	// Update crc
 	g_config.crc = configComputeCrc();	
 }

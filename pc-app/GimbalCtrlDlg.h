@@ -21,7 +21,7 @@ public:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 
 	static const int WORK_TIMER_ID = 1;
-	static const int WORK_TIMER_INTERVAL_MS = 200; //1000;
+	static const int WORK_TIMER_INTERVAL_MS = 40;
 
 // Implementation
 protected:
@@ -78,6 +78,9 @@ public:
 	int			m_yawMaxSpeed;
 	int			m_listUpdateIntervalMs;
 	CComboBox	m_comboListDataSource;
-	double		m_listLastUpdateTime;
+	double		m_listNextUpdateTime;
+	double		m_listUpdateIntervalSec;
+	double		m_diagNextUpdateTime;
+	double      m_diagUpdateIntervalSec;
 	afx_msg void OnBnClickedButtonListUpdtintvlSet();
 };

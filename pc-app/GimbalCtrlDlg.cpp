@@ -40,7 +40,10 @@ CGimbalCtrlDlg::CGimbalCtrlDlg(CWnd* pParent /*=NULL*/)
   , m_st32UpdateIntervalMs(0)
   , m_yawMaxSpeed(0)
   , m_listUpdateIntervalMs(1000)
-  , m_listLastUpdateTime( TimeMeasure::now())
+  , m_listNextUpdateTime(TimeMeasure::now())
+  , m_listUpdateIntervalSec(1)
+  , m_diagNextUpdateTime( TimeMeasure::now() + 0.5 )
+  , m_diagUpdateIntervalSec(1)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -287,16 +290,19 @@ void CGimbalCtrlDlg::OnTimer(UINT_PTR nIDEvent)
 	{
 		if( m_device.isOpened() )
 		{
-//			readState();
-			readDiagnostics();
-
-/*
 			double timeNow = TimeMeasure::now();
-			if( m_lastMeasureTime == 0 || timeNow >= m_lastMeasureTime + m_measureUpdateIntervalSec )
+
+			if (timeNow >= m_diagNextUpdateTime)
 			{
-				m_lastMeasureTime = timeNow;
-				readMeasurements();
-			} */
+				readState();
+				m_diagNextUpdateTime += m_diagUpdateIntervalSec;
+			}
+
+			if (timeNow >= m_listNextUpdateTime)
+			{
+				readDiagnostics();
+				m_listNextUpdateTime += m_listUpdateIntervalSec;
+			}
 		}
 	}
 
@@ -434,7 +440,6 @@ void CGimbalCtrlDlg::OnBnClickedButtonStorm32Getdata()
 {
 	m_device.getYawConfig( m_yawPID_P, m_yawPID_I, m_yawPID_D, m_yawSpeedSmoothFactor, m_st32UpdateIntervalMs, m_yawMaxSpeed );
     UpdateData(FALSE);
-
 }
 
 
@@ -442,8 +447,6 @@ void CGimbalCtrlDlg::OnBnClickedButtonYawSet()
 {
 	UpdateData(TRUE);
 	m_device.setYawConfig( m_yawPID_P, m_yawPID_I, m_yawPID_D, m_yawSpeedSmoothFactor, m_st32UpdateIntervalMs, m_yawMaxSpeed );
-
-
 }
 
 
@@ -461,5 +464,9 @@ void CGimbalCtrlDlg::OnBnClickedButtonListClear()
 
 void CGimbalCtrlDlg::OnBnClickedButtonListUpdtintvlSet()
 {
-	// TODO: Add your control notification handler code here
+	UpdateData(TRUE);
+
+	m_listUpdateIntervalSec = m_listUpdateIntervalMs / 1000.0;
+	if (m_listUpdateIntervalSec <= 0)
+		m_listUpdateIntervalSec = 1;
 }

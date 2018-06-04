@@ -403,11 +403,6 @@ void handleYawStabilizeMode()
 			PID_SetOutputLimits( -g_config.yawMaxSpeed, g_config.yawMaxSpeed, &g_state.yawPID );
 			PID_SetMode( PID_AUTOMATIC, &g_state.yawPID );
 		}
-		else
-		{
-			// Update yaw offset by rotation speed
-			g_state.yawOffset = addAngles( g_state.yawOffset, g_state.yawCtrlSpeed );
-		}
 	}
 	else
 	{
@@ -522,11 +517,17 @@ int main(void)
 			// PID
 			if( g_state.yawStabilizeMode )
 			{
+				// Update yaw offset by rotation speed
+				g_state.yawOffset = addAngles( g_state.yawOffset, g_state.yawCtrlSpeed / 2 );
+				// PID input
 				g_state.yawPIDInput = g_state.storm32YawAngle;
 				g_state.yawPIDSetPoint = g_state.yawOffset;
-				PID_Compute( &g_state.yawPID, millis());		
+				// PID execute
+				PID_Compute( &g_state.yawPID, millis());
+				// PID output
 				g_state.yawPIDspeed = g_state.yawPIDOutput;
 			
+				// Debug
 				g_debug.data0 = g_state.yawPIDOutput;
 				g_debug.data1 = subtractAngles( g_state.yawOffset, g_state.storm32YawAngle );
 				g_debug.data2 = g_state.storm32YawAngle;

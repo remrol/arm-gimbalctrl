@@ -400,7 +400,7 @@ void handleYawStabilizeMode()
 			
 			PID_PID2( &g_state.yawPIDInput,  &g_state.yawPIDOutput, &g_state.yawPIDSetPoint,
 				g_config.yawPID_p, g_config.yawPID_i, g_config.yawPID_d, PID_DIRECT, millis(), 10, &g_state.yawPID );
-					
+			PID_SetOutputLimits( -g_config.yawMaxSpeed, g_config.yawMaxSpeed, &g_state.yawPID );
 			PID_SetMode( PID_AUTOMATIC, &g_state.yawPID );
 		}
 		else

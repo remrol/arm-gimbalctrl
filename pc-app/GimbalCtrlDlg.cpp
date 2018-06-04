@@ -314,6 +314,28 @@ void CGimbalCtrlDlg::OnTimer(UINT_PTR nIDEvent)
 }
 
 
+std::string toString( int _value )
+{
+	int spaces = 0;
+
+	if( _value >= 0 )
+		spaces += 1;
+	if( abs(_value) < 10 )
+		spaces += 1;
+	if( abs(_value) < 100 )
+		spaces += 1;
+	if( abs(_value) < 1000 )
+		spaces += 1;
+
+	std::ostringstream oss;
+
+	for( int i = 0; i < spaces; ++i )
+		oss << " ";
+	oss << _value;
+
+	return oss.str();
+}
+
 void CGimbalCtrlDlg::readDiagnostics()
 {
 	int selectedData = m_comboListDataSource.GetCurSel();
@@ -328,7 +350,7 @@ void CGimbalCtrlDlg::readDiagnostics()
 		for( size_t i = 0; i < values.size(); ++i )
 		{
 			m_device.getDebug(i, values[i] );
-			ss << i << ":" << values[i] << "   ";
+			ss << i << ":" << toString( values[i] ) << "   ";
 		}
 
 		m_listDiagnostics.InsertString( 0, ss.str().c_str() );	

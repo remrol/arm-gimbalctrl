@@ -101,60 +101,25 @@ private:
     bool checkStatus( const std::string& _status, int _v0, int _v1, int _v2, int _v3, const std::string& _signature );
     bool checkStatus( const std::string& _status, double _v0, double _v1, double _v2, int _v3, int _v4, int _v5, const std::string& _signature );
 
-	static std::string buildMessage( char cmd )
-	{
-		std::string msg;
-		msg += cmd;
-		return msg;
-	}
+	static std::string buildMessage( char cmd );
 
 	template< typename T0 >
-	static std::string buildMessage( char cmd, T0 _arg0 )
-	{
-		std::stringstream ss;
-		ss << cmd << " " << _arg0 << "\n";
-		return ss.str();
-	}
+	static std::string buildMessage( char cmd, T0 _arg0 );
 
 	template< typename T0, typename T1 >
-	static std::string buildMessage( char cmd, T0 _arg0, T1 _arg1 )
-	{
-		std::stringstream ss;
-		ss << cmd << " " << _arg0 << " " << _arg1 << "\n";
-		return ss.str();
-	}
+	static std::string buildMessage( char cmd, T0 _arg0, T1 _arg1 );
 
 	template< typename T0, typename T1, typename T2 >
-	static std::string buildMessage( char cmd, T0 _arg0, T1 _arg1, T2 _arg2 )
-	{
-		std::stringstream ss;
-		ss << cmd << " " << _arg0 << " " << _arg1 << " " << _arg2 << "\n";
-		return ss.str();
-	}
+	static std::string buildMessage( char cmd, T0 _arg0, T1 _arg1, T2 _arg2 );
 
 	template< typename T0, typename T1, typename T2, typename T3 >
-	static std::string buildMessage( char cmd, T0 _arg0, T1 _arg1, T2 _arg2, T3 _arg3 )
-	{
-		std::stringstream ss;
-		ss << cmd << " " << _arg0 << " " << _arg1 << " " << _arg2 << " " << _arg3 << "\n";
-		return ss.str();
-	}
+	static std::string buildMessage( char cmd, T0 _arg0, T1 _arg1, T2 _arg2, T3 _arg3 );
 
 	template< typename T0, typename T1, typename T2, typename T3, typename T4 >
-	static std::string buildMessage( char cmd, T0 _arg0, T1 _arg1, T2 _arg2, T3 _arg3, T4 _arg4 )
-	{
-		std::stringstream ss;
-		ss << cmd << " " << _arg0 << " " << _arg1 << " " << _arg2 << " " << _arg3 << " " << _arg4 << "\n";
-		return ss.str();
-	}
+	static std::string buildMessage( char cmd, T0 _arg0, T1 _arg1, T2 _arg2, T3 _arg3, T4 _arg4 );
 
 	template< typename T0, typename T1, typename T2, typename T3, typename T4, typename T5 >
-	static std::string buildMessage( char cmd, T0 _arg0, T1 _arg1, T2 _arg2, T3 _arg3, T4 _arg4, T5 _arg5 )
-	{
-		std::stringstream ss;
-		ss << cmd << " " << _arg0 << " " << _arg1 << " " << _arg2 << " " << _arg3 << " " << _arg4 << " " << _arg5 << "\n";
-		return ss.str();
-	}
+	static std::string buildMessage( char cmd, T0 _arg0, T1 _arg1, T2 _arg2, T3 _arg3, T4 _arg4, T5 _arg5 );
 
 	bool validateDevice(std::string& _status);
 	std::string sendReceive( const std::string& _msg);

@@ -499,6 +499,7 @@ int main(void)
 			handleYawStabilizeMode();
 								
 			handlePulseTimeout += g_config.process_pulse_interval_ms;
+			now = millis();
 		}
 
 		// Periodically handle speed smoother 
@@ -506,6 +507,7 @@ int main(void)
 		{
 			handleSpeedSmooth();
 			handleSpeedSmoothTimeout += g_config.process_speedsmooth_interval_ms;
+			now = millis();
 		}
 
 		// Periodically update storm32 data

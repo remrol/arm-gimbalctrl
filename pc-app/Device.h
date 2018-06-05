@@ -112,7 +112,7 @@ private:
 	static std::string buildMessage( char cmd, T0 _arg0 )
 	{
 		std::stringstream ss;
-		ss << cmd << " " << _arg0 << "\r\n";
+		ss << cmd << " " << _arg0 << "\n";
 		return ss.str();
 	}
 
@@ -120,7 +120,7 @@ private:
 	static std::string buildMessage( char cmd, T0 _arg0, T1 _arg1 )
 	{
 		std::stringstream ss;
-		ss << cmd << " " << _arg0 << " " << _arg1 << "\r\n";
+		ss << cmd << " " << _arg0 << " " << _arg1 << "\n";
 		return ss.str();
 	}
 
@@ -128,7 +128,7 @@ private:
 	static std::string buildMessage( char cmd, T0 _arg0, T1 _arg1, T2 _arg2 )
 	{
 		std::stringstream ss;
-		ss << cmd << " " << _arg0 << " " << _arg1 << " " << _arg2 << "\r\n";
+		ss << cmd << " " << _arg0 << " " << _arg1 << " " << _arg2 << "\n";
 		return ss.str();
 	}
 
@@ -136,7 +136,7 @@ private:
 	static std::string buildMessage( char cmd, T0 _arg0, T1 _arg1, T2 _arg2, T3 _arg3 )
 	{
 		std::stringstream ss;
-		ss << cmd << " " << _arg0 << " " << _arg1 << " " << _arg2 << " " << _arg3 << "\r\n";
+		ss << cmd << " " << _arg0 << " " << _arg1 << " " << _arg2 << " " << _arg3 << "\n";
 		return ss.str();
 	}
 
@@ -144,7 +144,7 @@ private:
 	static std::string buildMessage( char cmd, T0 _arg0, T1 _arg1, T2 _arg2, T3 _arg3, T4 _arg4 )
 	{
 		std::stringstream ss;
-		ss << cmd << " " << _arg0 << " " << _arg1 << " " << _arg2 << " " << _arg3 << " " << _arg4 << "\r\n";
+		ss << cmd << " " << _arg0 << " " << _arg1 << " " << _arg2 << " " << _arg3 << " " << _arg4 << "\n";
 		return ss.str();
 	}
 
@@ -152,7 +152,7 @@ private:
 	static std::string buildMessage( char cmd, T0 _arg0, T1 _arg1, T2 _arg2, T3 _arg3, T4 _arg4, T5 _arg5 )
 	{
 		std::stringstream ss;
-		ss << cmd << " " << _arg0 << " " << _arg1 << " " << _arg2 << " " << _arg3 << " " << _arg4 << " " << _arg5 << "\r\n";
+		ss << cmd << " " << _arg0 << " " << _arg1 << " " << _arg2 << " " << _arg3 << " " << _arg4 << " " << _arg5 << "\n";
 		return ss.str();
 	}
 

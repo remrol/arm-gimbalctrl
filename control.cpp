@@ -207,7 +207,7 @@ void sendConfig()
 	uart_puts_p( PSTR(","));
 	sprintf_P(g_strbuf, PSTR("%d,%d,"), g_config.yawMaxSpeed, g_config.sensors_update_interval_ms);
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR("%d\r\n"), g_config.crc);
+	sprintf_P(g_strbuf, PSTR("%d\n"), g_config.crc);
 	uart_puts(g_strbuf);
 
 }
@@ -218,7 +218,7 @@ void sendState()
 	uart_puts(g_strbuf);
 	sprintf_P(g_strbuf, PSTR("%d,%d,%d,%d,"), g_state.pulse1Duration, g_state.pulse3Duration, g_state.motorDirection, g_state.motorSpeed );
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_state.yawCtrlSpeed, g_state.ocr0);
+	sprintf_P(g_strbuf, PSTR("%d,%d\n"), g_state.yawCtrlSpeed, g_state.ocr0);
 	uart_puts(g_strbuf);
 }
 
@@ -239,7 +239,7 @@ void sendUptime()
 	uart_puts(g_strbuf);
 	sprintf_P(g_strbuf, PSTR("%d day %d hour %d min"), (uint16_t) days, (uint16_t) hrs, (uint16_t) minutes );
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR(" %d sec %d ms\r\n"), (uint16_t) sec, (uint16_t) ms );
+	sprintf_P(g_strbuf, PSTR(" %d sec %d ms\n"), (uint16_t) sec, (uint16_t) ms );
 	uart_puts(g_strbuf);
 }
 
@@ -249,14 +249,14 @@ void sendInfo()
 	uart_puts_p( PSTR(__DATE__));
 	uart_putc(' ');
 	uart_puts_p( PSTR(__TIME__));
-	uart_puts_p( PSTR("\r\n"));
+	uart_puts_p( PSTR("\n"));
 }
 
 void sendPulseRanges()
 {
 	sprintf_P(g_strbuf, PSTR("%d,%d,"), g_config.pulse_min, g_config.pulse_max);
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_config.pulse_dband_lo, g_config.pulse_dband_hi);
+	sprintf_P(g_strbuf, PSTR("%d,%d\n"), g_config.pulse_dband_lo, g_config.pulse_dband_hi);
 	uart_puts(g_strbuf);
 }
 
@@ -269,7 +269,7 @@ void receivePulseRanges()
 	int16_t min = receiveInt16(timeout);
 	if( min == INT16_MIN || min < 100 || min > 5000 )
 	{
-		sprintf_P(g_strbuf, PSTR("ERR0 %d %d\r\n"), g_lastErr, min);
+		sprintf_P(g_strbuf, PSTR("ERR0 %d %d\n"), g_lastErr, min);
 		uart_puts( g_strbuf );
 		return;
 	}
@@ -277,7 +277,7 @@ void receivePulseRanges()
 	int16_t max = receiveInt16(timeout);
 	if( max == INT16_MIN || max < 100 || max > 5000 || max <= min )
 	{
-		sprintf_P(g_strbuf, PSTR("ERR1 %d %d\r\n"), g_lastErr, max);
+		sprintf_P(g_strbuf, PSTR("ERR1 %d %d\n"), g_lastErr, max);
 		uart_puts( g_strbuf );
 		return;
 	}
@@ -285,7 +285,7 @@ void receivePulseRanges()
 	int16_t clo = receiveInt16(timeout);
 	if( clo == INT16_MIN || clo < 100 || clo > 5000 ||  clo <= min || clo >= max )
 	{
-		sprintf_P(g_strbuf, PSTR("ERR2 %d %d\r\n"), g_lastErr, clo);
+		sprintf_P(g_strbuf, PSTR("ERR2 %d %d\n"), g_lastErr, clo);
 		uart_puts( g_strbuf );
 		return;
 	}
@@ -293,7 +293,7 @@ void receivePulseRanges()
 	int16_t chi = receiveInt16(timeout);
 	if( chi == INT16_MIN || chi < 100 || chi > 5000 ||  chi <= min || chi >= max || chi < clo)
 	{
-		sprintf_P(g_strbuf, PSTR("ERR3 %d %d\r\n"), g_lastErr, chi);
+		sprintf_P(g_strbuf, PSTR("ERR3 %d %d\n"), g_lastErr, chi);
 		uart_puts( g_strbuf );
 		return;
 	}
@@ -311,7 +311,7 @@ void receivePulseRanges()
 
 void sendMotorParams()
 {
-	sprintf_P(g_strbuf, PSTR("%d,%d,%d\r\n"), g_config.power, g_config.pwm_scale_factor, g_config.expo_percent);
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d\n"), g_config.power, g_config.pwm_scale_factor, g_config.expo_percent);
 	uart_puts(g_strbuf);
 }
 
@@ -323,7 +323,7 @@ void receiveMotorParams()
 	int16_t power = receiveInt16(timeout);
 	if( power == INT16_MIN || power < 0 || power > 255 )
 	{
-		sprintf_P( g_strbuf, PSTR("ERR0 %d %d\r\n"), g_lastErr, power);
+		sprintf_P( g_strbuf, PSTR("ERR0 %d %d\n"), g_lastErr, power);
 		uart_puts(g_strbuf);
 		return;
 	}
@@ -331,7 +331,7 @@ void receiveMotorParams()
 	int16_t scf = receiveInt16(timeout);
 	if( scf == INT16_MIN || scf < 0 || scf > 10000 )
 	{
-		sprintf_P( g_strbuf, PSTR("ERR1 %d %d\r\n"), g_lastErr, scf);
+		sprintf_P( g_strbuf, PSTR("ERR1 %d %d\n"), g_lastErr, scf);
 		uart_puts(g_strbuf);
 		return;
 	}
@@ -339,7 +339,7 @@ void receiveMotorParams()
 	int16_t expo = receiveInt16(timeout);
 	if( expo == INT16_MIN || expo < 0 || expo > 100 )
 	{
-		sprintf_P( g_strbuf, PSTR("ERR2 %d %d\r\n"), g_lastErr, expo);
+		sprintf_P( g_strbuf, PSTR("ERR2 %d %d\n"), g_lastErr, expo);
 		uart_puts(g_strbuf);
 		return;
 	}
@@ -353,7 +353,7 @@ void receiveMotorParams()
 
 void sendProcessing()
 {
-	sprintf_P(g_strbuf, PSTR("%d,%d,%d\r\n"), g_config.process_pulse_interval_ms, g_config.process_speedsmooth_interval_ms, g_config.speed_normal_smooth_factor);
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d\n"), g_config.process_pulse_interval_ms, g_config.process_speedsmooth_interval_ms, g_config.speed_normal_smooth_factor);
 	uart_puts(g_strbuf);
 }
 
@@ -366,7 +366,7 @@ void receiveProcessing()
 	int16_t pulseInterval = receiveInt16(timeout);
 	if( pulseInterval == INT16_MIN || pulseInterval < 0 || pulseInterval > 10000 )
 	{
-		sprintf_P(g_strbuf, PSTR("ERR0 %d %d\r\n"), g_lastErr, pulseInterval);
+		sprintf_P(g_strbuf, PSTR("ERR0 %d %d\n"), g_lastErr, pulseInterval);
 		uart_puts( g_strbuf );
 		return;
 	}
@@ -374,7 +374,7 @@ void receiveProcessing()
 	int16_t speedSmoothInterval = receiveInt16(timeout);
 	if( speedSmoothInterval == INT16_MIN || speedSmoothInterval < 0 || speedSmoothInterval > 10000 )
 	{
-		sprintf_P(g_strbuf, PSTR("ERR1 %d\r\n"), g_lastErr, speedSmoothInterval);
+		sprintf_P(g_strbuf, PSTR("ERR1 %d\n"), g_lastErr, speedSmoothInterval);
 		uart_puts( g_strbuf );
 		return;
 	}
@@ -382,7 +382,7 @@ void receiveProcessing()
 	int16_t speedSmoothFactor = receiveInt16(timeout);
 	if( speedSmoothFactor == INT16_MIN || speedSmoothFactor < 0 || speedSmoothFactor > 127 )
 	{
-		sprintf_P(g_strbuf, PSTR("ERR2 %d %d\r\n"), g_lastErr, speedSmoothFactor);
+		sprintf_P(g_strbuf, PSTR("ERR2 %d %d\n"), g_lastErr, speedSmoothFactor);
 		uart_puts( g_strbuf );
 		return;
 	}
@@ -398,7 +398,7 @@ void receiveProcessing()
 
 void sendTimeouts()
 {
-	sprintf_P(g_strbuf, PSTR("%d,%d\r\n"), g_config.mot_stop_nopulse_timeout_ms, g_config.mot_disable_stopped_timeout_ms);
+	sprintf_P(g_strbuf, PSTR("%d,%d\n"), g_config.mot_stop_nopulse_timeout_ms, g_config.mot_disable_stopped_timeout_ms);
 	uart_puts(g_strbuf);
 }
 
@@ -411,7 +411,7 @@ void receiveTimeouts()
 	int16_t mot_stop_nopulse_timeout_ms = receiveInt16(timeout);
 	if( mot_stop_nopulse_timeout_ms == INT16_MIN || mot_stop_nopulse_timeout_ms < 0 || mot_stop_nopulse_timeout_ms > 30000 )
 	{
-		sprintf_P(g_strbuf, PSTR("ERR0 %d %d\r\n"), g_lastErr, mot_stop_nopulse_timeout_ms);
+		sprintf_P(g_strbuf, PSTR("ERR0 %d %d\n"), g_lastErr, mot_stop_nopulse_timeout_ms);
 		uart_puts( g_strbuf );
 		return;
 	}
@@ -419,7 +419,7 @@ void receiveTimeouts()
 	int16_t mot_disable_stopped_timeout_ms = receiveInt16(timeout);
 	if( mot_disable_stopped_timeout_ms == INT16_MIN || mot_disable_stopped_timeout_ms < 0 || mot_disable_stopped_timeout_ms > 30000 )
 	{
-		sprintf_P(g_strbuf, PSTR("ERR1 %d\r\n"), g_lastErr, mot_disable_stopped_timeout_ms);
+		sprintf_P(g_strbuf, PSTR("ERR1 %d\n"), g_lastErr, mot_disable_stopped_timeout_ms);
 		uart_puts( g_strbuf );
 		return;
 	}
@@ -439,7 +439,7 @@ void sendSensors()
 	uart_puts(g_strbuf);
 	sprintf_P(g_strbuf, PSTR("%ld,%d,%d,%d,"), g_state.mpuEventTimeStamp, g_state.mpuAccelX, g_state.mpuAccelY, g_state.mpuAccelZ);
 	uart_puts(g_strbuf);
-	sprintf_P(g_strbuf, PSTR("%d,%d,%d\r\n"), g_state.mpuGyroX, g_state.mpuGyroY, g_state.mpuGyroZ);
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d\n"), g_state.mpuGyroX, g_state.mpuGyroY, g_state.mpuGyroZ);
 	uart_puts(g_strbuf);
 }
 
@@ -450,12 +450,12 @@ void updateStorm32LiveData()
 	
 	if( status != ST32_UPDATE_OK )
 	{
-		sprintf_P(g_strbuf, PSTR("ERR %d\r\n"), (int) status);
+		sprintf_P(g_strbuf, PSTR("ERR %d\n"), (int) status);
 		uart_puts(g_strbuf);
 	}
 	else
 	{
-		sprintf_P(g_strbuf, PSTR("%ld\r\n"), g_storm32LiveDataTimeStamp);
+		sprintf_P(g_strbuf, PSTR("%ld\n"), g_storm32LiveDataTimeStamp);
 		uart_puts(g_strbuf);	
 	}
 }
@@ -470,13 +470,13 @@ void readStorm32LiveData()
 	int16_t dataOffset = receiveInt16(timeout);
 	if( dataOffset == INT16_MIN || dataOffset < 0 || dataOffset > STORM32_FIELDSCOUNT - 2 )
 	{
-		sprintf_P(g_strbuf, PSTR("ERR0 %d %d\r\n"), g_lastErr, dataOffset);
+		sprintf_P(g_strbuf, PSTR("ERR0 %d %d\n"), g_lastErr, dataOffset);
 		uart_puts( g_strbuf );
 		return;
 	}
 	
 	int16_t* data = ( (int16_t*) ( &g_storm32LiveData) ) + dataOffset;
-	sprintf_P(g_strbuf, PSTR("%d,%d,%d\r\n"), data[0], data[1],  data[2] );
+	sprintf_P(g_strbuf, PSTR("%d,%d,%d\n"), data[0], data[1],  data[2] );
 	uart_puts(g_strbuf);	
 }
 
@@ -489,13 +489,13 @@ void sendDebug()
 	int16_t dataOffset = receiveInt16(timeout);
 	if( dataOffset == INT16_MIN || dataOffset < 0 || dataOffset > (int16_t) ( sizeof(g_debug) / 2 ) )
 	{
-		sprintf_P(g_strbuf, PSTR("ERR0 %d %d\r\n"), g_lastErr, dataOffset);
+		sprintf_P(g_strbuf, PSTR("ERR0 %d %d\n"), g_lastErr, dataOffset);
 		uart_puts( g_strbuf );
 		return;
 	}
 
 	int16_t* data = (int16_t*) &g_debug ;
-	sprintf_P(g_strbuf, PSTR("%d\r\n"), data[dataOffset] );
+	sprintf_P(g_strbuf, PSTR("%d\n"), data[dataOffset] );
 	uart_puts(g_strbuf);
 }
 
@@ -506,7 +506,7 @@ void sendYaw()
 	sendFloat(g_config.yawPID_i);
 	uart_puts_p( PSTR(","));
 	sendFloat(g_config.yawPID_d);
-	sprintf_P(g_strbuf, PSTR(",%d,%d,%d\r\n"), (int) g_config.yaw_speed_smooth_factor, (int) g_config.storm32_update_inteval_ms, (int) g_config.yawMaxSpeed );
+	sprintf_P(g_strbuf, PSTR(",%d,%d,%d\n"), (int) g_config.yaw_speed_smooth_factor, (int) g_config.storm32_update_inteval_ms, (int) g_config.yawMaxSpeed );
 	uart_puts(g_strbuf);
 }
 
@@ -518,7 +518,7 @@ void receiveYaw()
 	float p = receiveFloat(timeout);
 	if( isnan(p) || p <= 0)
 	{
-		sprintf_P(g_strbuf, PSTR("P ERR %d\r\n"), g_lastErr);
+		sprintf_P(g_strbuf, PSTR("P ERR %d\n"), g_lastErr);
 		uart_puts( g_strbuf );
 		return;
 	}		
@@ -526,7 +526,7 @@ void receiveYaw()
 	float i = receiveFloat(timeout);
 	if( isnan(i) || i <= 0)
 	{
-		sprintf_P(g_strbuf, PSTR("I ERR %d\r\n"), g_lastErr);
+		sprintf_P(g_strbuf, PSTR("I ERR %d\n"), g_lastErr);
 		uart_puts( g_strbuf );
 		return;
 	}	
@@ -534,7 +534,7 @@ void receiveYaw()
 	float d = receiveFloat(timeout);
 	if( isnan(d) || d <= 0)
 	{
-		sprintf_P(g_strbuf, PSTR("D ERR %d\r\n"), g_lastErr);
+		sprintf_P(g_strbuf, PSTR("D ERR %d\n"), g_lastErr);
 		uart_puts( g_strbuf );
 		return;
 	}
@@ -542,7 +542,7 @@ void receiveYaw()
 	int16_t yaw_speed_smooth_factor = receiveInt16(timeout);
 	if( yaw_speed_smooth_factor == INT16_MIN || yaw_speed_smooth_factor <= 0 || yaw_speed_smooth_factor > 127 )
 	{
-		sprintf_P(g_strbuf, PSTR("ERR2 %d %d\r\n"), g_lastErr, yaw_speed_smooth_factor);
+		sprintf_P(g_strbuf, PSTR("ERR2 %d %d\n"), g_lastErr, yaw_speed_smooth_factor);
 		uart_puts( g_strbuf );
 		return;
 	}	
@@ -550,7 +550,7 @@ void receiveYaw()
 	int16_t storm32_update_inteval_ms = receiveInt16(timeout);
 	if( storm32_update_inteval_ms == INT16_MIN || storm32_update_inteval_ms <= 0 || storm32_update_inteval_ms > 1000 )
 	{
-		sprintf_P(g_strbuf, PSTR("ERR3 %d %d\r\n"), g_lastErr, storm32_update_inteval_ms);
+		sprintf_P(g_strbuf, PSTR("ERR3 %d %d\n"), g_lastErr, storm32_update_inteval_ms);
 		uart_puts( g_strbuf );
 		return;
 	}	
@@ -558,7 +558,7 @@ void receiveYaw()
 	int16_t yawMaxSpeed = receiveInt16(timeout);
 	if( yawMaxSpeed == INT16_MIN || yawMaxSpeed <= 0 || yawMaxSpeed > 1000 )
 	{
-		sprintf_P(g_strbuf, PSTR("ERR4 %d %d\r\n"), g_lastErr, yawMaxSpeed);
+		sprintf_P(g_strbuf, PSTR("ERR4 %d %d\n"), g_lastErr, yawMaxSpeed);
 		uart_puts( g_strbuf );
 		return;
 	}
@@ -604,9 +604,9 @@ void control()
 			sendState(); 	break;
 			
 		case 'W': 
-			configEepromSave(); uart_puts_p( PSTR("1\r\n")); break;
+			configEepromSave(); uart_puts_p( PSTR("1\n")); break;
 		case 'd':
-			configLoadDefaults(); uart_puts_p( PSTR("1\r\n")); break;
+			configLoadDefaults(); uart_puts_p( PSTR("1\n")); break;
 			
 		case 'u':
 			sendUptime(); 	break;
